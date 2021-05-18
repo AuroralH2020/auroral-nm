@@ -19,5 +19,10 @@ export const Config = {
 	CS: {
 		URL: process.env.CS_URL!, 
 		SECRET_KEY: process.env.CS_SECRET_KEY!
+	},
+	MONGO: {
+		URL: process.env.MONGO_URL!, 
+		PORT: process.env.MONGO_PORT!,
+		DB: process.env.MONGO_DB!
 	}
 }

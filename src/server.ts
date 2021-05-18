@@ -3,6 +3,7 @@ import stoppable from 'stoppable'
 import { app } from './app'
 import { Config } from './config'
 import { logger } from './utils/logger'
+import { mongo } from './persistance/mongo'
 
 /**
  * Error Handler. Provides full stack - only in dev
@@ -15,6 +16,7 @@ if (Config.NODE_ENV === 'development') {
 function bootstrap() {
   try {
     // Run other services here
+    mongo.connect() // Mongo connection
     logger.info('All services initialized')
   } catch (err) {
     logger.error(err)
