@@ -1,7 +1,7 @@
 import cors from 'cors'
 import express from 'express'
 import { responseBuilder, HttpStatusCode } from './utils'
-// import { MainRouter } from './api/routes'
+import { UiRouter } from './api/ui-api/routes'
 import { Config } from './config'
 import { logger } from './utils/logger'
 
@@ -28,7 +28,7 @@ app.use((req, res, next) => {
   next()
 })
  
-// app.use('/api/v1/', MainRouter)
+app.use('/ui/v1/', UiRouter)
 
 /**
  * Not Found

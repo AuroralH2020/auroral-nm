@@ -1,10 +1,10 @@
 export enum RolesEnum {
-    ADMIN = 'admin',
-    USER = 'user'
+    ADMIN = 'administrator',
+    USER = 'user',
+    INFRAS_OPERATOR = 'infrastructure operator',
+    SERV_PROVIDER = 'service provider',
+    DEV_OWNER = 'device owner',
+    SYS_INTEGRATOR = 'system integrator',
+    SUPER_USER = 'devOps'
 }
 
-export enum RealmRolesEnum {
-    SUPER = 'super', // All roles + super
-    ADMIN = 'vicinity-admin-user', // Admin + User
-    USER = 'vicinity-basic-user' // User only
-}

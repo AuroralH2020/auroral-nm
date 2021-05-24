@@ -24,5 +24,14 @@ export const Config = {
 		URL: process.env.MONGO_URL!, 
 		PORT: process.env.MONGO_PORT!,
 		DB: process.env.MONGO_DB!
+	},
+	SMTP: {
+		HOST: process.env.SMTP_HOST!,
+		PORT: process.env.SMTP_PORT!,
+		USER: process.env.SMTP_USER!,
+		PASSWORD: process.env.SMTP_PASSWORD!,
+		MAIL_SERVER: process.env.SMTP_MAIL_SERVER!,
+		APPROVER_MAIL: process.env.SMTP_APPROVER_MAIL!,
+		SALES_MAIL: process.env.SMTP_SALES_MAIL!
 	}
 }
