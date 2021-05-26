@@ -47,7 +47,8 @@ export async function createRegistration(
 export async function findDuplicatesUser(
   this: IRegistrationModel, email: string
 ): Promise<boolean> {
-  const record = await this.findOne({ email, status: { $ne: RegistrationStatus.DECLINED } }).exec()
+  // Look in pending and open registrations
+  const record = await this.findOne({ email, status: { $in: [RegistrationStatus.OPEN, RegistrationStatus.PENDING] } }).exec()
   if (record) {
     // Duplicates found
     return true
@@ -60,7 +61,8 @@ export async function findDuplicatesUser(
 export async function findDuplicatesCompany(
   this: IRegistrationModel, companyName: string
 ): Promise<boolean> {
-  const record = await this.findOne({ companyName, status: { $ne: RegistrationStatus.DECLINED } }).exec()
+  // Look in pending and open registrations
+  const record = await this.findOne({ companyName, status: { $in: [RegistrationStatus.OPEN, RegistrationStatus.PENDING] } }).exec()
   if (record) {
     // Duplicates found
     return true

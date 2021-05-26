@@ -16,8 +16,10 @@ type JwtController = Controller<{}, {}, {}, null, ILocals>
 export const jwt = (roles?: RolesEnum[]) => {
     return function(req, res, next) {
         try {
-            const authHeader = req.headers.authorization
-            const token = authHeader && authHeader.split(' ')[1]
+            // const authHeader = req.headers.authorization
+            const authHeader = req.headers['x-access-token']
+            // const token = authHeader && authHeader.split(' ')[1]
+            const token = authHeader as string
             if (!token) {
                 throw new Error('Unauthorized, missing token')
             }
@@ -31,8 +33,9 @@ export const jwt = (roles?: RolesEnum[]) => {
             const userRoles = decoded.roles.split(',')
             .map(e => {
                 switch (e) {
-                    case 'admin': return RolesEnum.ADMIN
-                    case 'devOps': return RolesEnum.SUPER_USER
+                    case 'administrator': return RolesEnum.ADMIN
+                    case 'devOps': return RolesEnum.DEV_OPS
+                    case 'superUser': return RolesEnum.SUPER_USER
                     case 'infrastructure operator': return RolesEnum.INFRAS_OPERATOR
                     case 'service provider': return RolesEnum.SERV_PROVIDER
                     case 'device owner': return RolesEnum.DEV_OWNER

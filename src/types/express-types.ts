@@ -19,5 +19,5 @@ export interface Controller<ReqParams = {}, ReqBody = {}, ReqQuery = {}, Result 
 
 export type ApiResponse<T> = Response<{
     error: string | null
-    data?: T
+    message?: T
 }>

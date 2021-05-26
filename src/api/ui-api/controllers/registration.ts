@@ -11,6 +11,8 @@ import { IRegistration, IRegistrationPre, RegistrationStatus, RegistrationType }
 import { checkTempSecret, hashPassword, signMailToken, verifyToken } from '../../../auth-server/auth-server'
 import { notifyDevOpsOfNewRegistration, verificationMail, rejectRegistration } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
+import { UserModel } from '../../../persistance/user/model'
+import { OrganisationModel } from '../../../persistance/organisation/model'
 import { RolesEnum } from '../../../types/roles' 
 
 // Controllers
@@ -68,7 +70,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
       // Notify devOps by mail
       notifyDevOpsOfNewRegistration(data.name + ' ' + data.surname, data.companyName!)
     } else if (data.status === RegistrationStatus.PENDING) {
-      // Validate if new user that we have CID to assign to
+      // Validate if new user that we have CID to assign to (otherwise it is an invited organisation)
       if (!data.cid && data.type === RegistrationType.USER) {
         throw new Error('New users need a CID to be assigned to')
       }
@@ -88,7 +90,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
         cid
       })
       // Generate account validation token
-      const token = await signMailToken(pendingDoc.registrationId, 'validate')
+      const token = await signMailToken(pendingDoc.email, 'validate', pendingDoc.registrationId)
       // Notify user by mail
       verificationMail(data.email, token, data.type, locals.origin?.realm)
     } else {
@@ -107,6 +109,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
   const { status } = req.body
   const { token } = req.params
   const locals = res.locals
+  console.log(status, token)
 	try {
     if (status === RegistrationStatus.VERIFIED) {
       const decoded = await verifyToken(token)
@@ -115,19 +118,59 @@ export const putRegistration: putRegistrationController = async (req, res) => {
       const registrationObj = await RegistrationModel._getDoc(registrationId)
       // Validate if secret in token has not expired (email === username)
       await checkTempSecret(registrationObj.email, decoded.sub)
+      // Check if registration is already validated
+      if (registrationObj.status === RegistrationStatus.VERIFIED) {
+        throw new Error('Registration was already verified')
+      }
       if (decoded.aud !== 'validate') {
         throw new Error('Invalid token type')
       } else {
+        // Update status to verified
         await registrationObj._updateStatus(status)
         // Create org and user
+        if (registrationObj.type === RegistrationType.COMPANY) {
+          // Organisation and user with role admin
+          OrganisationModel._createOrganisation({
+            cid: registrationObj.cid,
+            name: registrationObj.companyName,
+            businessId: registrationObj.businessId,
+            location: registrationObj.companyLocation
+          })
+          UserModel._createUser({
+            firstName: registrationObj.name,
+            lastName: registrationObj.surname,
+            email: registrationObj.email,
+            occupation: registrationObj.occupation,
+            cid: registrationObj.cid,
+            roles: [RolesEnum.USER, RolesEnum.ADMIN]
+          })
+          // Verify account
+          AccountModel._verifyAccount(registrationObj.email)
+        } else if (registrationObj.type === RegistrationType.USER) {
+          // Only user with role user
+          UserModel._createUser({
+            firstName: registrationObj.name,
+            lastName: registrationObj.surname,
+            email: registrationObj.email,
+            occupation: registrationObj.occupation,
+            cid: registrationObj.cid,
+            roles: [RolesEnum.USER]
+          })
+          // Verify account
+          AccountModel._verifyAccount(registrationObj.email)
+        } else {
+          throw new Error('Wrong registration type')
+        }
       }
     } else if (status === RegistrationStatus.PENDING) {
       // For status pending token === registrationId
       const registrationId = token
       // Retrieve the registration object
       const registrationObj = await RegistrationModel._getDoc(registrationId)
+      // Update status to pending (user approval)
+      await registrationObj._updateStatus(status)
       // Generate account validation token
-      const newToken = await signMailToken(registrationId, 'validate')
+      const newToken = await signMailToken(registrationObj.email, 'validate', registrationId)
       // Notify user by mail
       verificationMail(registrationObj.email, newToken, registrationObj.type, locals.origin?.realm)
     } else if (status === RegistrationStatus.DECLINED) {
@@ -152,7 +195,11 @@ type findDuplicatesUserController = expressTypes.Controller<{}, { email: string 
 export const findDuplicatesUser: findDuplicatesUserController = async (req, res) => {
   const { email } = req.body
 	try {
-    const data = await RegistrationModel._findDuplicatesUser(email)
+    let data = await RegistrationModel._findDuplicatesUser(email)
+    // If not found duplicates try in users model
+    if (!data) {
+      data = await UserModel._findDuplicatesUser(email)
+    }
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
 		logger.error(err.message)
@@ -165,7 +212,11 @@ type findDuplicatesCompanyController = expressTypes.Controller<{}, { companyName
 export const findDuplicatesCompany: findDuplicatesCompanyController = async (req, res) => {
   const { companyName } = req.body
 	try {
-    const data = await RegistrationModel._findDuplicatesCompany(companyName)
+    let data = await RegistrationModel._findDuplicatesCompany(companyName)
+    // If not found duplicates try in organisations model
+    if (!data) {
+      data = await OrganisationModel._findDuplicatesCompany(companyName)
+    }
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
 		logger.error(err.message)

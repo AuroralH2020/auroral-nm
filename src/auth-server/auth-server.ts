@@ -50,7 +50,7 @@ export const comparePassword = async (username: string, password: string): Promi
     return true
 }
 
-export const signMailToken = async (username: string, purpose: string): Promise<string> => {
+export const signMailToken = async (username: string, purpose: string, idInLink?: string): Promise<string> => {
     if (validTokenTypes.lastIndexOf(purpose) === -1) {
         throw new Error('Invalid token type')
     }
@@ -69,7 +69,7 @@ export const signMailToken = async (username: string, purpose: string): Promise<
         jwt.sign(
         {
             exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
-            iss: username,
+            iss: idInLink ? idInLink : username,
             aud: purpose,
             sub: accountSecret
         }, 
