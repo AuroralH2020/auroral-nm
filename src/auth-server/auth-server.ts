@@ -103,6 +103,7 @@ export const signAppToken = async (username: string): Promise<string> => {
             {
                 iss: username,
                 org: user.cid,
+                uid: user.uid,
                 roles: user.roles.toString(),
                 exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
                 // iss: 'vicinityManager',

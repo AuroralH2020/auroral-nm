@@ -6,6 +6,7 @@ import { jwt, addOrigin } from './middlewares/index'
 import * as loginCtrl from './controllers/login'
 import * as registrationCtrl from './controllers/registration'
 import * as invitationCtrl from './controllers/invitation'
+import * as organisationCtrl from './controllers/organisation'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
@@ -32,6 +33,12 @@ UiRouter
 // INVITATIONS
 .get('/invitation/:id', addOrigin(Interfaces.UI), invitationCtrl.getInvitation)
 .post('/invitation', jwt(), addOrigin(Interfaces.UI), invitationCtrl.postInvitation)
+
+// ORGANISATIONS
+.get('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getOne)
+.get('/organisations/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getMany)
+.get('/organisation/:cid/configuration', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getConfiguration)
+.put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.updateOrganisation)
 
 // // auth
 // .post('/auth/get-token', getToken)

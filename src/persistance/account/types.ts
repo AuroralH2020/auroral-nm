@@ -4,7 +4,8 @@ import { RolesEnum } from '../../types/roles'
 export interface IAccount {
     username: string, // = registration email
     passwordHash: string,
-    cid: string, // organisation ID -- CID
+    uid: string, // user ID
+    cid: string, // organisation ID
     contactMail?: string,
     roles: RolesEnum[],
     tempSecret: string,  // Validate if mailTokens are current
@@ -17,7 +18,8 @@ export interface IAccount {
 
 export interface IAccountUI {
     username: string, // = registration email
-    cid: string, // organisation ID -- CID
+    uid: string, // user ID
+    cid: string, // organisation ID
     contactMail?: string,
     roles: RolesEnum[],
     lastLogin?: number,
@@ -28,7 +30,7 @@ export interface IAccountUI {
 export interface IAccountRegistrationPre {
     username: string, // = registration email
     password: string,
-    cid: string, // organisation ID -- CID
+    cid: string, // organisation ID
     contactMail?: string,
     roles: RolesEnum[]
 }
@@ -37,7 +39,7 @@ export interface IAccountRegistrationPre {
 export interface IAccountRegistrationPost {
     username: string, // = registration email
     passwordHash: string,
-    cid: string, // organisation ID -- CID
+    cid: string, // organisation ID
     contactMail?: string,
     roles: RolesEnum[]
 }
@@ -68,7 +70,8 @@ export interface IAccountModel extends Model<IAccountDocument> {
     ) => Promise<IAccountDocument>
     _verifyAccount: (
         this: IAccountModel,
-        username: string
+        username: string,
+        uid: string
     ) => Promise<void>
     _isVerified: (
         this: IAccountModel,

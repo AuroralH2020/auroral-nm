@@ -13,12 +13,13 @@ export enum UserStatus {
 }
 
 export interface IUser {
+    uid: string, // unique user id
     firstName: string,
     lastName: string,
     name: string, // fullName
     email: string, // Username/Unique
     contactMail: string,
-    cid: string,
+    cid: string, // unique organisation id
     occupation: string,
     location: string,
     avatar: string,
@@ -52,6 +53,7 @@ export interface IUserUI {
 
 // Input to create a new User
 export interface IUserCreate {
+    uid: string,
     firstName: string,
     lastName: string,
     email: string, // Username/Unique

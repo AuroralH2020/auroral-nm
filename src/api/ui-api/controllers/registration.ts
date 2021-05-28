@@ -136,7 +136,9 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             businessId: registrationObj.businessId,
             location: registrationObj.companyLocation
           })
+          const uid = uuidv4() // Create unique id
           UserModel._createUser({
+            uid,
             firstName: registrationObj.name,
             lastName: registrationObj.surname,
             email: registrationObj.email,
@@ -145,10 +147,12 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             roles: [RolesEnum.USER, RolesEnum.ADMIN]
           })
           // Verify account
-          AccountModel._verifyAccount(registrationObj.email)
+          AccountModel._verifyAccount(registrationObj.email, uid)
         } else if (registrationObj.type === RegistrationType.USER) {
           // Only user with role user
+          const uid = uuidv4() // Create unique id
           UserModel._createUser({
+            uid,
             firstName: registrationObj.name,
             lastName: registrationObj.surname,
             email: registrationObj.email,
@@ -157,7 +161,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             roles: [RolesEnum.USER]
           })
           // Verify account
-          AccountModel._verifyAccount(registrationObj.email)
+          AccountModel._verifyAccount(registrationObj.email, uid)
         } else {
           throw new Error('Wrong registration type')
         }

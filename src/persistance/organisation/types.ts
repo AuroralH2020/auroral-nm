@@ -76,6 +76,17 @@ export interface IOrganisationUpdate {
     notes?: string
 }
 
+export interface OrgConfiguration {
+    skinColor: UISkins
+}
+
+export interface FriendshipsData {
+    isNeighbour: boolean
+    canSendNeighbourRequest: boolean
+    canCancelNeighbourRequest: boolean
+    canAnswerNeighbourRequest: boolean
+}
+
 export interface IOrganisationDocument extends IOrganisation, Document {
     _updateOrganisation: (this: IOrganisationDocument, data: IOrganisationUpdate) => Promise<void>
     _removeOrganisation: (this: IOrganisationDocument) => Promise<void>
@@ -86,10 +97,20 @@ export interface IOrganisationModel extends Model<IOrganisationDocument> {
         this: IOrganisationModel,
         cid: string
     ) => Promise<IOrganisationUI>
+    _getOrganisations: (
+        this: IOrganisationModel,
+        cid: string,
+        type: number,
+        offset: number
+    ) => Promise<IOrganisationUI[]>
     _getDoc: (
         this: IOrganisationModel,
         cid: string
     ) => Promise<IOrganisationDocument>
+    _getConfiguration: (
+        this: IOrganisationModel,
+        cid: string
+    ) => Promise<OrgConfiguration>
     _createOrganisation: (
         this: IOrganisationModel,
         data: IOrganisationCreate

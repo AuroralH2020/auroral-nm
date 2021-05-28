@@ -31,7 +31,6 @@ export async function createUser(
   ): Promise<IUserDocument> {
     const newUser = {
       ...data,
-      uid: uuidv4(),
       accessLevel: UserVisibility.PRIVATE,
       name: data.firstName + ' ' + data.lastName
     }

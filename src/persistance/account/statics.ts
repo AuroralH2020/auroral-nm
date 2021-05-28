@@ -41,9 +41,9 @@ export async function createAccount(
   }
 
 export async function verifyAccount(
-  this: IAccountModel, username: string
+  this: IAccountModel, username: string, uid: string
 ): Promise<void> {
-  await this.updateOne({ username }, { $set: { verified: true } }).lean().exec()
+  await this.updateOne({ username }, { $set: { verified: true, uid } }).lean().exec()
 }
 
 export async function isVerified(

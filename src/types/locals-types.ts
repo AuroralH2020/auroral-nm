@@ -17,7 +17,7 @@ export type IOriginLocals = {
 
 export type ILocals = {
     origin: IOriginLocals | null
-    decoded: JWTDecodedToken | null
-    token: string | null
+    decoded: JWTDecodedToken
+    token: string
     roles: RolesEnum[]
 }

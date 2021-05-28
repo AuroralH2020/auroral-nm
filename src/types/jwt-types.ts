@@ -1,5 +1,6 @@
 export type JWTPayload = {
     org: string // organisation id
+    uid: string // user id
     roles: string // roles in string with commas
 }
 

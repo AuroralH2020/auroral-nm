@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getOrganisation, getDoc, createOrganisation, findDuplicatesCompany } from './statics'
+import { getOrganisation, getOrganisations, getDoc, createOrganisation, findDuplicatesCompany, getConfiguration } from './statics'
 import { updateOrganisation, removeOrganisation } from './methods'
 import { IOrganisationDocument, IOrganisationModel, OrganisationStatus, UISkins } from './types'
 
@@ -32,9 +32,11 @@ const OrganisationSchema = new Schema<IOrganisationDocument, IOrganisationModel>
 // Statics
 
 OrganisationSchema.statics._getOrganisation = getOrganisation
+OrganisationSchema.statics._getOrganisations = getOrganisations
 OrganisationSchema.statics._getDoc = getDoc
 OrganisationSchema.statics._createOrganisation = createOrganisation
 OrganisationSchema.statics._findDuplicatesCompany = findDuplicatesCompany
+OrganisationSchema.statics._getConfiguration = getConfiguration
 
 // Methods
 
