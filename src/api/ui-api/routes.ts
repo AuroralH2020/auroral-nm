@@ -7,6 +7,7 @@ import * as loginCtrl from './controllers/login'
 import * as registrationCtrl from './controllers/registration'
 import * as invitationCtrl from './controllers/invitation'
 import * as organisationCtrl from './controllers/organisation'
+import * as userCtrl from './controllers/user'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
@@ -39,6 +40,14 @@ UiRouter
 .get('/organisations/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getMany)
 .get('/organisation/:cid/configuration', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getConfiguration)
 .put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.updateOrganisation)
+// .delete
+
+// USERS
+.get('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.getOne)
+.get('/users/:cid', jwt(), addOrigin(Interfaces.UI), userCtrl.getMany)
+.put('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.updateUser)
+.put('/user/password/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.updateUserPassword)
+// .delete
 
 // // auth
 // .post('/auth/get-token', getToken)

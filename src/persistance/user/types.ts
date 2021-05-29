@@ -35,20 +35,24 @@ export interface IUser {
 }
 
 export interface IUserUI {
-    firstName: string,
-    lastName: string,
     name: string, // fullName
     email: string, // Username/Unique
     contactMail: string,
+    uid: string,
     cid: string,
     occupation: string,
     location: string,
     avatar: string,
-    status: UserStatus,
-    accessLevel: UserVisibility,
-    roles: RolesEnum[],
     lastUpdated: number,
     created: number
+}
+
+export interface IUserUIProfile extends IUserUI {
+    firstName: string,
+    lastName: string,
+    status: UserStatus,
+    accessLevel: UserVisibility,
+    roles: RolesEnum[]
 }
 
 // Input to create a new User
@@ -74,6 +78,7 @@ export interface IUserUpdate {
     location?: string,
     avatar?: string,
     accessLevel?: UserVisibility,
+    roles?: RolesEnum[]
 }
 
 export interface IUserDocument extends IUser, Document {
@@ -86,7 +91,7 @@ export interface IUserModel extends Model<IUserDocument> {
     _getUser: (
         this: IUserModel,
         uid: string
-    ) => Promise<IUserUI>
+    ) => Promise<IUserUIProfile>
     _getDoc: (
         this: IUserModel,
         uid: string
@@ -99,4 +104,10 @@ export interface IUserModel extends Model<IUserDocument> {
         this: IUserModel,
         email: string
     ) => Promise<boolean>
+    _getAllUsers: (
+        this: IUserModel,
+        uid: string,
+        accessLevel: UserVisibility[],
+        users: string[]
+    ) => Promise<IUserUI[]>
 }

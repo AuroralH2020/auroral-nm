@@ -91,3 +91,13 @@ export async function getConfiguration(
       throw new Error('Organisation not found')
     }
   }
+
+  export async function addUserToCompany  (
+    this: IOrganisationModel, cid: string, uid: string
+    ): Promise<void> {
+      const record = await this.updateOne({ cid }, { $push: { hasUsers: uid } }).exec()
+      if (!record.ok) {
+        throw new Error('Error adding user to organisation')
+      }
+    }
+  

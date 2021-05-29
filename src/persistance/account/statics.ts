@@ -34,6 +34,17 @@ export async function getDoc(
   }
 }
 
+export async function getDocByUid(
+  this: IAccountModel, uid: string
+): Promise<IAccountDocument> {
+  const record = await this.findOne({ uid }).exec()
+  if (record) {
+    return record
+  } else {
+    throw new Error('User not found')
+  }
+}
+
 export async function createAccount(
     this: IAccountModel, data: IAccountRegistrationPost
   ): Promise<IAccountDocument> {

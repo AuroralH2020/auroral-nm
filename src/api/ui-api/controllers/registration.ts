@@ -146,6 +146,8 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             cid: registrationObj.cid,
             roles: [RolesEnum.USER, RolesEnum.ADMIN]
           })
+          // Add user to organisation
+          OrganisationModel._addUserToCompany(registrationObj.cid, uid)
           // Verify account
           AccountModel._verifyAccount(registrationObj.email, uid)
         } else if (registrationObj.type === RegistrationType.USER) {
@@ -160,6 +162,8 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             cid: registrationObj.cid,
             roles: [RolesEnum.USER]
           })
+          // Add user to organisation
+          OrganisationModel._addUserToCompany(registrationObj.cid, uid)
           // Verify account
           AccountModel._verifyAccount(registrationObj.email, uid)
         } else {

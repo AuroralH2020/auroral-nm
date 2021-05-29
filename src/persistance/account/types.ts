@@ -12,7 +12,8 @@ export interface IAccount {
     lastLogin?: number,
     // originIp: string[], // IPs originating request for the user
     // realm: string[], // Realms where authentication was initiated (App originating)
-    created: number
+    lastUpdated: number,
+    created: number,
     verified: boolean
 }
 
@@ -23,6 +24,7 @@ export interface IAccountUI {
     contactMail?: string,
     roles: RolesEnum[],
     lastLogin?: number,
+    lastUpdated: number,
     created: number
 }
 
@@ -63,6 +65,10 @@ export interface IAccountModel extends Model<IAccountDocument> {
     _getDoc: (
         this: IAccountModel,
         username: string
+    ) => Promise<IAccountDocument>
+    _getDocByUid: (
+        this: IAccountModel,
+        uid: string
     ) => Promise<IAccountDocument>
     _createAccount: (
         this: IAccountModel,

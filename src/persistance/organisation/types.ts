@@ -119,4 +119,9 @@ export interface IOrganisationModel extends Model<IOrganisationDocument> {
         this: IOrganisationModel,
         name: string
     ) => Promise<boolean>
+    _addUserToCompany: (
+        this: IOrganisationModel,
+        cid: string,
+        uid: string
+    ) => Promise<void>
 }

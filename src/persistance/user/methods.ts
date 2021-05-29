@@ -5,13 +5,14 @@ import { IUserDocument, IUserUpdate, UserStatus, UserVisibility } from './types'
 export async function updateUser(this: IUserDocument, data: IUserUpdate): Promise<void> {
     this.firstName = data.firstName ? data.firstName : this.firstName
     this.lastName = data.lastName ? data.lastName : this.lastName
-    this.name = this.firstName + this.lastName
+    this.name = this.firstName + ' ' + this.lastName
     this.contactMail = data.contactMail ? data.contactMail : this.contactMail
     this.occupation = data.occupation ? data.occupation : this.occupation
     this.location = data.location ? data.location : this.location
     this.avatar = data.avatar ? data.avatar : this.avatar
-    this.accessLevel = data.accessLevel ? data.accessLevel : this.accessLevel
+    this.accessLevel = data.accessLevel ? Number(data.accessLevel) - 1 : this.accessLevel // AccessLevel from UI is 1 - 3, need to substract 1
     this.lastUpdated = new Date().getTime()
+    this.roles = data.roles ? data.roles : this.roles
     await this.save()
 }
 

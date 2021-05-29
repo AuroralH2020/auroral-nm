@@ -1,9 +1,8 @@
-import { v4 as uuidv4 } from 'uuid'
-import { IUserDocument, IUserModel, IUserCreate, IUserUI, UserVisibility, UserStatus } from './types'
+import { IUserDocument, IUserModel, IUserCreate, IUserUI, UserVisibility, UserStatus, IUserUIProfile } from './types'
 
 export async function getUser(
   this: IUserModel, uid: string
-): Promise<IUserUI> {
+): Promise<IUserUIProfile> {
   const record = await this.findOne(
     { uid }, 
     { hasNotifications: 0, hasAudits: 0, hasItems: 0, hasContracts: 0 }
@@ -19,6 +18,29 @@ export async function getDoc(
   this: IUserModel, uid: string
 ): Promise<IUserDocument> {
   const record = await this.findOne({ uid }).exec()
+  if (record) {
+    return record
+  } else {
+    throw new Error('User not found')
+  }
+}
+
+export async function getAllUsers(
+  this: IUserModel, cid: string, accessLevel: UserVisibility[], users: string[]
+): Promise<IUserUI[]> {
+  const record = await this.find(
+    { uid: { $in: users }, accessLevel: { $in: accessLevel } },
+    { name: 1,
+      email: 1,
+      contactMail: 1,
+      uid: 1,
+      cid: 1,
+      occupation: 1,
+      location: 1,
+      avatar: 1,
+      lastUpdated: 1,
+      created: 1 }
+    ).exec()
   if (record) {
     return record
   } else {
