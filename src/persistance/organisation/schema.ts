@@ -1,5 +1,16 @@
 import mongoose from 'mongoose'
-import { getOrganisation, getOrganisations, getDoc, createOrganisation, findDuplicatesCompany, getConfiguration, addUserToCompany } from './statics'
+import { 
+    getOrganisation, 
+    getOrganisations, 
+    getDoc, 
+    createOrganisation, 
+    findDuplicatesCompany, 
+    getConfiguration, 
+    addUserToCompany,
+    removeUserFromCompany,
+    addNodeToCompany,
+    removeNodeFromCompany
+} from './statics'
 import { updateOrganisation, removeOrganisation } from './methods'
 import { IOrganisationDocument, IOrganisationModel, OrganisationStatus, UISkins } from './types'
 
@@ -38,6 +49,9 @@ OrganisationSchema.statics._createOrganisation = createOrganisation
 OrganisationSchema.statics._findDuplicatesCompany = findDuplicatesCompany
 OrganisationSchema.statics._getConfiguration = getConfiguration
 OrganisationSchema.statics._addUserToCompany = addUserToCompany
+OrganisationSchema.statics._removeUserFromCompany = removeUserFromCompany
+OrganisationSchema.statics._addNodeToCompany = addNodeToCompany
+OrganisationSchema.statics._removeNodeFromCompany = removeNodeFromCompany
 
 // Methods
 

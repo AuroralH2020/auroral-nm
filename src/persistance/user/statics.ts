@@ -26,7 +26,7 @@ export async function getDoc(
 }
 
 export async function getAllUsers(
-  this: IUserModel, cid: string, accessLevel: UserVisibility[], users: string[]
+  this: IUserModel, accessLevel: UserVisibility[], users: string[]
 ): Promise<IUserUI[]> {
   const record = await this.find(
     { uid: { $in: users }, accessLevel: { $in: accessLevel } },

@@ -106,7 +106,6 @@ export interface IUserModel extends Model<IUserDocument> {
     ) => Promise<boolean>
     _getAllUsers: (
         this: IUserModel,
-        uid: string,
         accessLevel: UserVisibility[],
         users: string[]
     ) => Promise<IUserUI[]>

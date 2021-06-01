@@ -146,6 +146,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             cid: registrationObj.cid,
             roles: [RolesEnum.USER, RolesEnum.ADMIN]
           })
+          // TBD: Add organisation group to commServer
           // Add user to organisation
           OrganisationModel._addUserToCompany(registrationObj.cid, uid)
           // Verify account

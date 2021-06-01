@@ -5,7 +5,7 @@ export async function getOrganisation(
 ): Promise<IOrganisationUI> {
   const record = await this.findOne(
     { cid }, 
-    { hasNotifications: 0, hasAudits: 0, hasNodes: 0 }
+    { hasNotifications: 0, hasAudits: 0 }
     ).lean().exec()
   if (record) {
     return record
@@ -101,3 +101,29 @@ export async function getConfiguration(
       }
     }
   
+    export async function removeUserFromCompany  (
+      this: IOrganisationModel, cid: string, uid: string
+      ): Promise<void> {
+        const record = await this.updateOne({ cid }, { $pull: { hasUsers: uid } }).exec()
+        if (!record.ok) {
+          throw new Error('Error removing user from organisation')
+        }
+      }
+  
+    export async function addNodeToCompany  (
+      this: IOrganisationModel, cid: string, agid: string
+      ): Promise<void> {
+        const record = await this.updateOne({ cid }, { $push: { hasNodes: agid } }).exec()
+        if (!record.ok) {
+          throw new Error('Error adding node to organisation')
+        }
+      }
+
+    export async function removeNodeFromCompany  (
+      this: IOrganisationModel, cid: string, agid: string
+      ): Promise<void> {
+        const record = await this.updateOne({ cid }, { $pull: { hasNodes: agid } }).exec()
+        if (!record.ok) {
+          throw new Error('Error removing node from organisation')
+        }
+      }

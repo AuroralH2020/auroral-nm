@@ -45,7 +45,7 @@ export const getMany: getManyController = async (req, res) => {
                                       [UserVisibility.FRIENDS_ONLY, UserVisibility.PUBLIC] :
                                       [UserVisibility.PUBLIC]  
                 }
-                const data = await UserModel._getAllUsers(cid, accessLevel, users)
+                const data = await UserModel._getAllUsers(accessLevel, users)
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
                 logger.error(err.message)

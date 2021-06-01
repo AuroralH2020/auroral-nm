@@ -124,4 +124,19 @@ export interface IOrganisationModel extends Model<IOrganisationDocument> {
         cid: string,
         uid: string
     ) => Promise<void>
+    _removeUserFromCompany: (
+        this: IOrganisationModel,
+        cid: string,
+        uid: string
+    ) => Promise<void>
+    _addNodeToCompany: (
+        this: IOrganisationModel,
+        cid: string,
+        agid: string
+    ) => Promise<void>
+    _removeNodeFromCompany: (
+        this: IOrganisationModel,
+        cid: string,
+        agid: string
+    ) => Promise<void>
 }

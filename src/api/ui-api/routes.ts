@@ -8,6 +8,7 @@ import * as registrationCtrl from './controllers/registration'
 import * as invitationCtrl from './controllers/invitation'
 import * as organisationCtrl from './controllers/organisation'
 import * as userCtrl from './controllers/user'
+import * as nodeCtrl from './controllers/node'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
@@ -48,6 +49,15 @@ UiRouter
 .put('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.updateUser)
 .put('/user/password/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.updateUserPassword)
 // .delete
+
+// NODES
+.get('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getNode)
+.get('/nodes', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getNodes)
+.post('/node', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.createNode)
+.put('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.updateNode)
+.get('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getKey)
+.delete('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeKey)
+.delete('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeNode)
 
 // // auth
 // .post('/auth/get-token', getToken)
