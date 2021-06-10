@@ -2,6 +2,7 @@ import cors from 'cors'
 import express from 'express'
 import { responseBuilder, HttpStatusCode } from './utils'
 import { UiRouter } from './api/ui-api/routes'
+import { GtwRouter } from './api/gtw-api/routes'
 import { Config } from './config'
 import { logger } from './utils/logger'
 
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 })
  
 app.use('/ui/v1/', UiRouter)
+app.use('/gtw/v1/', GtwRouter)
 
 /**
  * Not Found

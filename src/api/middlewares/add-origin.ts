@@ -1,7 +1,7 @@
-import { logger } from '../../../utils/logger'
-import { Controller } from '../../../types/express-types'
-import { responseBuilder, HttpStatusCode } from '../../../utils'
-import { ILocals, Interfaces } from '../../../types/locals-types'
+import { logger } from '../../utils/logger'
+import { Controller } from '../../types/express-types'
+import { responseBuilder, HttpStatusCode } from '../../utils'
+import { ILocals, Interfaces } from '../../types/locals-types'
 
 type originController = Controller<{}, {}, {}, null, ILocals>
 

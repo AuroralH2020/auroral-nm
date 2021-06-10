@@ -73,7 +73,7 @@ export interface INodeModel extends Model<INodeDocument> {
     _getNode: (
         this: INodeModel,
         agid: string,
-        cid: string
+        cid?: string
     ) => Promise<INodeUI>
     _getDoc: (
         this: INodeModel,
@@ -100,12 +100,10 @@ export interface INodeModel extends Model<INodeDocument> {
     ) => Promise<void>
     _getKey: (
         this: INodeModel,
-        agid: string,
-        cid: string
+        agid: string
     ) => Promise<string | null>
     _removeKey: (
         this: INodeModel,
-        agid: string,
-        cid: string
+        agid: string
     ) => Promise<void>
 }

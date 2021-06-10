@@ -1,9 +1,9 @@
-import { Auth } from '../../../utils/jwt'
-import { Controller } from '../../../types/express-types'
-import { responseBuilder } from '../../../utils/response-builder'
-import { HttpStatusCode } from '../../../utils/http-status-codes'
-import { ILocals } from '../../../types/locals-types'
-import { RolesEnum } from '../../../types/roles'
+import { Auth } from '../../utils/jwt'
+import { Controller } from '../../types/express-types'
+import { responseBuilder } from '../../utils/response-builder'
+import { HttpStatusCode } from '../../utils/http-status-codes'
+import { ILocals } from '../../types/locals-types'
+import { RolesEnum } from '../../types/roles'
 
 type JwtController = Controller<{}, {}, {}, null, ILocals>
 

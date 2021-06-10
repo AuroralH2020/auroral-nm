@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { INodeDocument, INodeModel, INodeCreatePost, INodeUI, NodeStatus } from './types'
 
 export async function getNode(
-  this: INodeModel, agid: string, cid: string
+  this: INodeModel, agid: string, cid?: string
 ): Promise<INodeUI> {
   const record = await this.findOne(
     { agid, cid }, 
@@ -69,20 +69,20 @@ export async function removeItemFromNode(
   }
 
 export async function getKey(
-  this: INodeModel, agid: string, cid: string
+  this: INodeModel, agid: string
 ): Promise<string | null> {
-  const record = await this.findOne({ agid, cid }, { key: 1 }).exec()
+  const record = await this.findOne({ agid }, { key: 1 }).exec()
   if (record) {
     return record.key
   } else {
-    throw new Error('Node not found in organisation: ' + cid)
+    throw new Error('Node not found')
   }
 }
 
 export async function removeKey(
-  this: INodeModel, agid: string, cid: string
+  this: INodeModel, agid: string
 ): Promise<void> {
-  const record = await this.updateOne({ agid, cid }, { $set: { hasKey: false, key: null } }).exec()
+  const record = await this.updateOne({ agid }, { $set: { hasKey: false, key: null } }).exec()
   if (!record.ok) {
     throw new Error('Error removing key from node')
   }

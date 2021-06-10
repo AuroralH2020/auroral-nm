@@ -21,3 +21,12 @@ export type ILocals = {
     token: string
     roles: RolesEnum[]
 }
+
+export type ILocalsGtw = {
+    origin: IOriginLocals | null
+    decoded: {
+        iss: string,
+        aud: string
+    } | null
+    token: string | null
+}

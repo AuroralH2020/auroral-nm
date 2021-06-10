@@ -89,9 +89,8 @@ type getKeyController = expressTypes.Controller<{ agid: string }, {}, {}, string
  
 export const getKey: getKeyController = async (req, res) => {
   const { agid } = req.params
-  const { decoded } = res.locals
 	try {
-    const key = await NodeModel._getKey(agid, decoded.org)
+    const key = await NodeModel._getKey(agid)
     return responseBuilder(HttpStatusCode.OK, res, null, key)
 	} catch (err) {
 		logger.error(err.message)
@@ -105,7 +104,7 @@ export const removeKey: removeKeyController = async (req, res) => {
   const { agid } = req.params
   const { decoded } = res.locals
 	try {
-    await NodeModel._removeKey(agid, decoded.org)
+    await NodeModel._removeKey(agid)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		logger.error(err.message)

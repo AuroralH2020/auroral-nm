@@ -1,7 +1,7 @@
 // Express router
 import { Router } from 'express'
 // Middlewares
-import { jwt, addOrigin } from './middlewares/index'
+import { jwt, addOrigin } from '../middlewares/index'
 // Controllers
 import * as loginCtrl from './controllers/login'
 import * as registrationCtrl from './controllers/registration'
