@@ -139,4 +139,34 @@ export interface IOrganisationModel extends Model<IOrganisationDocument> {
         cid: string,
         agid: string
     ) => Promise<void>
+    _addIncomingFriendReq: (
+        this: IOrganisationModel,
+        cid: string,
+        friendCid: string
+    ) => Promise<void>
+    _delIncomingFriendReq: (
+        this: IOrganisationModel,
+        cid: string,
+        friendCid: string
+    ) => Promise<void>
+    _addOutgoingFriendReq: (
+        this: IOrganisationModel,
+        cid: string,
+        friendCid: string
+    ) => Promise<void>
+    _delOutgoingFriendReq: (
+        this: IOrganisationModel,
+        cid: string,
+        friendCid: string
+    ) => Promise<void>
+    _addFriendship: (
+        this: IOrganisationModel,
+        cid: string,
+        friendCid: string
+    ) => Promise<void>
+    _delFriendship: (
+        this: IOrganisationModel,
+        cid: string,
+        friendCid: string
+    ) => Promise<void>
 }

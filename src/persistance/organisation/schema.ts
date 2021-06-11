@@ -9,7 +9,13 @@ import {
     addUserToCompany,
     removeUserFromCompany,
     addNodeToCompany,
-    removeNodeFromCompany
+    removeNodeFromCompany,
+    addIncomingFriendReq,
+    delIncomingFriendReq,
+    addOutgoingFriendReq,
+    delOutgoingFriendReq,
+    addFriendship,
+    delFriendship
 } from './statics'
 import { updateOrganisation, removeOrganisation } from './methods'
 import { IOrganisationDocument, IOrganisationModel, OrganisationStatus, UISkins } from './types'
@@ -52,6 +58,12 @@ OrganisationSchema.statics._addUserToCompany = addUserToCompany
 OrganisationSchema.statics._removeUserFromCompany = removeUserFromCompany
 OrganisationSchema.statics._addNodeToCompany = addNodeToCompany
 OrganisationSchema.statics._removeNodeFromCompany = removeNodeFromCompany
+OrganisationSchema.statics._addIncomingFriendReq = addIncomingFriendReq
+OrganisationSchema.statics._delIncomingFriendReq = delIncomingFriendReq
+OrganisationSchema.statics._addOutgoingFriendReq = addOutgoingFriendReq
+OrganisationSchema.statics._delOutgoingFriendReq = delOutgoingFriendReq
+OrganisationSchema.statics._addFriendship = addFriendship
+OrganisationSchema.statics._delFriendship = delFriendship
 
 // Methods
 

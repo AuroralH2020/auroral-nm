@@ -16,7 +16,7 @@ export const getOne: getOneController = async (req, res) => {
         const { decoded } = res.locals // Requester organisation ID
         const { cid } = req.params // Requested organisation info
         try {
-                const data = await OrganisationModel._getOrganisation(decoded.org)
+                const data = await OrganisationModel._getOrganisation(cid)
                 // Complete organisation data with friendships
                 let isNeighbour = false
                 let canSendNeighbourRequest = true
@@ -25,20 +25,20 @@ export const getOne: getOneController = async (req, res) => {
                 // Use friendship arrays
                 const myNeighbours = data.knows
                 const requestsFrom = data.knowsRequestsFrom
-                const requestTo = data.knowsRequestsTo
+                const requestsTo = data.knowsRequestsTo
                 // Case I am same org that I am requesting
-                if (cid === decoded?.org) {
+                if (cid === decoded.org) {
                         canSendNeighbourRequest = false
                 } else {
                         // Check whether we are neighbors
-                        isNeighbour = myNeighbours.indexOf(cid) !== -1
+                        isNeighbour = myNeighbours.indexOf(decoded.org) !== -1
 
                         // Check whether authenticated user received or sent neighbour request to requested profile
                         // Check whether authenticated user can be cancelled sent neighbour request to requested profile
-                        canCancelNeighbourRequest = requestsFrom.indexOf(cid) !== -1
+                        canCancelNeighbourRequest = requestsFrom.indexOf(decoded.org) !== -1
 
                         // Check whether authenticated user can cancel sent request
-                        canAnswerNeighbourRequest = requestTo.indexOf(cid) !== -1
+                        canAnswerNeighbourRequest = requestsTo.indexOf(decoded.org) !== -1
                         
                         // If any of the previous is true we cannot send friendship requests
                         canSendNeighbourRequest = !canAnswerNeighbourRequest && !canCancelNeighbourRequest && !isNeighbour

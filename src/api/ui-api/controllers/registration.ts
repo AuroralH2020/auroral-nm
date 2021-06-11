@@ -109,7 +109,6 @@ export const putRegistration: putRegistrationController = async (req, res) => {
   const { status } = req.body
   const { token } = req.params
   const locals = res.locals
-  console.log(status, token)
 	try {
     if (status === RegistrationStatus.VERIFIED) {
       const decoded = await verifyToken(token)
@@ -180,6 +179,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
       await registrationObj._updateStatus(status)
       // Generate account validation token
       const newToken = await signMailToken(registrationObj.email, 'validate', registrationId)
+      logger.info('Registration pending to ' + token)
       // Notify user by mail
       verificationMail(registrationObj.email, newToken, registrationObj.type, locals.origin?.realm)
     } else if (status === RegistrationStatus.DECLINED) {
@@ -187,6 +187,11 @@ export const putRegistration: putRegistrationController = async (req, res) => {
       const registrationId = token
       // Retrieve the registration object
       const registrationObj = await RegistrationModel._getDoc(registrationId)
+      // Update status to declined (user approval)
+      await registrationObj._updateStatus(status)
+      // Remove unverified account
+      await AccountModel._deleteAccount(registrationObj.email)
+      logger.warn('Registration declined to ' + token)
       // Notify user by mail
       rejectRegistration(registrationObj.email, registrationObj.companyName)
     } else {

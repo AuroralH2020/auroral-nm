@@ -7,6 +7,7 @@ import * as loginCtrl from './controllers/login'
 import * as registrationCtrl from './controllers/registration'
 import * as invitationCtrl from './controllers/invitation'
 import * as organisationCtrl from './controllers/organisation'
+import * as friendingCtrl from './controllers/friending'
 import * as userCtrl from './controllers/user'
 import * as nodeCtrl from './controllers/node'
 // Types
@@ -42,6 +43,16 @@ UiRouter
 .get('/organisation/:cid/configuration', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getConfiguration)
 .put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.updateOrganisation)
 // .delete
+// Send friendship request to cid by autenticated user
+.post('/organisation/:cid/friendship/request', jwt(), addOrigin(Interfaces.UI), friendingCtrl.processFriendRequest)
+// Send friendship request approval to cid from authenticated user
+.post('/organisation/:cid/friendship/accept', jwt(), addOrigin(Interfaces.UI), friendingCtrl.acceptFriendRequest)
+// Send friendship request rejection to cid from authenticated user
+.post('/organisation/:cid/friendship/reject', jwt(), addOrigin(Interfaces.UI), friendingCtrl.rejectFriendRequest)
+// Send friendship request cancelation to cid from authenticated user
+.post('/organisation/:cid/friendship/cancelRequest', jwt(), addOrigin(Interfaces.UI), friendingCtrl.cancelFriendRequest)
+// Send friendship cancelation to cid from authenticated user
+.post('/organisation/cid/friendship/cancel', jwt(), addOrigin(Interfaces.UI), friendingCtrl.cancelFriendship)
 
 // USERS
 .get('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.getOne)
@@ -58,23 +69,5 @@ UiRouter
 .get('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getKey)
 .delete('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeKey)
 .delete('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeNode)
-
-// // auth
-// .post('/auth/get-token', getToken)
-// .post('/auth/refresh-token', refreshToken)
-// .post('/auth/reset-password', resetPwd)
-
-// // cs
-// .get('/cs/user/lock/:username', lockUser)
-// .get('/cs/users/:username', getUsers)
-// .get('/cs/users/:username/groups', getUserGroups)
-// .get('/cs/sessions/:username', getSessions)
-// .delete('/cs/sessions/:username', closeSession)
-// .get('/cs/group/:name', getGroup)
-// .post('/cs/user', postUser)
-// .post('/cs/add-user-to-group', addUserToGroup)
-// .post('/cs/group', postGroup)
-// .get('/cs/session-count', sessionCount)
-// .get('/cs/users/:username/roster', getUserRoster)
 
 export { UiRouter }
