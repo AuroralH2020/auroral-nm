@@ -10,6 +10,7 @@ import * as organisationCtrl from './controllers/organisation'
 import * as friendingCtrl from './controllers/friending'
 import * as userCtrl from './controllers/user'
 import * as nodeCtrl from './controllers/node'
+import * as notificationCtrl from './controllers/notification'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
@@ -52,7 +53,7 @@ UiRouter
 // Send friendship request cancelation to cid from authenticated user
 .post('/organisation/:cid/friendship/cancelRequest', jwt(), addOrigin(Interfaces.UI), friendingCtrl.cancelFriendRequest)
 // Send friendship cancelation to cid from authenticated user
-.post('/organisation/cid/friendship/cancel', jwt(), addOrigin(Interfaces.UI), friendingCtrl.cancelFriendship)
+.post('/organisation/:cid/friendship/cancel', jwt(), addOrigin(Interfaces.UI), friendingCtrl.cancelFriendship)
 
 // USERS
 .get('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.getOne)
@@ -69,5 +70,10 @@ UiRouter
 .get('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getKey)
 .delete('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeKey)
 .delete('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeNode)
+
+// NOTIFICATIONS
+.get('/notifications/', jwt(), addOrigin(Interfaces.UI), notificationCtrl.getNotifications)
+.get('/notifications/refresh', jwt(), addOrigin(Interfaces.UI), notificationCtrl.refreshNotifications)
+.put('/notifications/read/:notificationId', jwt(), addOrigin(Interfaces.UI), notificationCtrl.setRead)
 
 export { UiRouter }

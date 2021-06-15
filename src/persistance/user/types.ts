@@ -92,6 +92,10 @@ export interface IUserModel extends Model<IUserDocument> {
         this: IUserModel,
         uid: string
     ) => Promise<IUserUIProfile>
+    _getUserByRole: (
+        this: IUserModel,
+        role: RolesEnum
+    ) => Promise<IUserUI[]>
     _getDoc: (
         this: IUserModel,
         uid: string

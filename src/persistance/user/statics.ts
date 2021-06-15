@@ -1,3 +1,4 @@
+import { RolesEnum } from '../../types/roles'
 import { IUserDocument, IUserModel, IUserCreate, IUserUI, UserVisibility, UserStatus, IUserUIProfile } from './types'
 
 export async function getUser(
@@ -13,6 +14,17 @@ export async function getUser(
     throw new Error('User not found')
   }
 }
+
+export async function getUsersByRole(
+  this: IUserModel, role: RolesEnum
+  ): Promise<IUserUI[]> {
+    const record = await this.find({ roles: role }).lean().exec()
+    if (record) {
+      return record
+    } else {
+      throw new Error('User not found')
+    }
+  }
 
 export async function getDoc(
   this: IUserModel, uid: string

@@ -14,6 +14,8 @@ import { AccountModel } from '../../../persistance/account/model'
 import { UserModel } from '../../../persistance/user/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { RolesEnum } from '../../../types/roles' 
+import { NotificationModel } from '../../../persistance/notification/model'
+import { NotificationType, NotificationStatus } from '../../../persistance/notification/types'
 
 // Controllers
 
@@ -62,13 +64,24 @@ export const postRegistration: postRegistrationController = async (req, res) => 
         roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN] : [RolesEnum.USER]
       })
       // Create registration obj
-      await RegistrationModel._createRegistration({
+      const registration = await RegistrationModel._createRegistration({
         ...data,
         registrationId: uuidv4(),
         cid
       })
-      // Notify devOps by mail
+      // Notify devOps by mail and UI
       notifyDevOpsOfNewRegistration(data.name + ' ' + data.surname, data.companyName!)
+      // Get users devOps and send notifications to them
+      const devOpsIds = await UserModel._getUserByRole(RolesEnum.DEV_OPS)
+      // Send notifications to all user with role Dev Ops
+      devOpsIds.forEach(async (it) => {
+        await NotificationModel._createNotification({
+          owner: it.uid,
+          actor: { id: registration.registrationId, name: registration.email },
+          type: NotificationType.registrationRequest,
+          status: NotificationStatus.WAITING
+        })
+      })
     } else if (data.status === RegistrationStatus.PENDING) {
       // Validate if new user that we have CID to assign to (otherwise it is an invited organisation)
       if (!data.cid && data.type === RegistrationType.USER) {
@@ -166,6 +179,22 @@ export const putRegistration: putRegistrationController = async (req, res) => {
           OrganisationModel._addUserToCompany(registrationObj.cid, uid)
           // Verify account
           AccountModel._verifyAccount(registrationObj.email, uid)
+          // Update registration notifications
+          // Get users devOps and send notifications to them
+          const devOpsIds = await UserModel._getUserByRole(RolesEnum.DEV_OPS)
+          devOpsIds.forEach(async (it) => {
+            const notificationsToUpdate = await NotificationModel._findNotifications({
+              owners: [it.uid],
+              status: NotificationStatus.WAITING,
+              type: NotificationType.registrationRequest,
+              actor: { id: registrationObj.registrationId, name: registrationObj.email } // Notifications sent by my friend
+            })
+            // Update notification of registrationRequest --> accept it
+            notificationsToUpdate.forEach(async (elem) => {
+              await NotificationModel._setRead(elem)
+              await NotificationModel._setStatus(elem, NotificationStatus.RESPONDED)
+            })
+          })
         } else {
           throw new Error('Wrong registration type')
         }
@@ -194,6 +223,22 @@ export const putRegistration: putRegistrationController = async (req, res) => {
       logger.warn('Registration declined to ' + token)
       // Notify user by mail
       rejectRegistration(registrationObj.email, registrationObj.companyName)
+      // Update registration notifications
+      // Get users devOps and send notifications to them
+      const devOpsIds = await UserModel._getUserByRole(RolesEnum.DEV_OPS)
+      devOpsIds.forEach(async (it) => {
+        const notificationsToUpdate = await NotificationModel._findNotifications({
+          owners: [it.uid],
+          status: NotificationStatus.WAITING,
+          type: NotificationType.registrationRequest,
+          actor: { id: registrationObj.registrationId, name: registrationObj.email } // Notifications sent by my friend
+        })
+        // Update notification of registrationRequest --> decline it
+        notificationsToUpdate.forEach(async (elem) => {
+          await NotificationModel._setRead(elem)
+          await NotificationModel._setStatus(elem, NotificationStatus.RESPONDED)
+        })
+      })
     } else {
       throw new Error('Wrong registration update request with status: ' + status)
     }  
