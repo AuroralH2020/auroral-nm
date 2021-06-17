@@ -77,7 +77,7 @@ export interface IRegistrationModel extends Model<IRegistrationDocument> {
         this: IRegistrationModel,
         registrationId: string
     ) => Promise<IRegistration>
-    _getRegistrations: (
+    _getAllRegistration: (
         this: IRegistrationModel
     ) => Promise<IRegistration[]>
     _getDoc: (

@@ -36,7 +36,7 @@ type getRegistrationsController = expressTypes.Controller<{}, {}, {}, IRegistrat
  
 export const getAllRegistrations: getRegistrationsController = async (req, res) => {
 	try {
-    const data = await RegistrationModel._getRegistrations()
+    const data = await RegistrationModel._getAllRegistration()
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
 		logger.error(err.message)

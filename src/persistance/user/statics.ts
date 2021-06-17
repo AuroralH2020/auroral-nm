@@ -15,7 +15,7 @@ export async function getUser(
   }
 }
 
-export async function getUsersByRole(
+export async function getUserByRole(
   this: IUserModel, role: RolesEnum
   ): Promise<IUserUI[]> {
     const record = await this.find({ roles: role }).lean().exec()
