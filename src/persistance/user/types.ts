@@ -13,23 +13,27 @@ export enum UserStatus {
 }
 
 export interface IUser {
-    uid: string, // unique user id
-    firstName: string,
-    lastName: string,
-    name: string, // fullName
-    email: string, // Username/Unique
-    contactMail: string,
-    cid: string, // unique organisation id
-    occupation: string,
-    location: string,
-    avatar: string,
+    // context: string
+    uid: string, // Auroral Id
+    firstName: string, // User property
+    lastName: string, // User property
+    name: string, // fullName / User property
+    email: string, // Username/Unique / User property
+    contactMail: string, // Fallback mail / User property
+    cid: string, // Organisation Auroral Id
+    occupation: string, // User property
+    location: string, // User property
+    avatar: string, // Base64 encoded Image or URI
     status: UserStatus,
-    accessLevel: UserVisibility,
-    roles: RolesEnum[],
+    accessLevel: UserVisibility, // User privacy
+    roles: RolesEnum[], // User application roles
+    // Next four might be removed, we will keep relation among entities 
+    // but we might not store IDs 'physically' in user document
     hasNotifications: string[], // Contains notifications ids
-    hasAudits: string[],
-    hasItems: string[],
-    hasContracts: string[],
+    hasAudits: string[], // Contains audits ids
+    hasItems: string[], // Contains items ids
+    // hasContracts: string[], // Contains contracts ids
+    // Timestamps
     lastUpdated: number,
     created: number
 }

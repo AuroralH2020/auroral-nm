@@ -37,14 +37,16 @@ export type NotificationObj = {
 }
 
 export interface INotification {
-    notificationId: string
-    owner: string // cid or uid
-    actor: NotificationObj
-    target: NotificationObj
-    object: NotificationObj
+    // context: string
+    notificationId: string // ID in Auroral
+    owner: string // cid or uid of the entity that owns the notification (If entity === organisation => all users in organisation are notified)
+    actor: NotificationObj // Entity that caused the notification
+    target: NotificationObj // Entity affected by the notification
+    object: NotificationObj // Entity instrumental for the notification to happen
     isUnread: boolean
     status: NotificationStatus
     type: NotificationType
+    // Timestamps
     created: number
 }
 

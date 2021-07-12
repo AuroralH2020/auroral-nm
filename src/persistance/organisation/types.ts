@@ -1,5 +1,4 @@
 import { Document, Model } from 'mongoose'
-import { RolesEnum } from '../../types/roles' 
 
 export enum UISkins {
     BLUE = 'blue',
@@ -16,24 +15,29 @@ export enum OrganisationStatus {
 }
 
 export interface IOrganisation {
+    // context: string
     name: string, // Company Name
-    cid: string,
-    businessId: string,
-    location: string,
-    skinColor: UISkins,
-    avatar: string,
-    notes: string,
+    cid: string, // Company ID in AURORAL
+    businessId: string, // Business ID / ICO / Registration Number
+    location: string, // TBD: Update to object, so far just string
+    skinColor: UISkins, // Configures the colour in the UI
+    avatar: string, // Base64 encoded Image or URI
+    notes: string, // Description of the company given by user
     status: OrganisationStatus,
-    hasNotifications: string[], // Contains notifications ids
+    // Next four might be removed, we will keep relation among entities 
+    // but we might not store IDs 'physically' in organisation document
+    hasNotifications: string[], // Contains notifications IDs
     hasAudits: string[],
     hasUsers: string[],
     hasNodes: string[],
+    // Stores IDs of other organsations (Friendship process)
     knows: string[],
     knowsRequestsFrom: string[],
     knowsRequestsTo: string[],
+    // Timestamps
     lastUpdated: number,
     created: number
-    // auto: boolean // Activate for fast registration
+    // auto: boolean // TBD: Activate for fast registration if needed
 }
 
 export interface IOrganisationUI {

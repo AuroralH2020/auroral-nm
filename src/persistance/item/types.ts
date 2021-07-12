@@ -18,20 +18,22 @@ export enum ItemPrivacy {
 }
 
 export interface IItem {
-    name: string, // fullName
-    oid: string, // unique Item id
-    agid: string,
-    uid: string,
-    cid: string, // unique organisation id
-    avatar: string,
-    accessLevel: ItemPrivacy,
-    type: ItemType,
+    // context: string
+    name: string, // Name of item given by user
+    oid: string, // Auroral Id
+    agid: string, // Node Auroral Id
+    uid: string, // User Auroral Id
+    cid: string, // Organisation Auroral Id
+    avatar: string, // Base64 encoded Image or URI
+    accessLevel: ItemPrivacy, // Privacy level of the item
+    type: ItemType, // Subtype of the item
     status: ItemStatus,
     // semanticType: string,
     // interactionPatterns: ??[],
     // hasContracts: string[],
     // hasAudits: string[],
     // mode: Production and testing ??
+    // Timestamps
     lastUpdated: number,
     created: number
 }

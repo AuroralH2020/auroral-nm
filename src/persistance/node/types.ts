@@ -13,17 +13,19 @@ export enum NodeStatus {
 }
 
 export interface INode {
-    agid: string, // unique Node id
-    name: string, // fullName
-    cid: string, // unique organisation id
-    type: NodeType,
+    // context: string
+    agid: string, // ID in Auroral
+    name: string, // Name of Node given by User
+    cid: string, // organisation id in Auroral
+    type: NodeType, // Project the node belongs to
     // location: string,
     status: NodeStatus,
-    hasItems: string[],
-    itemsCount: number,
-    hasKey: boolean,
-    key: string | null,
-    lastUpdated: number,
+    hasItems: string[], // Ids of items under the node
+    itemsCount: number, // Count of items (hasItems.length())
+    hasKey: boolean, // Has token auth enabled for the node
+    key: string | null, // Has public key to validate token
+    // Timestamps
+    lastUpdated: number, 
     created: number
 }
 
