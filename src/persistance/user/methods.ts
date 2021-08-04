@@ -38,7 +38,7 @@ export async function removeUser(this: IUserDocument): Promise<void> {
     // this.hasNotifications
     // this.hasAudits
     this.hasItems = []
-    this.hasContracts = []
+    // this.hasContracts = []
     this.lastUpdated = new Date().getTime()
     // this.created
     await this.save()

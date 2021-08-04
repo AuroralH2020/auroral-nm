@@ -51,6 +51,7 @@ export async function getAllUsers(
       location: 1,
       avatar: 1,
       lastUpdated: 1,
+      roles: 1,
       created: 1 }
     ).exec()
   if (record) {
