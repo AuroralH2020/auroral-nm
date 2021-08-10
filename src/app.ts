@@ -29,8 +29,8 @@ app.use((req, res, next) => {
   next()
 })
  
-app.use('/ui/v1/', UiRouter)
-app.use('/gtw/v1/', GtwRouter)
+app.use('/api/ui/v1/', UiRouter)
+app.use('/api/gtw/v1/', GtwRouter)
 
 /**
  * Not Found
