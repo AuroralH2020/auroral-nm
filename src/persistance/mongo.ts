@@ -6,7 +6,13 @@ let database: mongoose.Connection
 
 export const mongo = {
   connect: () => {
-    const uri = `mongodb://${Config.MONGO.URL}:${Config.MONGO.PORT}/${Config.MONGO.DB}?retryWrites=true&w=majority`
+    let uri: string = ''
+    
+    if (Config.MONGO.USER) {
+      uri = `mongodb://${Config.MONGO.USER}:${Config.MONGO.PASSWORD}@${Config.MONGO.URL}:${Config.MONGO.PORT}/${Config.MONGO.DB}?retryWrites=true&w=majority`
+    } else {
+      uri = `mongodb://${Config.MONGO.URL}:${Config.MONGO.PORT}/${Config.MONGO.DB}?retryWrites=true&w=majority`
+    }
 
     if (database) {
       return
