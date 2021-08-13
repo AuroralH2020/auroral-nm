@@ -12,7 +12,7 @@ import { Interfaces } from '../../types/locals-types'
 const GtwRouter = Router()
 
 GtwRouter
-.post('/handshake', guard, addOrigin(Interfaces.GATEWAY), miscCtrl.handshake)
+.get('/handshake', guard, addOrigin(Interfaces.GATEWAY), miscCtrl.handshake)
 .get('/counters', addOrigin(Interfaces.GATEWAY), guard, miscCtrl.getCounters)
 .post('/counters', addOrigin(Interfaces.GATEWAY), guard, miscCtrl.sendCounters)
 .get('/items/:oid', addOrigin(Interfaces.GATEWAY), guard, itemsCtrl.neighbourhood)
