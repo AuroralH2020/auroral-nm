@@ -17,7 +17,6 @@ type handshakeController = expressTypes.Controller<{}, {}, {}, string, localsTyp
 export const handshake: handshakeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
-    console.log(decoded)
     const data = decoded ? `Gateway ${decoded.iss} authenticated` : 'Gateway connected as anonymous, restrictions might apply'
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
