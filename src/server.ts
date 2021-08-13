@@ -4,6 +4,7 @@ import { app } from './app'
 import { Config } from './config'
 import { logger } from './utils/logger'
 import { mongo } from './persistance/mongo'
+import { cs } from './microservices/commServer'
 
 /**
  * Error Handler. Provides full stack - only in dev
@@ -13,10 +14,12 @@ if (Config.NODE_ENV === 'development') {
 }
 
 // Start other services
-function bootstrap() {
+async function bootstrap() {
   try {
     // Run other services here
     mongo.connect() // Mongo connection
+    const sessions = (await cs.getSessions()).sessions.length
+    logger.info(`Communication server connected, there are ${sessions} sessions active`)
     logger.info('All services initialized')
   } catch (err) {
     logger.error(err)

@@ -28,7 +28,7 @@ const ApiHeader = {
 export const cs = {
     getSessions: async (username?: string) => {
         const uri = username ? 'sessions/' + username : 'sessions'
-        return request(uri, 'GET', undefined, ApiHeader) as Promise<csSession[]>
+        return request(uri, 'GET', undefined, ApiHeader) as Promise<{ sessions: csSession[]}>
     },
     closeSessions: async (username: string) => {
         return request('sessions/' + username, 'DELETE', undefined, ApiHeader) as Promise<void>
