@@ -4,8 +4,9 @@ import { INodeDocument, INodeModel, INodeCreatePost, INodeUI, NodeStatus } from 
 export async function getNode(
   this: INodeModel, agid: string, cid?: string
 ): Promise<INodeUI> {
+  const query = cid ? { agid, cid } : { agid }
   const record = await this.findOne(
-    { agid, cid }, 
+    query, 
     { key: 0 }
     ).lean().exec()
   if (record) {
@@ -16,9 +17,10 @@ export async function getNode(
 }
 
 export async function getDoc(
-  this: INodeModel, agid: string, cid: string
+  this: INodeModel, agid: string, cid?: string
 ): Promise<INodeDocument> {
-  const record = await this.findOne({ agid, cid }).exec()
+  const query = cid ? { agid, cid } : { agid }
+  const record = await this.findOne(query).exec()
   if (record) {
     return record
   } else {

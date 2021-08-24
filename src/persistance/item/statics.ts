@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import { IItemDocument, IItemModel, IItemCreatePost, IItem, ItemStatus } from './types'
 
 export async function getItem(
@@ -42,8 +41,7 @@ export async function createItem(
     this: IItemModel, data: IItemCreatePost
   ): Promise<IItemDocument> {
     const newItem = {
-      ...data,
-      oid: uuidv4()
+      ...data
     }
     return this.create(newItem)
 }

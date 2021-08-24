@@ -20,6 +20,7 @@ export interface INode {
     type: NodeType, // Project the node belongs to
     // location: string,
     status: NodeStatus,
+    visible: boolean, // True if is it discoverable in the P2P network
     hasItems: string[], // Ids of items under the node
     itemsCount: number, // Count of items (hasItems.length())
     hasKey: boolean, // Has token auth enabled for the node

@@ -41,7 +41,8 @@ export interface IItem {
 // Input to create a new Item
 export interface IItemCreate {
     name: string, // fullName
-    type: ItemType
+    type: ItemType,
+    oid: string
     // semanticType: string,
     // interactionPatterns: ??[]
 }
@@ -51,7 +52,8 @@ export interface IItemCreatePost {
     name: string, // fullName
     agid: string,
     cid: string, // unique organisation id
-    type: ItemType
+    type?: ItemType,
+    oid?: string
     // semanticType: string,
     // interactionPatterns: ??[]
 }

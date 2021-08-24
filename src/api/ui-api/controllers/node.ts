@@ -5,9 +5,13 @@ import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
 
 // Controller specific imports
+import { cs } from '../../../microservices/commServer'
 import { INodeCreate, INodeCreatePost, INodeUI, INodeUpdate } from '../../../persistance/node/types'
 import { NodeModel } from '../../../persistance/node/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
+
+// Constants
+const PUBLIC_NODES = 'PUBLIC_NODES' // CS group for nodes
 
 // Controllers
 
@@ -51,9 +55,12 @@ export const createNode: postNodeController = async (req, res) => {
     const node = await NodeModel._createNode(nodeData)
     // Add node to organisation
     await OrganisationModel._addNodeToCompany(decoded.org, node.agid)
-    // TBD: Add node as user in commServer
-    // Create node group in commServer ???
-    // TBD: Add to organisation group in commServer
+    // Create node user in CS
+    await cs.postUser(node.agid, password)
+    // Add to organisation group in commServer
+    await cs.addUserToGroup(node.agid, decoded.org)
+    // Add to nodes group in commServer (Initially public)
+    await cs.addUserToGroup(node.agid, PUBLIC_NODES)
     // TBD: Add audit
     // TBD: Add notification
     return responseBuilder(HttpStatusCode.OK, res, null, null)
@@ -122,7 +129,14 @@ export const removeNode: removeNodeController = async (req, res) => {
     const node = await NodeModel._getDoc(agid, decoded.org)
     await node._removeNode()
     await OrganisationModel._removeNodeFromCompany(decoded.org, agid)
-    // TBD: Remove from commServer
+    // Delete node user from CS
+    await cs.deleteUser(node.agid)
+    // Remove from organisation group in commServer
+    await cs.deleteUserFromGroup(node.agid, decoded.org)
+    // Remove from nodes group in commServer (Initially public)
+    await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
+    // TBD: Add notification
+    // TBD: Add audit
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		logger.error(err.message)

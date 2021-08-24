@@ -13,6 +13,7 @@ const NodeSchema = new Schema<INodeDocument, INodeModel>({
     name: { type: String, required: true }, // fullName
     cid: { type: String, required: true }, // unique organisation id
     status: { type: String, default: NodeStatus.ACTIVE, enum: statuses },
+    visible: { type: Boolean, default: true },
     type: { type: String, required: true, enum: nodeTypes },
     // location: String,
     hasItems: [{ type: String, default: [] }],

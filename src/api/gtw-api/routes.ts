@@ -16,15 +16,15 @@ GtwRouter
 .get('/counters', addOrigin(Interfaces.GATEWAY), guard(), miscCtrl.getCounters)
 .post('/counters', addOrigin(Interfaces.GATEWAY), guard(), miscCtrl.sendCounters)
 .get('/items/:oid', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.neighbourhood)
-.post('/items/registration', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.registration)
+.post('/items/register', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.registration)
 .post('/items/remove', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.deleteItems)
 .put('/items/modify', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.updateItem) // Update item
 .delete('/agent/:agid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.deleteAgent)
+.get('/agent/:agid/items', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getAgentItems) // change to post if depends on update or use query
+// .post('/items/td', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getTd) // Remove once Gateway is updated, deprecated use
 
 // .put('/items/update', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.updateItemContent) // Update only TDs non critial properties
-// .post('/items/td', guard(), controllers.td)
 // .post('/items/searchItems', guard(), controllers.searchItems)
 // // agent
-// .get('/agent/:agid/items', guard(), controllers.getAgentItems) // change to post if depends on update or use query
 
 export { GtwRouter }
