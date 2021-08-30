@@ -117,4 +117,14 @@ export interface IUserModel extends Model<IUserDocument> {
         accessLevel: UserVisibility[],
         users: string[]
     ) => Promise<IUserUI[]>
+    _addItemToUser: (
+        this: IUserModel,
+        uid: string,
+        oid: string
+    ) => Promise<void>
+    _removeItemFromUser: (
+        this: IUserModel,
+        uid: string,
+        oid: string
+    ) => Promise<void>
 }

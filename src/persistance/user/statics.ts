@@ -85,3 +85,21 @@ export async function findDuplicatesUser(
     return false
   }
 }
+
+export async function addItemToUser(
+  this: IUserModel, uid: string, oid: string
+): Promise<void> {
+  const record = await this.updateOne({ uid }, { $addToSet: { hasItems: oid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding item to user')
+  }
+}
+
+export async function removeItemFromUser(
+  this: IUserModel, uid: string, oid: string
+  ): Promise<void> {
+    const record = await this.updateOne({ uid }, { $pull: { hasItems: oid } }).exec()
+    if (!record.ok) {
+      throw new Error('Error removing item from user')
+    }
+  }

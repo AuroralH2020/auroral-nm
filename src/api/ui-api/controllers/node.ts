@@ -5,13 +5,10 @@ import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
 
 // Controller specific imports
-import { cs } from '../../../microservices/commServer'
-import { INodeCreate, INodeCreatePost, INodeUI, INodeUpdate } from '../../../persistance/node/types'
+import { INodeCreate, INodeUI, INodeUpdate } from '../../../persistance/node/types'
 import { NodeModel } from '../../../persistance/node/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
-
-// Constants
-const PUBLIC_NODES = 'PUBLIC_NODES' // CS group for nodes
+import { NodeService } from '../../../core'
 
 // Controllers
 
@@ -50,19 +47,7 @@ export const createNode: postNodeController = async (req, res) => {
   const { name, type, password } = req.body
   const { decoded } = res.locals
 	try {
-    const nodeData: INodeCreatePost = { name, type, cid: decoded.org }
-    // Create node
-    const node = await NodeModel._createNode(nodeData)
-    // Add node to organisation
-    await OrganisationModel._addNodeToCompany(decoded.org, node.agid)
-    // Create node user in CS
-    await cs.postUser(node.agid, password)
-    // Add to organisation group in commServer
-    await cs.addUserToGroup(node.agid, decoded.org)
-    // Add to nodes group in commServer (Initially public)
-    await cs.addUserToGroup(node.agid, PUBLIC_NODES)
-    // TBD: Add audit
-    // TBD: Add notification
+    await NodeService.createOne(decoded.org, name, type, password)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		logger.error(err.message)
@@ -82,9 +67,21 @@ export const updateNode: putNodeController = async (req, res) => {
     // TBD: Update node in commServer
     // TBD: Add notification
     // TBD: Add audit
-
     // TBD: Consider updating password too 
+    return responseBuilder(HttpStatusCode.OK, res, null, null)
+	} catch (err) {
+		logger.error(err.message)
+		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+	}
+}
 
+type removeNodeController = expressTypes.Controller<{ agid: string }, {}, {}, null, localsTypes.ILocals>
+ 
+export const removeNode: removeNodeController = async (req, res) => {
+  const { agid } = req.params
+  const { decoded } = res.locals
+	try {
+    await NodeService.removeOne(agid, decoded.org)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		logger.error(err.message)
@@ -112,31 +109,6 @@ export const removeKey: removeKeyController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     await NodeModel._removeKey(agid)
-    return responseBuilder(HttpStatusCode.OK, res, null, null)
-	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
-	}
-}
-
-type removeNodeController = expressTypes.Controller<{ agid: string }, {}, {}, null, localsTypes.ILocals>
- 
-export const removeNode: removeNodeController = async (req, res) => {
-  const { agid } = req.params
-  const { decoded } = res.locals
-	try {
-    // TBD: Check before removing if it has any items still under it
-    const node = await NodeModel._getDoc(agid, decoded.org)
-    await node._removeNode()
-    await OrganisationModel._removeNodeFromCompany(decoded.org, agid)
-    // Delete node user from CS
-    await cs.deleteUser(node.agid)
-    // Remove from organisation group in commServer
-    await cs.deleteUserFromGroup(node.agid, decoded.org)
-    // Remove from nodes group in commServer (Initially public)
-    await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
-    // TBD: Add notification
-    // TBD: Add audit
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		logger.error(err.message)
