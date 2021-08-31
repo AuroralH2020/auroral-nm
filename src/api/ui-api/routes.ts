@@ -11,6 +11,7 @@ import * as friendingCtrl from './controllers/friending'
 import * as userCtrl from './controllers/user'
 import * as nodeCtrl from './controllers/node'
 import * as notificationCtrl from './controllers/notification'
+import * as itemsCtrl from './controllers/items'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
@@ -70,6 +71,9 @@ UiRouter
 .get('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getKey)
 .delete('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeKey)
 .delete('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeNode)
+
+// ITEMS
+.get('/items', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getMany)
 
 // NOTIFICATIONS
 .get('/notifications/', jwt(), addOrigin(Interfaces.UI), notificationCtrl.getNotifications)

@@ -6,6 +6,7 @@ import { responseBuilder } from '../../../utils/response-builder'
 
 // Controller specific imports
 import { NodeModel } from '../../../persistance/node/model'
+import { NodeService } from '../../../core'
 
 // Controllers
 
@@ -16,15 +17,13 @@ export const deleteAgent: deleteAgentController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     if (decoded) {
+      // Validate that authorised to remove node
       const myAgid = decoded.iss
       if (agid !== myAgid) {
         throw new Error('You are not authorized to remove this agent ' + agid)
       }
-      // TBD: Remove agent
-      // TBD: Remove agent from CS
-      // TBD: Remove OIDS under agent --> Update contracts accordingly
-      // TBD: Remove agent from organisation
-      // TBD: Send notifications and audits
+      // Remove node
+      await NodeService.removeOne(agid)
       logger.info('Gateway with id ' + agid + ' was removed')
       return responseBuilder(HttpStatusCode.OK, res, null, null)
     } else {
@@ -54,19 +53,6 @@ export const getAgentItems: getAgentItemsController = async (req, res) => {
       logger.error('Gateway unauthorized access attempt')
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
-	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
-	}
-}
-
-type getTdController = expressTypes.Controller<{}, {}, {}, {}, localsTypes.ILocalsGtw>
- 
-export const getTd: getTdController = async (req, res) => {
-	try {
-      // Returning dummy empty array
-      const ret = {}
-      return responseBuilder(HttpStatusCode.OK, res, null, ret)
 	} catch (err) {
 		logger.error(err.message)
 		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)

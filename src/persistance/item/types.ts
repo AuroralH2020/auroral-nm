@@ -1,14 +1,14 @@
 import { Document, Model } from 'mongoose'
 
 export enum ItemType {
-    DEVICE = 'device',
-    SERVICE = 'service'
+    DEVICE = 'Device',
+    SERVICE = 'Service'
 }
 
 export enum ItemStatus {
-    DISABLED = 'disabled',
-    ENABLED = 'enabled',
-    DELETED = 'deleted'
+    DISABLED = 'Disabled',
+    ENABLED = 'Enabled',
+    DELETED = 'Deleted'
 }
 
 export enum ItemPrivacy {
@@ -24,7 +24,7 @@ export interface IItem {
     agid: string, // Node Auroral Id
     uid: string, // User Auroral Id
     cid: string, // Organisation Auroral Id
-    avatar: string, // Base64 encoded Image or URI
+    avatar?: string, // Base64 encoded Image or URI
     accessLevel: ItemPrivacy, // Privacy level of the item
     type: ItemType, // Subtype of the item
     status: ItemStatus,
@@ -35,7 +35,10 @@ export interface IItem {
     // mode: Production and testing ??
     // Timestamps
     lastUpdated: number,
-    created: number
+    created: number,
+    // Query enrichment
+    companyName?: string, // Organisation Name: Is added after the get query
+    online?: boolean // Is online in CS
 }
 
 // Input to create a new Item
@@ -69,6 +72,15 @@ export interface IItemUpdate {
     // interactionPatterns: ??[]
 }
 
+export type GetAllQuery = {
+    cid?: string | { $in: string[] },
+    type: ItemType,
+    accessLevel?: ItemPrivacy |
+                { $or: ItemPrivacy[] },
+    status?: ItemStatus | 
+            { $ne: ItemStatus }
+}
+
 export interface IItemDocument extends IItem, Document {
     _updateItem: (this: IItemDocument, data: IItemUpdate) => Promise<IItemDocument>
     _removeItem: (this: IItemDocument) => Promise<void>
@@ -89,6 +101,7 @@ export interface IItemModel extends Model<IItemDocument> {
     ) => Promise<IItemDocument>
     _getAllItems: (
         this: IItemModel,
-        items: string[]
+        params: GetAllQuery,
+        offset: number
     ) => Promise<IItem[]>
 }

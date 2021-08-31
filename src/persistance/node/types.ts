@@ -81,7 +81,7 @@ export interface INodeModel extends Model<INodeDocument> {
     _getDoc: (
         this: INodeModel,
         agid: string,
-        cid: string
+        cid?: string
     ) => Promise<INodeDocument>
     _createNode: (
         this: INodeModel,

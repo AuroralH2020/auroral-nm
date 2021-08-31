@@ -35,16 +35,21 @@ export const createOne = async (cid: string, name: string, type: NodeType, passw
     }
 }
 
-export const removeOne = async (agid: string, cid: string): Promise<void> => {
+/**
+ * 
+ * @param agid 
+ * @param cid Optional: If present _getDoc will validate if agid belongs to organisation
+ */
+export const removeOne = async (agid: string, cid?: string): Promise<void> => {
     try {
         // Get Node
         const node = await NodeModel._getDoc(agid, cid)
         // Remove items under node
         node.hasItems.forEach(async it => {
-        await ItemService.removeOne(it)
+            await ItemService.removeOne(it)
         })
         // Remove node from organisation
-        await OrganisationModel._removeNodeFromCompany(cid, agid)
+        await OrganisationModel._removeNodeFromCompany(node.cid, agid)
         // Remove node
         await node._removeNode()
         // Remove from nodes group in commServer (Initially public)

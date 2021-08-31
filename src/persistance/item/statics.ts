@@ -1,4 +1,4 @@
-import { IItemDocument, IItemModel, IItemCreatePost, IItem, ItemStatus } from './types'
+import { IItemDocument, IItemModel, IItemCreatePost, IItem, ItemStatus, GetAllQuery } from './types'
 
 export async function getItem(
   this: IItemModel, oid: string
@@ -25,11 +25,15 @@ export async function getDoc(
 }
 
 export async function getAllItems(
-  this: IItemModel, items: string[]
+  this: IItemModel, params: GetAllQuery, offset: number
 ): Promise<IItem[]> {
   const record = await this.find(
-    { oid: { $in: items }, status: { $ne: ItemStatus.DELETED } }
-  ).exec()
+    params
+  )
+  .skip(offset)
+  .limit(12)
+  .lean()
+  .exec()
   if (record) {
     return record
   } else {

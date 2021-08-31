@@ -18,7 +18,8 @@ export const getNode: getNodeController = async (req, res) => {
   const { agid } = req.params
   const { decoded } = res.locals
 	try {
-    // TBD: Validate that agid belongs to organisation
+    // Validate that agid belongs to organisation by passing optional CID param to _getNode
+    // Get node
     const data = await NodeModel._getNode(agid, decoded.org)
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
@@ -47,6 +48,7 @@ export const createNode: postNodeController = async (req, res) => {
   const { name, type, password } = req.body
   const { decoded } = res.locals
 	try {
+    // Create node
     await NodeService.createOne(decoded.org, name, type, password)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
@@ -62,7 +64,7 @@ export const updateNode: putNodeController = async (req, res) => {
   const { agid } = req.params
   const { decoded } = res.locals
 	try {
-    const node = await NodeModel._getDoc(agid, decoded.org)
+    const node = await NodeModel._getDoc(agid)
     const updatedNode = await node._updateNode(data) 
     // TBD: Update node in commServer
     // TBD: Add notification
@@ -81,6 +83,8 @@ export const removeNode: removeNodeController = async (req, res) => {
   const { agid } = req.params
   const { decoded } = res.locals
 	try {
+    // Validate that agid belongs to organisation by passing optional CID param to _getNode
+    // Remove node
     await NodeService.removeOne(agid, decoded.org)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {

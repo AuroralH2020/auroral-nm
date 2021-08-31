@@ -1,5 +1,4 @@
 // Controller common imports
-import * as crypto from 'crypto'
 import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
@@ -10,6 +9,8 @@ import { cs } from '../../../microservices/commServer'
 import { IItemCreate, IItemUpdate } from '../../../persistance/item/types'
 import { NodeModel } from '../../../persistance/node/model'
 import { ItemModel } from '../../../persistance/item/model'
+import { ItemService } from '../../../core'
+import { csUserRoster } from '../../../types/cs-types'
 
 // Types
 
@@ -36,15 +37,8 @@ export const registration: registrationController = async (req, res) => {
       // Async registration of items
       await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
         try {
-          // Add item to Mongo
-          await ItemModel._createItem({ ...it, agid, cid }) 
-          // Create password for CS
-          const password: string = crypto.randomBytes(8).toString('base64')
-          // Add to CS
-          await cs.postUser(it.oid, password)
-          // Add to agent
-          await NodeModel._addItemToNode(agid, it.oid)
-          // TBD: Add notifications and audits
+          // Create item
+          const password = await ItemService.createOne(it, agid, cid)
           // Create response
           response.push({ name: it.name, oid: it.oid, password })
           return true
@@ -66,18 +60,18 @@ export const registration: registrationController = async (req, res) => {
 	}
 }
 
-type neighbourhoodController = expressTypes.Controller<{ oid: string }, {}, {}, null, localsTypes.ILocalsGtw>
+type neighbourhoodController = expressTypes.Controller<{ oid: string }, {}, {}, csUserRoster | undefined, localsTypes.ILocalsGtw>
  
 export const neighbourhood: neighbourhoodController = async (req, res) => {
   const { oid } = req.params
   const { decoded } = res.locals
 	try {
     if (decoded) {
-      // TBD: Retrieve from CS visible jids
-      return responseBuilder(HttpStatusCode.OK, res, null, null)
+      const neighbours = await cs.getUserRoster(oid)
+      return responseBuilder(HttpStatusCode.OK, res, null, neighbours)
     } else {
       logger.error('Gateway unauthorized access attempt')
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
 	} catch (err) {
 		logger.error(err.message)
@@ -95,22 +89,10 @@ export const deleteItems: deleteItemsController = async (req, res) => {
       const agid = decoded.iss
       oids.forEach(async (it) => {
         try {
-          const item = await ItemModel._getDoc(it)
-          if (agid !== item.agid) {
-            throw new Error('Cannot remove ' + it + ' because it does not belong to ' + agid)
-          }
-          // Remove item from mongo
-          await item._removeItem()
-          // Remove oid from CS
-          await cs.deleteUser(it)
-          // Remove oid from agent
-          await NodeModel._removeItemFromNode(agid, it)
-          // TBD: Remove oid from user
-          // TBD: Remove contracts
-          // TBD: Audits and notifications
+          await ItemService.removeOne(it, agid)
           logger.info(it + ' was removed from ' + agid)
         } catch (error) {
-          logger.error(error)
+          logger.error(error.message)
         }
       })
       return responseBuilder(HttpStatusCode.OK, res, null, null)
