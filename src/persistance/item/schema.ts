@@ -19,6 +19,7 @@ const ItemSchema = new Schema<IItemDocument, IItemModel>({
     type: { type: String, required: true, enum: itemTypes },
     accessLevel: { type: Number, default: ItemPrivacy.PRIVATE, enum: privacyLevels },
     avatar: String,
+    description: String,
     // semanticType: string,
     // interactionPatterns: ??[],
     // hasContracts: string[],

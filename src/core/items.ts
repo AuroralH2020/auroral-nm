@@ -10,14 +10,14 @@ import { ItemModel } from '../persistance/item/model'
 import { UserModel } from '../persistance/user/model'
 import { NodeModel } from '../persistance/node/model'
 import { OrganisationModel } from '../persistance/organisation/model'
-import { IItem, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy } from '../persistance/item/types'
+import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy } from '../persistance/item/types'
 
 // Functions
 
 /**
  * Get Items
  */
- export const getMany = async (cid: string, type: ItemType, offset: number, filter: number): Promise<IItem[]> => {
+ export const getMany = async (cid: string, type: ItemType, offset: number, filter: number): Promise<IItemUI[]> => {
     try {
         // Get your organisation data
         const myOrganisation = await OrganisationModel._getOrganisation(cid)
@@ -37,6 +37,40 @@ import { IItem, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy } fr
                 online: (await cs.getSessions(it.oid)).sessions.length >= 1
             }
         }))
+    } catch (error) {
+        logger.error(error.message)
+        throw new Error(error.message)
+    }
+}
+
+/**
+ * Get One Item
+ */
+ export const getOne = async (cid: string, oid: string): Promise<IItemUI> => {
+    try {
+        // Get Item
+        const data = await ItemModel._getItem(oid)
+        // Get User
+        const user = await UserModel._getUser(data.uid)
+        // Get Company
+        const company = await OrganisationModel._getOrganisation(data.cid)
+        // Get CS Status
+        const csObject = await cs.getSessions(data.oid)
+        // Get gateway info
+        const gateway = await NodeModel._getNode(data.agid)
+        // Enrich Data and return
+        return {
+                ...data,
+                companyName: company.name,
+                online: csObject.sessions.length >= 1,
+                owner: {
+                    name: user.name,
+                    email: user.email
+                },
+                gateway: {
+                    name: gateway.name
+                }
+            }
     } catch (error) {
         logger.error(error.message)
         throw new Error(error.message)

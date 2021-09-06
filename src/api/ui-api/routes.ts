@@ -74,6 +74,8 @@ UiRouter
 
 // ITEMS
 .get('/items', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getMany)
+.get('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getOne)
+.put('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.updateOne)
 
 // NOTIFICATIONS
 .get('/notifications/', jwt(), addOrigin(Interfaces.UI), notificationCtrl.getNotifications)

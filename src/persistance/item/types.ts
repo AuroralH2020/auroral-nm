@@ -28,6 +28,7 @@ export interface IItem {
     accessLevel: ItemPrivacy, // Privacy level of the item
     type: ItemType, // Subtype of the item
     status: ItemStatus,
+    description?: string,
     // semanticType: string,
     // interactionPatterns: ??[],
     // hasContracts: string[],
@@ -35,10 +36,21 @@ export interface IItem {
     // mode: Production and testing ??
     // Timestamps
     lastUpdated: number,
-    created: number,
+    created: number
+}
+
+// Interface to Items returned to UI
+export interface IItemUI extends IItem {
     // Query enrichment
     companyName?: string, // Organisation Name: Is added after the get query
     online?: boolean // Is online in CS
+    owner?: { // User owner info
+        name: string,
+        email: string
+    },
+    gateway?: { // Item gateway
+        name: string
+    }
 }
 
 // Input to create a new Item
@@ -68,7 +80,8 @@ export interface IItemUpdate {
     agid?: string,
     avatar?: string,
     accessLevel?: ItemPrivacy,
-    status?: ItemStatus
+    status?: ItemStatus,
+    description?: string
     // interactionPatterns: ??[]
 }
 

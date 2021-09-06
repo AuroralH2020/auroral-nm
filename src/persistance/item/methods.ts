@@ -5,6 +5,7 @@ export async function updateItem(this: IItemDocument, data: IItemUpdate): Promis
     this.agid = data.agid ? data.agid : this.agid
     this.avatar = data.avatar ? data.avatar : this.avatar
     this.status = data.status ? data.status : this.status
+    this.description = data.description ? data.description : this.description
     this.accessLevel = data.accessLevel ? data.accessLevel : this.accessLevel
     this.lastUpdated = new Date().getTime()
     await this.save()
@@ -18,6 +19,7 @@ export async function removeItem(this: IItemDocument): Promise<void> {
     // this.uid // unique user id
     // this.agid // unique node id
     // this.type
+    this.description = undefined
     this.status = ItemStatus.DELETED
     this.accessLevel = ItemPrivacy.PRIVATE
     this.avatar = ''
