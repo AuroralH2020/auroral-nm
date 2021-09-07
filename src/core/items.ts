@@ -10,7 +10,7 @@ import { ItemModel } from '../persistance/item/model'
 import { UserModel } from '../persistance/user/model'
 import { NodeModel } from '../persistance/node/model'
 import { OrganisationModel } from '../persistance/organisation/model'
-import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy } from '../persistance/item/types'
+import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, IItemUpdate } from '../persistance/item/types'
 
 // Functions
 
@@ -101,16 +101,16 @@ import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy } 
 /**
  * Remove Item
  * @param oid 
- * @param agid optional: If present validate item belongs to that agent 
+ * @param owner optional: If present validate item belongs to that agent or uid (Is an AGID or UID)
  */
-export const removeOne = async (oid: string, agid?: string): Promise<void> => {
+export const removeOne = async (oid: string, owner?: string): Promise<void> => {
     try {
         // Get item
         const item = await ItemModel._getDoc(oid)
-        // TBD Validate if item belongs to user (with UID)
-        // Validate agid provided by agent
-        if (agid && agid !== item.agid) {
-            throw new Error('Cannot remove ' + oid + ' because it does not belong to ' + agid)
+        // Validate agid provided by agent or uid by UI
+        if (owner && owner !== item.agid && owner !== item.uid) {
+            logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
+            throw new Error('Unauthorized')
         }
         // Remove item from user
         if (item.uid) {
@@ -127,7 +127,33 @@ export const removeOne = async (oid: string, agid?: string): Promise<void> => {
         // TBD: Remove contracts
         // TBD: Audits and notifications
     } catch (error) {
-        logger.error(error.message)
+        throw new Error(error.message)
+    }
+}
+
+/**
+ * Update item 
+ * @param oid 
+ * @param data 
+ * @param owner optional: If present validate item belongs to that agent or uid (Is an AGID or UID)  
+ */
+export const updateOne = async (oid: string, data: IItemUpdate, owner?: string): Promise<void> => {
+    try {
+    // Get item
+        const item = await ItemModel._getDoc(oid)
+    // Validate agid provided by agent or uid by UI
+        if (owner && owner !== item.agid && owner !== item.uid) {
+            logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
+            throw new Error('Unauthorized')
+        }
+    // TBD: Do checks before updating
+        // Check contracts
+        // Check conflicts
+        // Authorizations
+        // Dependencies
+    // Update
+        await item._updateItem(data)
+    } catch (error) {
         throw new Error(error.message)
     }
 }
