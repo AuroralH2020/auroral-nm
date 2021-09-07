@@ -51,7 +51,7 @@ export const jwt = (roles?: RolesEnum[]) => {
             res.locals.token = token
             next()
         } catch (err) {
-            console.log(err.stack)
+            // console.log(err.stack)
             return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err.message)
         }
     } as JwtController

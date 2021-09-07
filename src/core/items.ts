@@ -107,6 +107,7 @@ export const removeOne = async (oid: string, agid?: string): Promise<void> => {
     try {
         // Get item
         const item = await ItemModel._getDoc(oid)
+        // TBD Validate if item belongs to user (with UID)
         // Validate agid provided by agent
         if (agid && agid !== item.agid) {
             throw new Error('Cannot remove ' + oid + ' because it does not belong to ' + agid)

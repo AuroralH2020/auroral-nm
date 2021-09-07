@@ -17,15 +17,14 @@ export const getMany: getManyController = async (req, res) => {
   const { type, offset, filter } = req.query
   const { decoded } = res.locals
 	try {
-        console.log(type, offset, filter)
         // const data = await ItemService.getMany(decoded.org, type, offset, filter)
         const data: IItemUI[] = [{
             // context: string
             name: 'Dummy',
             oid: '0000',
             agid: '0000',
-            uid: '0000',
-            cid: '0000',
+            uid: '19951f90-6d59-4648-ae06-08e15549f1f1',
+            cid: '904b7c42-7b4b-4637-aa38-e96a55ff4288',
             companyName: 'Some company',
             online: true,
             accessLevel: ItemPrivacy.PRIVATE,
@@ -53,9 +52,10 @@ export const getOne: getOneController = async (req, res) => {
             name: 'Dummy',
             oid,
             agid: '0000',
-            uid: '0000',
-            cid: '0000',
+            uid: '19951f90-6d59-4648-ae06-08e15549f1f1',
+            cid: '904b7c42-7b4b-4637-aa38-e96a55ff4288',
             companyName: 'Some company',
+            description: 'Some description',
             owner: { 
               name: 'Some user',
               email: 'a@b.com'
@@ -84,11 +84,33 @@ export const updateOne: UpdateOneController = async (req, res) => {
   const data = req.body
   const { decoded } = res.locals
 	try {
-        const item = await ItemModel._getDoc(oid)
-        await item._updateItem(data)
-        return responseBuilder(HttpStatusCode.OK, res, null, null)
+    console.log(data)
+    const item = await ItemModel._getDoc(oid)
+    await item._updateItem(data)
+    return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    if (err.message === 'Item not found') {
+      return responseBuilder(HttpStatusCode.NOT_FOUND, res, err)
+    } else {
+      return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    }
+	}
+}
+
+type RemoveOneController = expressTypes.Controller<{ oid: string }, {}, {}, null, localsTypes.ILocals>
+ 
+export const removeOne: RemoveOneController = async (req, res) => {
+  const { oid } = req.params
+  const { decoded } = res.locals
+	try {
+    await ItemService.removeOne(oid)
+    return responseBuilder(HttpStatusCode.OK, res, null, null)
+	} catch (err) {
+    if (err.message === 'Item not found') {
+      return responseBuilder(HttpStatusCode.NOT_FOUND, res, err)
+    } else {
+      return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    }
 	}
 }

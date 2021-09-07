@@ -18,7 +18,7 @@ function errorBuilder(statusCode: HttpStatusCode, errorMessage?: string | null) 
     }
 }
 
-export function responseBuilder<T>(statusCode: HttpStatusCode, res: ApiResponse<T>, error?: string | null, message?: T) {
+export function responseBuilder<T>(statusCode: HttpStatusCode, res: ApiResponse<T>, error?: string | null, message?: T, success?: boolean) {
     const err = errorBuilder(statusCode, error)
     if (err) {
         return res.status(statusCode).json({
@@ -27,7 +27,8 @@ export function responseBuilder<T>(statusCode: HttpStatusCode, res: ApiResponse<
     } else {
         return res.status(statusCode).json({
             error: null,
-            message
+            message,
+            success
         })
     }
 }
