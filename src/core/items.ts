@@ -53,7 +53,14 @@ import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, I
         // Get Item
         const data = await ItemModel._getItem(oid)
         // Get User
-        const user = await UserModel._getUser(data.uid)
+        let owner
+        if (data.uid) {
+            const user = await UserModel._getUser(data.uid)
+            owner = {
+                name: user.name,
+                email: user.email
+            }
+        }
         // Get Company
         const company = await OrganisationModel._getOrganisation(data.cid)
         // Get CS Status
@@ -65,10 +72,7 @@ import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, I
                 ...data,
                 companyName: company.name,
                 online: csObject.sessions.length >= 1,
-                owner: {
-                    name: user.name,
-                    email: user.email
-                },
+                owner,
                 gateway: {
                     name: gateway.name
                 }
