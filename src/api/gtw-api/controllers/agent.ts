@@ -3,6 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { NodeModel } from '../../../persistance/node/model'
@@ -31,8 +32,9 @@ export const deleteAgent: deleteAgentController = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
     }
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+		logger.error(error.message)
+		return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -54,7 +56,8 @@ export const getAgentItems: getAgentItemsController = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+		logger.error(error.message)
+		return responseBuilder(error.status, res, error.message)
 	}
 }

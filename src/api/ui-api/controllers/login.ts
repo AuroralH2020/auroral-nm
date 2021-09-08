@@ -3,6 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { comparePassword, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword } from '../../../auth-server/auth-server'
@@ -16,7 +17,8 @@ type authController = expressTypes.Controller<{}, {username: string, password: s
 export const authenticate: authController = async (req, res) => {
     const { username, password } = req.body
     if (!username || !password) {
-		return responseBuilder(HttpStatusCode.BAD_REQUEST, res)
+                logger.warn('Missing username or password')
+	        return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null, 'Missing username or password')
 	}
 	try {
                 await comparePassword(username, password)
@@ -25,8 +27,9 @@ export const authenticate: authController = async (req, res) => {
                 // TBD: Add passwordless LOGIN
                 return responseBuilder(HttpStatusCode.OK, res, null, token)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -35,7 +38,8 @@ type sendRecoverPwdController = expressTypes.Controller<{}, { username: string }
 export const sendRecoverPwdMail: sendRecoverPwdController = async (req, res) => {
         const { username } = req.body
         if (!username) {
-                return responseBuilder(HttpStatusCode.BAD_REQUEST, res)
+                logger.warn('Missing username')
+                return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null)
 	}
         try {
                 // Check if account exists and verified
@@ -46,8 +50,9 @@ export const sendRecoverPwdMail: sendRecoverPwdController = async (req, res) => 
                 recoverPassword(username, token, res.locals.origin?.realm)
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
-                logger.error(err.message)
-                return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
         }
 }
 
@@ -57,7 +62,8 @@ export const processRecoverPwd: processRecoverPwdController = async (req, res) =
         const { password } = req.body
         const { token } = req.params
         if (!password) {
-                return responseBuilder(HttpStatusCode.BAD_REQUEST, res)
+                logger.warn('Missing password')
+                return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null)
 	}
         try {
                 const decoded = await verifyToken(token)
@@ -74,8 +80,9 @@ export const processRecoverPwd: processRecoverPwdController = async (req, res) =
                 logger.info(`User account ${username} password restored`)
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
-                logger.error(err.message)
-                return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
         }
 }
 
@@ -85,13 +92,15 @@ export const refreshToken: refreshTokenController = async (req, res) => {
         // const { roles } = req.body
         const { decoded } = res.locals
         if (!decoded) {
-                return responseBuilder(HttpStatusCode.BAD_REQUEST, res)
+                logger.warn('Missing token')
+                return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null, 'Missing token')
 	}
         try {
                 const token = await signAppToken(decoded.iss)
                 return responseBuilder(HttpStatusCode.OK, res, null, token)
         } catch (err) {
-                logger.error(err.message)
-                return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
         }
 }

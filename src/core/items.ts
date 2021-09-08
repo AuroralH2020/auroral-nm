@@ -4,6 +4,7 @@
 
 // Imports
 import * as crypto from 'crypto'
+import { errorHandler, ErrorType } from '../utils/error-handler'
 import { logger } from '../utils/logger'
 import { cs } from '../microservices/commServer'
 import { ItemModel } from '../persistance/item/model'
@@ -37,7 +38,8 @@ import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, I
                 online: (await cs.getSessions(it.oid)).sessions.length >= 1
             }
         }))
-    } catch (error) {
+    } catch (err) {
+        const error = errorHandler(err)
         logger.error(error.message)
         throw new Error(error.message)
     }
@@ -71,7 +73,8 @@ import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, I
                     name: gateway.name
                 }
             }
-    } catch (error) {
+    } catch (err) {
+        const error = errorHandler(err)
         logger.error(error.message)
         throw new Error(error.message)
     }
@@ -92,7 +95,8 @@ import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, I
         await NodeModel._addItemToNode(agid, item.oid)
         // TBD: Add notifications and audits
         return password
-    } catch (error) {
+    } catch (err) {
+        const error = errorHandler(err)
         logger.error(error.message)
         throw new Error(error.message)
     }
@@ -110,7 +114,7 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         // Validate agid provided by agent or uid by UI
         if (owner && owner !== item.agid && owner !== item.uid) {
             logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
-            throw new Error('Unauthorized')
+            throw new Error(ErrorType.UNAUTHORIZED)
         }
         // Remove item from user
         if (item.uid) {
@@ -126,7 +130,8 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         await item._removeItem()
         // TBD: Remove contracts
         // TBD: Audits and notifications
-    } catch (error) {
+    } catch (err) {
+        const error = errorHandler(err)
         throw new Error(error.message)
     }
 }
@@ -144,7 +149,7 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
     // Validate agid provided by agent or uid by UI
         if (owner && owner !== item.agid && owner !== item.uid) {
             logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
-            throw new Error('Unauthorized')
+            throw new Error(ErrorType.UNAUTHORIZED)
         }
     // TBD: Do checks before updating
         // Check contracts
@@ -153,7 +158,8 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
         // Dependencies
     // Update
         await item._updateItem(data)
-    } catch (error) {
+    } catch (err) {
+        const error = errorHandler(err)
         throw new Error(error.message)
     }
 }

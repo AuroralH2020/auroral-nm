@@ -9,6 +9,7 @@ import { OrganisationModel } from '../persistance/organisation/model'
 import { INodeCreatePost, NodeType } from '../persistance/node/types'
 import { NodeModel } from '../persistance/node/model'
 import { ItemService } from '../core'
+import { errorHandler } from '../utils/error-handler'
 
 // Constants
 const PUBLIC_NODES = 'PUBLIC_NODES' // CS group for nodes
@@ -29,7 +30,8 @@ export const createOne = async (cid: string, name: string, type: NodeType, passw
         await cs.addUserToGroup(node.agid, PUBLIC_NODES)
         // TBD: Add audit
         // TBD: Add notification
-    } catch (error) {
+    } catch (err) {
+        const error = errorHandler(err)
         logger.error(error.message)
         throw new Error(error.message)
     }
@@ -58,7 +60,8 @@ export const removeOne = async (agid: string, cid?: string): Promise<void> => {
         await cs.deleteUser(node.agid)
         // TBD: Add notification
         // TBD: Add audit
-    } catch (error) {
+    } catch (err) {
+        const error = errorHandler(err)
         logger.error(error.message)
         throw new Error(error.message)
     }

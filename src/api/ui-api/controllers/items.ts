@@ -3,6 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { ItemService } from '../../../core'
@@ -19,8 +20,9 @@ export const getMany: getManyController = async (req, res) => {
         const data = await ItemService.getMany(decoded.org, type, offset, filter)
         return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -33,8 +35,9 @@ export const getOne: getOneController = async (req, res) => {
         const data = await ItemService.getOne(decoded.org, oid)
         return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -48,12 +51,9 @@ export const updateOne: UpdateOneController = async (req, res) => {
     await ItemService.updateOne(oid, data, decoded.uid)
     return responseBuilder(HttpStatusCode.OK, res, null, null, true)
 	} catch (err) {
-		logger.error(err.message)
-    if (err.message === 'Unauthorized') {
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, err)
-    } else {
-      return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
-    }
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -66,11 +66,8 @@ export const removeOne: RemoveOneController = async (req, res) => {
     await ItemService.removeOne(oid, decoded.uid)
     return responseBuilder(HttpStatusCode.OK, res, null, null, true)
 	} catch (err) {
-    logger.error(err.message)
-    if (err.message === 'Unauthorized') {
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, err)
-    } else {
-      return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
-    }
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }

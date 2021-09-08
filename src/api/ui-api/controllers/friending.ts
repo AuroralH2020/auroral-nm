@@ -3,6 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { OrganisationModel } from '../../../persistance/organisation/model'
@@ -46,8 +47,9 @@ export const processFriendRequest: processFriendRequestController = async (req, 
     logger.info('Friend request sent from ' + myCid + ' to ' + friendCid)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -93,8 +95,9 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
     logger.info('Friend request accepted between' + myCid + ' and ' + friendCid)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -137,8 +140,9 @@ export const rejectFriendRequest: rejectFriendRequestController = async (req, re
     logger.info('Friend request rejected between' + myCid + ' and ' + friendCid)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -181,8 +185,9 @@ export const cancelFriendRequest: cancelFriendRequestController = async (req, re
     logger.info('Friend request cancelled between' + myCid + ' and ' + friendCid)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -222,7 +227,8 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
     logger.info('Friend cancelled between' + myCid + ' and ' + friendCid)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }

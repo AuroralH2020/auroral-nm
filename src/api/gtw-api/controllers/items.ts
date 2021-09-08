@@ -3,6 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { cs } from '../../../microservices/commServer'
@@ -55,8 +56,9 @@ export const registration: registrationController = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, response)
     }
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -74,8 +76,9 @@ export const neighbourhood: neighbourhoodController = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -92,7 +95,8 @@ export const deleteItems: deleteItemsController = async (req, res) => {
           await ItemService.removeOne(it, agid)
           logger.info(it + ' was removed from ' + agid)
         } catch (error) {
-          logger.error(error.message)
+          const e = errorHandler(error)
+          logger.error(e.message)
         }
       })
       return responseBuilder(HttpStatusCode.OK, res, null, null)
@@ -101,8 +105,9 @@ export const deleteItems: deleteItemsController = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
     }
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -125,7 +130,8 @@ export const updateItem: updateItemController = async (req, res) => {
           // TBD: Audits and notifications
           logger.info(it.oid + ' was updated')
         } catch (error) {
-          logger.error(error)
+          const e = errorHandler(error)
+          logger.error(e.message)
         }
       })
       return responseBuilder(HttpStatusCode.OK, res, null, null)
@@ -134,7 +140,8 @@ export const updateItem: updateItemController = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
     }
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }

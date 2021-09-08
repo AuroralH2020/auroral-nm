@@ -6,6 +6,7 @@ import { Config } from '../config'
 import { logger } from '../utils/logger'
 import { RegistrationType } from '../persistance/registration/types'
 import { InvitationType } from '../persistance/invitation/types'
+import { errorHandler } from '../utils/error-handler'
 
 const TEMP_RECOVER_PWD = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/recoverPwd.html', 'utf-8')
 const TEMP_ACTIVATE_COMPANY = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/activateCompany.html', 'utf-8')
@@ -36,7 +37,8 @@ const sendMail = async (mails: string | string[], cc: string | string[] | undefi
             html: html, // html body
             attachments: attachments
         })
-    } catch (error) {
+    } catch (err) {
+        const error = errorHandler(err)
         logger.error(error.message)
     }
 }

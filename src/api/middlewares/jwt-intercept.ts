@@ -1,9 +1,9 @@
 import { Auth } from '../../utils/jwt'
 import { Controller } from '../../types/express-types'
 import { responseBuilder } from '../../utils/response-builder'
-import { HttpStatusCode } from '../../utils/http-status-codes'
 import { ILocals } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
+import { errorHandler } from '../../utils/error-handler'
 
 type JwtController = Controller<{}, {}, {}, null, ILocals>
 
@@ -51,8 +51,8 @@ export const jwt = (roles?: RolesEnum[]) => {
             res.locals.token = token
             next()
         } catch (err) {
-            // console.log(err.stack)
-            return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err.message)
+            const error = errorHandler(err)
+            return responseBuilder(error.status, res, error.message)
         }
     } as JwtController
   }

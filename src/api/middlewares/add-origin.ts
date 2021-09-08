@@ -1,7 +1,8 @@
 import { logger } from '../../utils/logger'
 import { Controller } from '../../types/express-types'
-import { responseBuilder, HttpStatusCode } from '../../utils'
+import { responseBuilder } from '../../utils'
 import { ILocals, Interfaces } from '../../types/locals-types'
+import { errorHandler } from '../../utils/error-handler'
 
 type originController = Controller<{}, {}, {}, null, ILocals>
 
@@ -17,8 +18,9 @@ export const addOrigin = (_type: Interfaces) => {
             logger.debug(`Succesful request to ${req.method} ${req.path}`)
             next()
         } catch (err) {
-            logger.error(err.stack)
-            return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err.message)
+            const error = errorHandler(err)
+            logger.error(error.stack)
+            return responseBuilder(error.status, res, error.message)
         }
     } as originController
 }

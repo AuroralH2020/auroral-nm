@@ -3,6 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { InvitationModel } from '../../../persistance/invitation/model'
@@ -22,8 +23,9 @@ export const getInvitation: getInvitationController = async (req, res) => {
                 await InvitationModel._setUsedInvitation(invitationId)
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
-                logger.error(err.message)
-                return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
         }
 }
 
@@ -51,7 +53,8 @@ export const postInvitation: postInvitationController = async (req, res) => {
                         return responseBuilder(HttpStatusCode.OK, res, null, null)
                 }
         } catch (err) {
-                logger.error(err.message)
-                return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
         }
 }

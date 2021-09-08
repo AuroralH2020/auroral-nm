@@ -5,9 +5,10 @@ import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
 
 // Controller specific imports
-import { IRecordCreate, IRecordCreatePost } from '../../../persistance/record/types'
+import { IRecordCreate } from '../../../persistance/record/types'
 import { NodeModel } from '../../../persistance/node/model'
 import { RecordModel } from '../../../persistance/record/model'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controllers
 
@@ -20,8 +21,9 @@ export const handshake: handshakeController = async (req, res) => {
     const data = decoded ? `Gateway ${decoded.iss} authenticated` : 'Gateway connected as anonymous, restrictions might apply'
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -46,8 +48,9 @@ export const sendCounters: sendCountersController = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
     }
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -73,8 +76,9 @@ export const getCounters: getCountersController = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
     }
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 

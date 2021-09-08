@@ -3,6 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { INodeCreate, INodeUI, INodeUpdate } from '../../../persistance/node/types'
@@ -23,8 +24,9 @@ export const getNode: getNodeController = async (req, res) => {
     const data = await NodeModel._getNode(agid, decoded.org)
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -37,8 +39,9 @@ export const getNodes: getNodesController = async (req, res) => {
     const data = await NodeModel._getAllNodes(nodes)
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -52,8 +55,9 @@ export const createNode: postNodeController = async (req, res) => {
     await NodeService.createOne(decoded.org, name, type, password)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -72,8 +76,9 @@ export const updateNode: putNodeController = async (req, res) => {
     // TBD: Consider updating password too 
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -88,8 +93,9 @@ export const removeNode: removeNodeController = async (req, res) => {
     await NodeService.removeOne(agid, decoded.org)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -101,8 +107,9 @@ export const getKey: getKeyController = async (req, res) => {
     const key = await NodeModel._getKey(agid)
     return responseBuilder(HttpStatusCode.OK, res, null, key)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
 
@@ -115,7 +122,8 @@ export const removeKey: removeKeyController = async (req, res) => {
     await NodeModel._removeKey(agid)
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
-		logger.error(err.message)
-		return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, err)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
 	}
 }
