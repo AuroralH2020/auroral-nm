@@ -3,6 +3,7 @@
  */
 
 import { HttpStatusCode } from './http-status-codes'
+import { logger } from './logger'
 
 type CustomError = {
     message: string,
@@ -24,6 +25,8 @@ export const errorHandler = (err: unknown): CustomError => {
             stack: err.stack
         }
     } else {
+        logger.warn('Caught unexpected error type...')
+        logger.warn('Error type: ' + typeof err)
         return {
             message: 'Server error',
             status: HttpStatusCode.INTERNAL_SERVER_ERROR
