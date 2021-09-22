@@ -2,6 +2,7 @@
 import { Router } from 'express'
 // Middlewares
 import { jwt, addOrigin } from '../middlewares/index'
+import { validateBody } from '../middlewares/body-validator'
 // Controllers
 import * as loginCtrl from './controllers/login'
 import * as registrationCtrl from './controllers/registration'
@@ -15,6 +16,8 @@ import * as itemsCtrl from './controllers/items'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
+//Joi schemas
+import { registrationSchema } from '../../core/joi-schemas'
 
 const UiRouter = Router()
 
@@ -29,7 +32,8 @@ UiRouter
 
 // REGISTRATION
 .get('/registration', jwt([RolesEnum.DEV_OPS]), addOrigin(Interfaces.UI), registrationCtrl.getAllRegistrations)
-.post('/registration', addOrigin(Interfaces.UI), registrationCtrl.postRegistration)
+.post('/registration', addOrigin(Interfaces.UI), validateBody(registrationSchema), registrationCtrl.postRegistration)
+// .post('/registration', addOrigin(Interfaces.UI), registrationCtrl.postRegistration)
 .get('/registration/:registrationId', jwt([RolesEnum.DEV_OPS]), addOrigin(Interfaces.UI), registrationCtrl.getRegistration)
 .put('/registration/:token', addOrigin(Interfaces.UI), registrationCtrl.putRegistration)
 .post('/registration/duplicatesUser', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesUser)

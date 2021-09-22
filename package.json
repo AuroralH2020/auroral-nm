@@ -42,6 +42,7 @@
     "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "got": "^11.8.1",
+    "joi": "^17.4.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.9",
     "mustache": "^4.2.0",
