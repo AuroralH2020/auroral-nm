@@ -5,6 +5,8 @@ import { Controller } from '../../types/express-types'
 import { responseBuilder } from '../../utils'
 import { errorHandler } from '../../utils/error-handler'
 import { JsonType } from '../../types/misc-types'
+import { HttpStatusCode } from '../../utils/http-status-codes'
+
 
 type bodyValidatorController = Controller<{}, JsonType, {}, null, {}>
 
@@ -14,7 +16,7 @@ export const validateBody = (_schema: Joi.ObjectSchema) => {
             const validation = _schema.validate(req.body.data)
             if (validation.error) {
                 logger.debug(validation.error.message)
-                return responseBuilder(400, res,  validation.error.stack)
+                return responseBuilder(HttpStatusCode.BAD_REQUEST, res,  validation.error.stack)
             } else {
                 next()
             }

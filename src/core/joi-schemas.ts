@@ -9,7 +9,7 @@ export const registrationSchema = Joi.object({
     email: Joi.string().required(),
     // Pattern: min 8 characters, at least one uppercase, at least one lowercase
     // eslint-disable-next-line no-control-regex
-    password: Joi.string().min(8).pattern(new RegExp('(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]*)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$')).required()
+    password: Joi.string().min(8).pattern(new RegExp('(?=^.{8,}$)(?=.*[0-9])(?=.*[!@#$%^&*]*)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$')).required()
     .messages({
         'string.pattern.base': '"password" should have minimum 8 characters with at least 1 uppercase character and 1 digit (0-9)',
         'string.empty': '"password" cannot be an empty field',
