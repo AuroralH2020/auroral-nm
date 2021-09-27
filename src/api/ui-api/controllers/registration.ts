@@ -47,10 +47,10 @@ export const getAllRegistrations: getRegistrationsController = async (req, res) 
 	}
 }
 
-type postRegistrationController = expressTypes.Controller<{}, { data: IRegistrationPre } , {}, null, localsTypes.ILocals>
+type postRegistrationController = expressTypes.Controller<{}, IRegistrationPre , {}, null, localsTypes.ILocals>
  
 export const postRegistration: postRegistrationController = async (req, res) => {
-  const { data } = req.body
+  const data  = req.body
   const locals = res.locals
 	try {
     if (!data.status) {

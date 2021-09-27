@@ -16,8 +16,8 @@ import * as itemsCtrl from './controllers/items'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
-//Joi schemas
-import { registrationSchema } from '../../core/joi-schemas'
+// Joi schemas
+import { updateItemSchema, updateOrganisationSchema, passwordSchema, registrationSchema, registrationStatusSchema, updateNodeSchema, updatePasswordSchema, updateUserSchema, emptyItemSchema } from '../../core/joi-schemas'
 
 const UiRouter = Router()
 
@@ -26,7 +26,7 @@ UiRouter
 .post('/login/authenticate', addOrigin(Interfaces.UI), loginCtrl.authenticate)
 .post('/login/refresh', addOrigin(Interfaces.UI), jwt(), loginCtrl.refreshToken)
 .post('/login/recovery', addOrigin(Interfaces.UI), loginCtrl.sendRecoverPwdMail)
-.put('/login/recovery/:token', addOrigin(Interfaces.UI), loginCtrl.processRecoverPwd)
+.put('/login/recovery/:token', addOrigin(Interfaces.UI), validateBody(passwordSchema), loginCtrl.processRecoverPwd)
 // .post('/remember', loginCtrl.rememberCookie)
 // .put('/remember/:id', loginCtrl.updateCookie)
 
@@ -35,7 +35,7 @@ UiRouter
 .post('/registration', addOrigin(Interfaces.UI), validateBody(registrationSchema), registrationCtrl.postRegistration)
 // .post('/registration', addOrigin(Interfaces.UI), registrationCtrl.postRegistration)
 .get('/registration/:registrationId', jwt([RolesEnum.DEV_OPS]), addOrigin(Interfaces.UI), registrationCtrl.getRegistration)
-.put('/registration/:token', addOrigin(Interfaces.UI), registrationCtrl.putRegistration)
+.put('/registration/:token', addOrigin(Interfaces.UI), validateBody(registrationStatusSchema), registrationCtrl.putRegistration)
 .post('/registration/duplicatesUser', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesUser)
 .post('/registration/duplicatesCompany', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesCompany)
 
@@ -47,7 +47,7 @@ UiRouter
 .get('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getOne)
 .get('/organisations/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getMany)
 .get('/organisation/:cid/configuration', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getConfiguration)
-.put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.updateOrganisation)
+.put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), validateBody(updateOrganisationSchema), organisationCtrl.updateOrganisation)
 // .delete
 // Send friendship request to cid by autenticated user
 .post('/organisation/:cid/friendship/request', jwt(), addOrigin(Interfaces.UI), friendingCtrl.processFriendRequest)
@@ -63,15 +63,15 @@ UiRouter
 // USERS
 .get('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.getOne)
 .get('/users/:cid', jwt(), addOrigin(Interfaces.UI), userCtrl.getMany)
-.put('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.updateUser)
-.put('/user/password/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.updateUserPassword)
+.put('/user/:uid', jwt(), addOrigin(Interfaces.UI), validateBody(updateUserSchema), userCtrl.updateUser)
+.put('/user/password/:uid', jwt(), addOrigin(Interfaces.UI), validateBody(updatePasswordSchema), userCtrl.updateUserPassword)
 // .delete
 
 // NODES
 .get('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getNode)
 .get('/nodes', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getNodes)
 .post('/node', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.createNode)
-.put('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.updateNode)
+.put('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), validateBody(updateNodeSchema), nodeCtrl.updateNode)
 .get('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getKey)
 .delete('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeKey)
 .delete('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeNode)
@@ -79,12 +79,12 @@ UiRouter
 // ITEMS
 .get('/items', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getMany)
 .get('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getOne)
-.put('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.updateOne)
+.put('/items/:oid', jwt(), addOrigin(Interfaces.UI), validateBody(updateItemSchema), itemsCtrl.updateOne)
 .delete('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.removeOne)
 
 // NOTIFICATIONS
 .get('/notifications/', jwt(), addOrigin(Interfaces.UI), notificationCtrl.getNotifications)
 .get('/notifications/refresh', jwt(), addOrigin(Interfaces.UI), notificationCtrl.refreshNotifications)
-.put('/notifications/read/:notificationId', jwt(), addOrigin(Interfaces.UI), notificationCtrl.setRead)
+.put('/notifications/read/:notificationId', jwt(), addOrigin(Interfaces.UI), validateBody(emptyItemSchema), notificationCtrl.setRead)
 
 export { UiRouter }
