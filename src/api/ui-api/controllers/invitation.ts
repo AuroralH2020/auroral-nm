@@ -29,11 +29,11 @@ export const getInvitation: getInvitationController = async (req, res) => {
         }
 }
 
-type postInvitationController = expressTypes.Controller<{}, { data: IInvitationPre }, {}, null, localsTypes.ILocals>
+type postInvitationController = expressTypes.Controller<{}, IInvitationPre, {}, null, localsTypes.ILocals>
  
 export const postInvitation: postInvitationController = async (req, res) => {
         const { decoded, origin }  = res.locals
-        const { data } = req.body
+        const data = req.body
         try {        
                 if (!decoded) {
                         throw new Error('Problem decoding token') 

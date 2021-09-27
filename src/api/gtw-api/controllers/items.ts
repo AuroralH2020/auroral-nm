@@ -121,11 +121,13 @@ export const updateItem: updateItemController = async (req, res) => {
       const agid = decoded.iss
       thingDescriptions.forEach(async (it) => {
         try {
-          const item = await ItemModel._getDoc(it.oid)
-          if (agid !== item.agid) {
-            throw new Error('Cannot update ' + it + ' because it does not belong to ' + agid)
+          if (it.oid) {
+            const item = await ItemModel._getDoc(it.oid)
+            if (agid !== item.agid) {
+              throw new Error('Cannot update ' + it + ' because it does not belong to ' + agid)
+            }
+            await item._updateItem(it)
           }
-          await item._updateItem(it)
           // TBD: Update contracts if needed
           // TBD: Audits and notifications
           logger.info(it.oid + ' was updated')

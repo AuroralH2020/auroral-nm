@@ -75,7 +75,7 @@ export interface IItemCreatePost {
 
 // Input to create a new Item
 export interface IItemUpdate {
-    oid: string,
+    oid?: string,
     name?: string, // fullName
     agid?: string,
     avatar?: string,
