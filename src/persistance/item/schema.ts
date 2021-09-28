@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getItem, getDoc, createItem, getAllItems } from './statics'
+import { getItem, getDoc, createItem, getAllItems, addUserToItem, removeUserFromItem } from './statics'
 import { updateItem, removeItem } from './methods'
 import { IItemDocument, IItemModel, ItemType, ItemStatus, ItemPrivacy } from './types'
 
@@ -35,6 +35,8 @@ ItemSchema.statics._getItem = getItem
 ItemSchema.statics._getDoc = getDoc
 ItemSchema.statics._createItem = createItem
 ItemSchema.statics._getAllItems = getAllItems
+ItemSchema.statics._addUserToItem = addUserToItem
+ItemSchema.statics._removeUserFromItem = removeUserFromItem
 
 // Methods
 

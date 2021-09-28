@@ -117,4 +117,13 @@ export interface IItemModel extends Model<IItemDocument> {
         params: GetAllQuery,
         offset: number
     ) => Promise<IItem[]>
+    _addUserToItem: (
+        this: IItemModel,
+        oid: string,
+        uid: string
+    ) => Promise<void>
+    _removeUserFromItem: (
+        this: IItemModel,
+        oid: string
+    ) => Promise<void>
 }

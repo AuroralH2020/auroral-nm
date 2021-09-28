@@ -49,3 +49,15 @@ export async function createItem(
     }
     return this.create(newItem)
 }
+
+export async function addUserToItem (
+  this: IItemModel, oid: string, uid: string
+): Promise<void> {
+  await this.updateOne({ oid }, { $set: { uid } }).exec()
+}
+
+export async function removeUserFromItem (
+  this: IItemModel, oid: string
+): Promise<void> {
+  await this.updateOne({ oid }, { $set: { uid: null } }).exec()
+}
