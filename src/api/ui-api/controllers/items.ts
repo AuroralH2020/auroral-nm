@@ -7,7 +7,12 @@ import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { ItemService } from '../../../core'
-import { IItemUI, IItemUpdate, ItemType } from '../../../persistance/item/types'
+import { IItemUI, IItemUpdate, ItemStatus, ItemType } from '../../../persistance/item/types'
+import { OrganisationModel } from '../../../persistance/organisation/model'
+import { NotificationModel } from '../../../persistance/notification/model'
+import { UserModel } from '../../../persistance/user/model'
+import { NotificationStatus, NotificationType } from '../../../persistance/notification/types'
+import { ItemModel } from '../../../persistance/item/model'
 
 // Controllers
 
@@ -49,6 +54,25 @@ export const updateOne: UpdateOneController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     await ItemService.updateOne(oid, data, decoded.uid)
+    // Send notification to company
+    const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
+    const myItemName = (await ItemModel._getItem(oid)).name
+    let notifType = NotificationType.itemUpdatedByUser
+    if (data.status) { 
+      if (data.status === ItemStatus.DISABLED) {
+        notifType = NotificationType.itemDisabled
+      }
+      if (data.status === ItemStatus.ENABLED) {
+        notifType = NotificationType.itemEnabled
+      }
+    }
+    await NotificationModel._createNotification({
+      owner: decoded.org,
+      actor: { id: decoded.org, name: myOrgName },
+      target: { id: oid, name: myItemName },
+      type: notifType,
+      status: NotificationStatus.INFO
+    })
     return responseBuilder(HttpStatusCode.OK, res, null, null, true)
 	} catch (err) {
     const error = errorHandler(err)
@@ -64,6 +88,16 @@ export const removeOne: RemoveOneController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     await ItemService.removeOne(oid, decoded.uid)
+    // Send notification to company
+    const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
+    const myItemName = (await ItemModel._getItem(oid)).name
+    await NotificationModel._createNotification({
+      owner: decoded.org,
+      actor: { id: decoded.org, name: myOrgName },
+      target: { id: oid, name: myItemName },
+      type: NotificationType.itemRemoved,
+      status: NotificationStatus.INFO
+    })
     return responseBuilder(HttpStatusCode.OK, res, null, null, true)
 	} catch (err) {
     const error = errorHandler(err)
