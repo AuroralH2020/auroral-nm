@@ -12,6 +12,7 @@ import { NodeModel } from '../../../persistance/node/model'
 import { ItemModel } from '../../../persistance/item/model'
 import { ItemService } from '../../../core'
 import { csUserRoster } from '../../../types/cs-types'
+import { Config } from '../../../config'
 
 // Types
 
@@ -32,28 +33,31 @@ export const registration: registrationController = async (req, res) => {
 	try {
     logger.debug('Registering items in node: ' + req.body.agid)
     const response: registrationResponse[] = []
-    if (decoded) {
-      const agid = decoded.iss ? decoded.iss : req.body.agid
-      const cid = (await NodeModel._getNode(agid)).cid
-      // Async registration of items
-      await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
-        try {
-          // Create item
-          const password = await ItemService.createOne(it, agid, cid)
-          // Create response
-          response.push({ name: it.name, oid: it.oid, password })
-          return true
-        } catch (error) {
-          // Create response
-          response.push({ name: it.name, oid: it.oid, password: null, error: true })
-          return false
-        }
-      }))
-      logger.info('Gateway with id ' + agid + ' registered items')
-      return responseBuilder(HttpStatusCode.OK, res, null, response)
+    if (!decoded && Config.NODE_ENV === 'production') {
+        logger.error('Gateway unauthorized access attempt')
+        return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, response)
     } else {
-      logger.error('Gateway unauthorized access attempt')
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, response)
+        if (!decoded) {
+          logger.warn('Gateway anonymous access, it will be forbidden in production...')
+        }
+        const agid = decoded ? decoded.iss : req.body.agid
+        const cid = (await NodeModel._getNode(agid)).cid
+        // Async registration of items
+        await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
+          try {
+            // Create item
+            const password = await ItemService.createOne(it, agid, cid)
+            // Create response
+            response.push({ name: it.name, oid: it.oid, password })
+            return true
+          } catch (error) {
+            // Create response
+            response.push({ name: it.name, oid: it.oid, password: null, error: true })
+            return false
+          }
+        }))
+        logger.info('Gateway with id ' + agid + ' registered items')
+        return responseBuilder(HttpStatusCode.OK, res, null, response)
     }
 	} catch (err) {
     const error = errorHandler(err)
@@ -67,14 +71,17 @@ type neighbourhoodController = expressTypes.Controller<{ oid: string }, {}, {}, 
 export const neighbourhood: neighbourhoodController = async (req, res) => {
   const { oid } = req.params
   const { decoded } = res.locals
-	try {
-    if (decoded) {
-      const neighbours = await cs.getUserRoster(oid)
-      return responseBuilder(HttpStatusCode.OK, res, null, neighbours)
-    } else {
-      logger.error('Gateway unauthorized access attempt')
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
-    }
+    try {
+        if (!decoded && Config.NODE_ENV === 'production') {
+            logger.error('Gateway unauthorized access attempt')
+            return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+        } else {
+            if (!decoded) {
+              logger.warn('Gateway anonymous access, it will be forbidden in production...')
+            }
+            const neighbours = await cs.getUserRoster(oid)
+            return responseBuilder(HttpStatusCode.OK, res, null, neighbours)
+        }
 	} catch (err) {
     const error = errorHandler(err)
     logger.error(error.message)
@@ -82,27 +89,30 @@ export const neighbourhood: neighbourhoodController = async (req, res) => {
 	}
 }
 
-type deleteItemsController = expressTypes.Controller<{}, { oids: string[] }, {}, null, localsTypes.ILocalsGtw>
+type deleteItemsController = expressTypes.Controller<{}, { agid: string, oids: string[] }, {}, null, localsTypes.ILocalsGtw>
  
 export const deleteItems: deleteItemsController = async (req, res) => {
   const { oids } = req.body
   const { decoded } = res.locals
 	try {
-    if (decoded) {
-      const agid = decoded.iss
-      oids.forEach(async (it) => {
-        try {
-          await ItemService.removeOne(it, agid)
-          logger.info(it + ' was removed from ' + agid)
-        } catch (error) {
-          const e = errorHandler(error)
-          logger.error(e.message)
+      if (!decoded && Config.NODE_ENV === 'production') {
+          logger.error('Gateway unauthorized access attempt')
+          return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+      } else {
+        if (!decoded) {
+          logger.warn('Gateway anonymous access, it will be forbidden in production...')
         }
-      })
-      return responseBuilder(HttpStatusCode.OK, res, null, null)
-    } else {
-      logger.error('Gateway unauthorized access attempt')
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
+        const agid = decoded ? decoded.iss : req.body.agid
+        oids.forEach(async (it) => {
+          try {
+            await ItemService.removeOne(it, agid)
+            logger.info(it + ' was removed from ' + agid)
+          } catch (error) {
+            const e = errorHandler(error)
+            logger.error(e.message)
+          }
+        })
+        return responseBuilder(HttpStatusCode.OK, res, null, null)
     }
 	} catch (err) {
     const error = errorHandler(err)
@@ -111,36 +121,39 @@ export const deleteItems: deleteItemsController = async (req, res) => {
 	}
 }
 
-type updateItemController = expressTypes.Controller<{}, { thingDescriptions: IItemUpdate[] }, {}, null, localsTypes.ILocalsGtw>
+type updateItemController = expressTypes.Controller<{}, { agid: string, thingDescriptions: IItemUpdate[] }, {}, null, localsTypes.ILocalsGtw>
  
 export const updateItem: updateItemController = async (req, res) => {
   const { thingDescriptions } = req.body
   const { decoded } = res.locals
 	try {
-    if (decoded) {
-      const agid = decoded.iss
-      thingDescriptions.forEach(async (it) => {
-        try {
-          if (it.oid) {
-            const item = await ItemModel._getDoc(it.oid)
-            if (agid !== item.agid) {
-              throw new Error('Cannot update ' + it + ' because it does not belong to ' + agid)
-            }
-            await item._updateItem(it)
+      if (!decoded && Config.NODE_ENV === 'production') {
+          logger.error('Gateway unauthorized access attempt')
+          return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+      } else {
+          if (!decoded) {
+            logger.warn('Gateway anonymous access, it will be forbidden in production...')
           }
-          // TBD: Update contracts if needed
-          // TBD: Audits and notifications
-          logger.info(it.oid + ' was updated')
-        } catch (error) {
-          const e = errorHandler(error)
-          logger.error(e.message)
+          const agid = decoded ? decoded.iss : req.body.agid
+            thingDescriptions.forEach(async (it) => {
+              try {
+                if (it.oid) {
+                  const item = await ItemModel._getDoc(it.oid)
+                  if (agid !== item.agid) {
+                    throw new Error('Cannot update ' + it + ' because it does not belong to ' + agid)
+                  }
+                  await item._updateItem(it)
+                }
+                // TBD: Update contracts if needed
+                // TBD: Audits and notifications
+                logger.info(it.oid + ' was updated')
+              } catch (error) {
+                const e = errorHandler(error)
+                logger.error(e.message)
+              }
+            })
+            return responseBuilder(HttpStatusCode.OK, res, null, null)
         }
-      })
-      return responseBuilder(HttpStatusCode.OK, res, null, null)
-    } else {
-      logger.error('Gateway unauthorized access attempt')
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
-    }
 	} catch (err) {
     const error = errorHandler(err)
     logger.error(error.message)
