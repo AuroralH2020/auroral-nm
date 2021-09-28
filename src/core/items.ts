@@ -116,7 +116,7 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         // Get item
         const item = await ItemModel._getDoc(oid)
         // Validate agid provided by agent or uid by UI
-        if (owner && owner !== item.agid && owner !== item.uid) {
+        if (owner != null && owner !== item.agid && owner !== item.uid) {
             logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
             throw new Error(ErrorType.UNAUTHORIZED)
         }
@@ -151,17 +151,35 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
     // Get item
         const item = await ItemModel._getDoc(oid)
     // Validate agid provided by agent or uid by UI
-        if (owner && owner !== item.agid && owner !== item.uid) {
-            logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
+        if (owner != null && owner !== item.agid && owner !== item.uid && item.status !== ItemStatus.DISABLED) {
+            logger.error('Cannot update ' + oid + ' because it does not belong to user or agent requester: ' + owner)
             throw new Error(ErrorType.UNAUTHORIZED)
         }
     // TBD: Do checks before updating
-        // Check contracts
-        // Check conflicts
-        // Authorizations
-        // Dependencies
+    // Check contracts
+    // Check conflicts
+    // Authorizations
+    // Dependencies
+    
     // Update
-        await item._updateItem(data)
+        if (data.status && owner) {
+            // Add privacy if disabling
+            const dataWithPrivacy = data.status === ItemStatus.DISABLED ?
+                { status: data.status, accessLevel: ItemPrivacy.PRIVATE } : 
+                data
+            // Update status
+            await item._updateItem(dataWithPrivacy)
+            // Add/remove item to/from user AND user from item
+            if (data.status === ItemStatus.DISABLED) {
+                await UserModel._removeItemFromUser(owner, oid)
+                await ItemModel._removeUserFromItem(oid)
+            } else {
+                await UserModel._addItemToUser(owner, oid)
+                await ItemModel._addUserToItem(oid, owner)
+            }
+        } else {
+            await item._updateItem(data)
+        }
     } catch (err) {
         const error = errorHandler(err)
         throw new Error(error.message)
