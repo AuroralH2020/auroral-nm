@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import { INotificationDocument, INotificationModel, INotificationCreate, INotification, NotificationStatus, NotifFinderType } from './types'
+import { MyError, ErrorSource } from '../../utils/error-handler'
+import { HttpStatusCode } from '../../utils/http-status-codes'
+import { logger } from '../../utils/logger'
 
 export async function getNotifications(
   this: INotificationModel, owners: string[], unreadOnly: boolean, limit: number = 0, offset: number = 0
@@ -17,7 +20,8 @@ export async function getNotifications(
   if (records) {
     return records
   } else {
-    throw new Error('Notification not found')
+    logger.warn('Notification not found')
+    throw new MyError('Notification not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -28,7 +32,8 @@ export async function getDoc(
   if (record) {
     return record
   } else {
-    throw new Error('Notification not found')
+    logger.warn('Notification not found')
+    throw new MyError('Notification not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 

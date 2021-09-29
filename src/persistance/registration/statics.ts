@@ -1,4 +1,7 @@
 import { IRegistrationDocument, IRegistrationModel, IRegistrationPost, IRegistration, RegistrationStatus } from './types'
+import { MyError, ErrorSource } from '../../utils/error-handler'
+import { HttpStatusCode } from '../../utils/http-status-codes'
+import { logger } from '../../utils/logger'
 
 export async function getDoc(
   this: IRegistrationModel, registrationId: string
@@ -7,7 +10,8 @@ export async function getDoc(
   if (record) {
     return record
   } else {
-    throw new Error('Registration not found')
+    logger.warn('Registration not found')
+    throw new MyError('Registration not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -18,7 +22,8 @@ export async function getRegistration(
   if (record) {
     return record
   } else {
-    throw new Error('Registration not found')
+    logger.warn('Registration not found')
+    throw new MyError('Registration not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -29,7 +34,8 @@ export async function getAllRegistration(
   if (record) {
     return record
   } else {
-    throw new Error('Registration not found')
+    logger.warn('Registration not found')
+    throw new MyError('Registration not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 

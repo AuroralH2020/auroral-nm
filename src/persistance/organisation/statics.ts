@@ -1,16 +1,20 @@
 import { IOrganisationDocument, IOrganisationModel, IOrganisationCreate, IOrganisationUI, OrganisationStatus, OrgConfiguration } from './types'
+import { MyError, ErrorSource } from '../../utils/error-handler'
+import { HttpStatusCode } from '../../utils/http-status-codes'
+import { logger } from '../../utils/logger'
 
 export async function getOrganisation(
   this: IOrganisationModel, cid: string
 ): Promise<IOrganisationUI> {
   const record = await this.findOne(
-    { cid }, 
+    { cid, status: OrganisationStatus.ACTIVE }, 
     { hasNotifications: 0, hasAudits: 0 }
     ).lean().exec()
   if (record) {
     return record
   } else {
-    throw new Error('Organisation not found')
+    logger.warn('Organisation not found')
+    throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -19,7 +23,7 @@ export async function getOrganisations(
 ): Promise<IOrganisationUI[]> {
   // Define variables and constants
   const LIMIT = 12 // max num of items when pagination active
-  const query = {}
+  const query = { status: OrganisationStatus.ACTIVE }
   let record: IOrganisationUI[] = [] // final result
   // Retrieve all organisations
   if (type === 0) {
@@ -44,18 +48,20 @@ export async function getOrganisations(
   if (record) {
     return record
   } else {
-    throw new Error('Organisation not found')
+    logger.warn('Organisation not found')
+    throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
 export async function getDoc(
   this: IOrganisationModel, cid: string
 ): Promise<IOrganisationDocument> {
-  const record = await this.findOne({ cid }).exec()
+  const record = await this.findOne({ cid,  status: OrganisationStatus.ACTIVE }).exec()
   if (record) {
     return record
   } else {
-    throw new Error('Organisation not found')
+    logger.warn('Organisation not found')
+    throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -88,7 +94,8 @@ export async function getConfiguration(
         skinColor: record.skinColor
       }
     } else {
-      throw new Error('Organisation not found')
+      logger.warn('Organisation not found')
+      throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
     }
   }
 
