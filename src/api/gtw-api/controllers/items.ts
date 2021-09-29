@@ -13,6 +13,10 @@ import { ItemModel } from '../../../persistance/item/model'
 import { ItemService } from '../../../core'
 import { csUserRoster } from '../../../types/cs-types'
 import { Config } from '../../../config'
+import { OrganisationModel } from '../../../persistance/organisation/model'
+import { NotificationModel } from '../../../persistance/notification/model'
+import { UserModel } from '../../../persistance/user/model'
+import { NotificationStatus, NotificationType } from '../../../persistance/notification/types'
 
 // Types
 
@@ -49,6 +53,15 @@ export const registration: registrationController = async (req, res) => {
             const password = await ItemService.createOne(it, agid, cid)
             // Create response
             response.push({ name: it.name, oid: it.oid, password })
+            // Create Notification
+            const myOrgName = (await OrganisationModel._getOrganisation(cid)).name
+            await NotificationModel._createNotification({
+              owner: cid,
+              actor: { id: cid, name: myOrgName },
+              target: { id: it.oid, name: it.name },
+              type: NotificationType.itemDiscovered,
+              status: NotificationStatus.INFO
+            })
             return true
           } catch (error) {
             // Create response
@@ -106,6 +119,16 @@ export const deleteItems: deleteItemsController = async (req, res) => {
         oids.forEach(async (it) => {
           try {
             await ItemService.removeOne(it, agid)
+            // Create Notification
+            const myItem = (await ItemModel._getItem(it))
+            const myOrg = (await OrganisationModel._getOrganisation(myItem.cid))
+            await NotificationModel._createNotification({
+              owner: myOrg.cid,
+              actor: { id: myOrg.cid, name: myOrg.name },
+              target: { id: myItem.oid, name: myItem.name },
+              type: NotificationType.itemRemoved,
+              status: NotificationStatus.INFO
+            })
             logger.info(it + ' was removed from ' + agid)
           } catch (error) {
             const e = errorHandler(error)
@@ -143,6 +166,15 @@ export const updateItem: updateItemController = async (req, res) => {
                     throw new Error('Cannot update ' + it + ' because it does not belong to ' + agid)
                   }
                   await item._updateItem(it)
+                  // Create Notification
+                  const myOrg = (await OrganisationModel._getOrganisation(item.cid))
+                  await NotificationModel._createNotification({
+                    owner: myOrg.cid,
+                    actor: { id: myOrg.cid, name: myOrg.name },
+                    target: { id: item.oid, name: item.name },
+                    type: NotificationType.itemUpdatedByNode,
+                    status: NotificationStatus.INFO
+                  })
                 }
                 // TBD: Update contracts if needed
                 // TBD: Audits and notifications

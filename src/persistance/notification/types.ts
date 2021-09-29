@@ -5,7 +5,9 @@ export enum NotificationType {
     itemEnabled = 11, // info
     itemDisabled = 12, // info
     itemDiscovered = 13, // info
-    itemUpdated = 14, // info
+    itemUpdatedByNode = 14, // info
+    itemUpdatedByUser = 15, // info
+    itemRemoved = 16, // info
     contractRequest = 21, // info
     contractAccepted = 22, // info
     contractCancelled = 23, // info
