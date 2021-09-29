@@ -59,5 +59,5 @@ export async function addUserToItem (
 export async function removeUserFromItem (
   this: IItemModel, oid: string
 ): Promise<void> {
-  await this.updateOne({ oid }, { $set: { uid: null } }).exec()
+  await this.updateOne({ oid }, { $set: { uid: undefined } }).exec()
 }
