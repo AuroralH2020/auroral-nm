@@ -125,7 +125,7 @@ export const deleteItems: deleteItemsController = async (req, res) => {
             await NotificationModel._createNotification({
               owner: myOrg.cid,
               actor: { id: myOrg.cid, name: myOrg.name },
-              target: { id: myItem.cid, name: myItem.name },
+              target: { id: myItem.oid, name: myItem.name },
               type: NotificationType.itemRemoved,
               status: NotificationStatus.INFO
             })
@@ -171,7 +171,7 @@ export const updateItem: updateItemController = async (req, res) => {
                   await NotificationModel._createNotification({
                     owner: myOrg.cid,
                     actor: { id: myOrg.cid, name: myOrg.name },
-                    target: { id: item.cid, name: item.name },
+                    target: { id: item.oid, name: item.name },
                     type: NotificationType.itemUpdatedByNode,
                     status: NotificationStatus.INFO
                   })
