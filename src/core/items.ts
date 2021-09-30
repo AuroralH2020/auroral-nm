@@ -172,13 +172,20 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
                 data
             // Update status
             await item._updateItem(dataWithPrivacy)
-            // Add/remove item to/from user AND user from item
             if (data.status === ItemStatus.DISABLED) {
+                // Remove item from user AND user from item
                 await UserModel._removeItemFromUser(owner, oid)
+                // Remove user from item document
                 await ItemModel._removeUserFromItem(oid)
+                // Remove item from CS organisation group
+                await cs.deleteUserFromGroup(oid, item.cid)
             } else {
+                // Add item to user
                 await UserModel._addItemToUser(owner, oid)
+                // Add item user to item document
                 await ItemModel._addUserToItem(oid, owner)
+                // Add item to CS organisation group
+                await cs.addUserToGroup(oid, item.cid)
             }
         } else {
             await item._updateItem(data)
