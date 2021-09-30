@@ -1,10 +1,14 @@
 import { v4 as uuidv4 } from 'uuid'
 import { INodeDocument, INodeModel, INodeCreatePost, INodeUI, NodeStatus } from './types'
+import { MyError, ErrorSource } from '../../utils/error-handler'
+import { HttpStatusCode } from '../../utils/http-status-codes'
+import { logger } from '../../utils/logger'
+
 
 export async function getNode(
   this: INodeModel, agid: string, cid?: string
 ): Promise<INodeUI> {
-  const query = cid ? { agid, cid } : { agid }
+  const query = cid ? { agid, cid, status: NodeStatus.ACTIVE } : { agid, status: NodeStatus.ACTIVE }
   const record = await this.findOne(
     query, 
     { key: 0 }
@@ -12,19 +16,21 @@ export async function getNode(
   if (record) {
     return record
   } else {
-    throw new Error('Node not found in organisation: ' + cid)
+    logger.warn('Node not found in organisation: ' + cid)
+    throw new MyError('Node not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
 export async function getDoc(
   this: INodeModel, agid: string, cid?: string
 ): Promise<INodeDocument> {
-  const query = cid ? { agid, cid } : { agid }
+  const query = cid ? { agid, cid, status: NodeStatus.ACTIVE } : { agid, status: NodeStatus.ACTIVE }
   const record = await this.findOne(query).exec()
   if (record) {
     return record
   } else {
-    throw new Error('Node not found in organisation: ' + cid)
+    logger.warn('Node not found in organisation: ' + cid)
+    throw new MyError('Node not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -38,7 +44,8 @@ export async function getAllNodes(
   if (record) {
     return record
   } else {
-    throw new Error('Node not found')
+    logger.warn('Node not found')
+    throw new MyError('Node not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 

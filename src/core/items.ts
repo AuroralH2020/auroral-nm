@@ -4,7 +4,7 @@
 
 // Imports
 import * as crypto from 'crypto'
-import { errorHandler, ErrorType } from '../utils/error-handler'
+import { MyError, errorHandler, ErrorType, ErrorSource } from '../utils/error-handler'
 import { logger } from '../utils/logger'
 import { cs } from '../microservices/commServer'
 import { ItemModel } from '../persistance/item/model'
@@ -12,6 +12,7 @@ import { UserModel } from '../persistance/user/model'
 import { NodeModel } from '../persistance/node/model'
 import { OrganisationModel } from '../persistance/organisation/model'
 import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, IItemUpdate } from '../persistance/item/types'
+import { HttpStatusCode } from '../utils/http-status-codes'
 
 // Functions
 
@@ -79,8 +80,12 @@ import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, I
             }
     } catch (err) {
         const error = errorHandler(err)
-        logger.error(error.message)
-        throw new Error(error.message)
+        if (error.source === ErrorSource.ITEM) {
+            throw new MyError(error.message, error.status, { source: error.source })
+        } else {
+            logger.error('Error in getItem: ' + error.message)
+            throw new MyError(error.message, error.status)
+        }
     }
 }
 

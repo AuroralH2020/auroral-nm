@@ -1,39 +1,45 @@
 import { RolesEnum } from '../../types/roles'
 import { IUserDocument, IUserModel, IUserCreate, IUserUI, UserVisibility, UserStatus, IUserUIProfile } from './types'
+import { MyError, ErrorSource } from '../../utils/error-handler'
+import { logger } from '../../utils/logger'
+import { HttpStatusCode } from '../../utils/http-status-codes'
 
 export async function getUser(
   this: IUserModel, uid: string
 ): Promise<IUserUIProfile> {
   const record = await this.findOne(
-    { uid }, 
+    { uid , status: UserStatus.ACTIVE }, 
     { hasNotifications: 0, hasAudits: 0, hasItems: 0, hasContracts: 0 }
     ).lean().exec()
   if (record) {
     return record
   } else {
-    throw new Error('User not found')
+    logger.warn('User not found')
+    throw new MyError('User not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.USER })
   }
 }
 
 export async function getUserByRole(
   this: IUserModel, role: RolesEnum
   ): Promise<IUserUI[]> {
-    const record = await this.find({ roles: role }).lean().exec()
+    const record = await this.find({ roles: role, status: UserStatus.ACTIVE }).lean().exec()
     if (record) {
       return record
     } else {
-      throw new Error('User not found')
+      logger.warn('User not found')
+      throw new MyError('User not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.USER })
     }
   }
 
 export async function getDoc(
   this: IUserModel, uid: string
 ): Promise<IUserDocument> {
-  const record = await this.findOne({ uid }).exec()
+  const record = await this.findOne({ uid, status: UserStatus.ACTIVE }).exec()
   if (record) {
     return record
   } else {
-    throw new Error('User not found')
+    logger.warn('User not found')
+    throw new MyError('User not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.USER })
   }
 }
 
@@ -41,7 +47,7 @@ export async function getAllUsers(
   this: IUserModel, accessLevel: UserVisibility[], users: string[]
 ): Promise<IUserUI[]> {
   const record = await this.find(
-    { uid: { $in: users }, accessLevel: { $in: accessLevel } },
+    { uid: { $in: users }, accessLevel: { $in: accessLevel }, status: UserStatus.ACTIVE },
     { name: 1,
       email: 1,
       contactMail: 1,
@@ -57,7 +63,8 @@ export async function getAllUsers(
   if (record) {
     return record
   } else {
-    throw new Error('User not found')
+    logger.warn('User not found')
+    throw new MyError('User not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.USER })
   }
 }
 

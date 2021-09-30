@@ -1,26 +1,35 @@
 import { IItemDocument, IItemModel, IItemCreatePost, IItem, ItemStatus, GetAllQuery } from './types'
+import { MyError, ErrorSource } from '../../utils/error-handler'
+import { HttpStatusCode } from '../../utils/http-status-codes'
+import { logger } from '../../utils/logger'
 
 export async function getItem(
   this: IItemModel, oid: string
 ): Promise<IItem> {
   const record = await this.findOne(
-    { oid }
+    // FILTER disabled items
+    { oid , status: { $ne: ItemStatus.DELETED } }
     ).lean().exec()
   if (record) {
     return record
   } else {
-    throw new Error('Item not found')
+    logger.warn('Item not found')
+    throw new MyError('Item not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }
 
 export async function getDoc(
   this: IItemModel, oid: string
 ): Promise<IItemDocument> {
-  const record = await this.findOne({ oid }).exec()
+  const record = await this.findOne(
+    // FILTER disabled items
+    { oid , status: { $ne: ItemStatus.DELETED } })
+    .exec()
   if (record) {
     return record
   } else {
-    throw new Error('Item not found')
+    logger.warn('Item not found')
+    throw new MyError('Item not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }
 
@@ -37,7 +46,8 @@ export async function getAllItems(
   if (record) {
     return record
   } else {
-    throw new Error('Item not found')
+    logger.warn('Item not found')
+    throw new MyError('Item not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }
 

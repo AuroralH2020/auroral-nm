@@ -37,11 +37,10 @@ export const getOne: getOneController = async (req, res) => {
   const { oid } = req.params
   const { decoded } = res.locals
 	try {
-        const data = await ItemService.getOne(decoded.org, oid)
-        return responseBuilder(HttpStatusCode.OK, res, null, data)
+    const data = await ItemService.getOne(decoded.org, oid)
+    return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
     return responseBuilder(error.status, res, error.message)
 	}
 }
