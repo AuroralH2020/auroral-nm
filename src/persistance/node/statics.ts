@@ -2,8 +2,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { INodeDocument, INodeModel, INodeCreatePost, INodeUI, NodeStatus } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
-import { logger } from '../../utils/logger'
-
 
 export async function getNode(
   this: INodeModel, agid: string, cid?: string
@@ -16,7 +14,7 @@ export async function getNode(
   if (record) {
     return record
   } else {
-    logger.warn('Node not found in organisation: ' + cid)
+    // logger.warn('Node not found in organisation: ' + cid)
     throw new MyError('Node not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
@@ -29,7 +27,7 @@ export async function getDoc(
   if (record) {
     return record
   } else {
-    logger.warn('Node not found in organisation: ' + cid)
+    // logger.warn('Node not found in organisation: ' + cid)
     throw new MyError('Node not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
@@ -44,7 +42,7 @@ export async function getAllNodes(
   if (record) {
     return record
   } else {
-    logger.warn('Node not found')
+    // logger.warn('Node not found')
     throw new MyError('Node not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }

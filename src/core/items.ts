@@ -41,7 +41,6 @@ import { HttpStatusCode } from '../utils/http-status-codes'
         }))
     } catch (err) {
         const error = errorHandler(err)
-        logger.error(error.message)
         throw new Error(error.message)
     }
 }
@@ -83,7 +82,6 @@ import { HttpStatusCode } from '../utils/http-status-codes'
         if (error.source === ErrorSource.ITEM) {
             throw new MyError(error.message, error.status, { source: error.source })
         } else {
-            logger.error('Error in getItem: ' + error.message)
             throw new MyError(error.message, error.status)
         }
     }
@@ -106,7 +104,7 @@ import { HttpStatusCode } from '../utils/http-status-codes'
         return password
     } catch (err) {
         const error = errorHandler(err)
-        logger.error(error.message)
+        // logger.error(error.message)
         throw new Error(error.message)
     }
 }
@@ -157,7 +155,7 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
         const item = await ItemModel._getDoc(oid)
     // Validate agid provided by agent or uid by UI
         if (owner != null && owner !== item.agid && owner !== item.uid && item.status !== ItemStatus.DISABLED) {
-            logger.error('Cannot update ' + oid + ' because it does not belong to user or agent requester: ' + owner)
+            // logger.error('Cannot update ' + oid + ' because it does not belong to user or agent requester: ' + owner)
             throw new Error(ErrorType.UNAUTHORIZED)
         }
     // TBD: Do checks before updating

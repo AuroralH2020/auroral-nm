@@ -10,9 +10,11 @@ import { ItemService } from '../../../core'
 import { IItemUI, IItemUpdate, ItemStatus, ItemType } from '../../../persistance/item/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { NotificationModel } from '../../../persistance/notification/model'
+import { AuditModel } from '../../../persistance/audit/model'
 import { UserModel } from '../../../persistance/user/model'
-import { NotificationStatus, NotificationType } from '../../../persistance/notification/types'
+import { NotificationStatus } from '../../../persistance/notification/types'
 import { ItemModel } from '../../../persistance/item/model'
+import { ResultStatusType, EventType } from '../../../types/misc-types'
 
 // Controllers
 
@@ -26,7 +28,7 @@ export const getMany: getManyController = async (req, res) => {
         return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -56,26 +58,36 @@ export const updateOne: UpdateOneController = async (req, res) => {
     // Send notification to company
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
     const myItemName = (await ItemModel._getItem(oid)).name
-    let notifType = NotificationType.itemUpdatedByUser
+    const myUserName = (await UserModel._getUser(decoded.uid)).name
+    let eventType = EventType.itemUpdatedByUser
     if (data.status) { 
       if (data.status === ItemStatus.DISABLED) {
-        notifType = NotificationType.itemDisabled
+        eventType = EventType.itemDisabled
       }
       if (data.status === ItemStatus.ENABLED) {
-        notifType = NotificationType.itemEnabled
+        eventType = EventType.itemEnabled
       }
     }
+    // Notification
     await NotificationModel._createNotification({
       owner: decoded.org,
       actor: { id: decoded.org, name: myOrgName },
       target: { id: oid, name: myItemName },
-      type: notifType,
+      type: eventType,
       status: NotificationStatus.INFO
+    })
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: decoded.uid, name: myUserName },
+      target: { id: oid, name: myItemName },
+      type: eventType,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })
     return responseBuilder(HttpStatusCode.OK, res, null, null, true)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -87,20 +99,29 @@ export const removeOne: RemoveOneController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     await ItemService.removeOne(oid, decoded.uid)
-    // Send notification to company
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
     const myItemName = (await ItemModel._getItem(oid)).name
+    const myUserName = (await UserModel._getUser(decoded.uid)).name
+    // Notification
     await NotificationModel._createNotification({
       owner: decoded.org,
       actor: { id: decoded.org, name: myOrgName },
       target: { id: oid, name: myItemName },
-      type: NotificationType.itemRemoved,
+      type: EventType.itemRemoved,
       status: NotificationStatus.INFO
+    })
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: decoded.uid, name: myUserName },
+      target: { id: oid, name: myItemName },
+      type: EventType.itemRemoved,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })
     return responseBuilder(HttpStatusCode.OK, res, null, null, true)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }

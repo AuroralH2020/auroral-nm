@@ -1,8 +1,7 @@
 // Express router
 import { Router } from 'express'
 // Middlewares
-import { jwt, addOrigin } from '../middlewares/index'
-import { validateBody } from '../middlewares/body-validator'
+import { jwt, addOrigin, validateBody, createAudit } from '../middlewares/index'
 // Controllers
 import * as loginCtrl from './controllers/login'
 import * as registrationCtrl from './controllers/registration'
@@ -12,9 +11,11 @@ import * as friendingCtrl from './controllers/friending'
 import * as userCtrl from './controllers/user'
 import * as nodeCtrl from './controllers/node'
 import * as notificationCtrl from './controllers/notification'
+import * as auditCtrl from './controllers/audit'
 import * as itemsCtrl from './controllers/items'
 // Types
 import { Interfaces } from '../../types/locals-types'
+import { SourceType } from '../../types/misc-types'
 import { RolesEnum } from '../../types/roles'
 // Joi schemas
 import { updateItemSchema, updateOrganisationSchema, passwordSchema, registrationSchema, registrationStatusSchema, updateNodeSchema, updatePasswordSchema, updateUserSchema, emptyItemSchema } from '../../core/joi-schemas'
@@ -47,44 +48,47 @@ UiRouter
 .get('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getOne)
 .get('/organisations/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getMany)
 .get('/organisation/:cid/configuration', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getConfiguration)
-.put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), validateBody(updateOrganisationSchema), organisationCtrl.updateOrganisation)
+.put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), validateBody(updateOrganisationSchema), createAudit(Interfaces.UI, SourceType.ORGANISATION), organisationCtrl.updateOrganisation)
 // .delete
 // Send friendship request to cid by autenticated user
-.post('/organisation/:cid/friendship/request', jwt(), addOrigin(Interfaces.UI), friendingCtrl.processFriendRequest)
+.post('/organisation/:cid/friendship/request', jwt(), addOrigin(Interfaces.UI), createAudit(Interfaces.UI, SourceType.ORGANISATION), friendingCtrl.processFriendRequest)
 // Send friendship request approval to cid from authenticated user
-.post('/organisation/:cid/friendship/accept', jwt(), addOrigin(Interfaces.UI), friendingCtrl.acceptFriendRequest)
+.post('/organisation/:cid/friendship/accept', jwt(), addOrigin(Interfaces.UI), createAudit(Interfaces.UI, SourceType.ORGANISATION), friendingCtrl.acceptFriendRequest)
 // Send friendship request rejection to cid from authenticated user
-.post('/organisation/:cid/friendship/reject', jwt(), addOrigin(Interfaces.UI), friendingCtrl.rejectFriendRequest)
+.post('/organisation/:cid/friendship/reject', jwt(), addOrigin(Interfaces.UI), createAudit(Interfaces.UI, SourceType.ORGANISATION), friendingCtrl.rejectFriendRequest)
 // Send friendship request cancelation to cid from authenticated user
-.post('/organisation/:cid/friendship/cancelRequest', jwt(), addOrigin(Interfaces.UI), friendingCtrl.cancelFriendRequest)
+.post('/organisation/:cid/friendship/cancelRequest', jwt(), addOrigin(Interfaces.UI), createAudit(Interfaces.UI, SourceType.ORGANISATION), friendingCtrl.cancelFriendRequest)
 // Send friendship cancelation to cid from authenticated user
-.post('/organisation/:cid/friendship/cancel', jwt(), addOrigin(Interfaces.UI), friendingCtrl.cancelFriendship)
+.post('/organisation/:cid/friendship/cancel', jwt(), addOrigin(Interfaces.UI), createAudit(Interfaces.UI, SourceType.ORGANISATION), friendingCtrl.cancelFriendship)
 
 // USERS
 .get('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.getOne)
 .get('/users/:cid', jwt(), addOrigin(Interfaces.UI), userCtrl.getMany)
-.put('/user/:uid', jwt(), addOrigin(Interfaces.UI), validateBody(updateUserSchema), userCtrl.updateUser)
-.put('/user/password/:uid', jwt(), addOrigin(Interfaces.UI), validateBody(updatePasswordSchema), userCtrl.updateUserPassword)
+.put('/user/:uid', jwt(), addOrigin(Interfaces.UI), validateBody(updateUserSchema), createAudit(Interfaces.UI, SourceType.USER), userCtrl.updateUser)
+.put('/user/password/:uid', jwt(), addOrigin(Interfaces.UI), validateBody(updatePasswordSchema), createAudit(Interfaces.UI, SourceType.USER), userCtrl.updateUserPassword)
 // .delete
 
 // NODES
 .get('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getNode)
 .get('/nodes', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getNodes)
-.post('/node', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.createNode)
-.put('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), validateBody(updateNodeSchema), nodeCtrl.updateNode)
-.get('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getKey)
-.delete('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeKey)
-.delete('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.removeNode)
+.post('/node', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), createAudit(Interfaces.UI, SourceType.NODE), nodeCtrl.createNode)
+.put('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), validateBody(updateNodeSchema), createAudit(Interfaces.UI, SourceType.NODE), nodeCtrl.updateNode)
+.get('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), createAudit(Interfaces.UI, SourceType.NODE), nodeCtrl.getKey)
+.delete('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI),createAudit(Interfaces.UI, SourceType.NODE), nodeCtrl.removeKey)
+.delete('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI),createAudit(Interfaces.UI, SourceType.NODE), nodeCtrl.removeNode)
 
 // ITEMS
-.get('/items', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getMany)
+.get('/items', jwt(), addOrigin(Interfaces.UI),  itemsCtrl.getMany)
 .get('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getOne)
-.put('/items/:oid', jwt(), addOrigin(Interfaces.UI), validateBody(updateItemSchema), itemsCtrl.updateOne)
-.delete('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.removeOne)
+.put('/items/:oid', jwt(), addOrigin(Interfaces.UI), validateBody(updateItemSchema), createAudit(Interfaces.UI, SourceType.ITEM), itemsCtrl.updateOne)
+.delete('/items/:oid', jwt(), addOrigin(Interfaces.UI), createAudit(Interfaces.UI, SourceType.ITEM), itemsCtrl.removeOne)
 
 // NOTIFICATIONS
 .get('/notifications/', jwt(), addOrigin(Interfaces.UI), notificationCtrl.getNotifications)
 .get('/notifications/refresh', jwt(), addOrigin(Interfaces.UI), notificationCtrl.refreshNotifications)
 .put('/notifications/read/:notificationId', jwt(), addOrigin(Interfaces.UI), validateBody(emptyItemSchema), notificationCtrl.setRead)
+
+// AUDITS
+.get('/audits/:id', jwt(), addOrigin(Interfaces.UI), auditCtrl.getNotifications)
 
 export { UiRouter }

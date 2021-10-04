@@ -7,10 +7,12 @@ import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { UserModel } from '../../../persistance/user/model'
+import { AuditModel } from '../../../persistance/audit/model'
 import { IUserUI, IUserUIProfile, IUserUpdate, UserVisibility } from '../../../persistance/user/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { AccountModel } from '../../../persistance/account/model'
 import { hashPassword, comparePassword } from '../../../auth-server/auth-server'
+import { ResultStatusType, EventType } from '../../../types/misc-types'
 
 // Controllers
 
@@ -23,7 +25,7 @@ export const getOne: getOneController = async (req, res) => {
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
                 const error = errorHandler(err)
-                logger.error(error.message)
+                logger.error({ msg: error.message, id: res.locals.reqId })
                 return responseBuilder(error.status, res, error.message)
         }
 }
@@ -51,7 +53,7 @@ export const getMany: getManyController = async (req, res) => {
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
                 const error = errorHandler(err)
-                logger.error(error.message)
+                logger.error({ msg: error.message, id: res.locals.reqId })
                 return responseBuilder(error.status, res, error.message)
         }
 }
@@ -69,10 +71,18 @@ export const updateUser: updateUserController = async (req, res) => {
                         const account = await AccountModel._getDocByUid(uid)
                         account._updateRoles(payload.roles)
                 }
+                // Audit
+                await AuditModel._createAudit({
+                        ...res.locals.audit,
+                        actor: { id: uid, name: userDoc.name },
+                        target: { id: uid, name: userDoc.name },
+                        type: EventType.userUpdated,
+                        labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+                })
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
-                logger.error(error.message)
+                logger.error({ msg: error.message, id: res.locals.reqId })
                 return responseBuilder(error.status, res, error.message)
         }
 }
@@ -87,13 +97,22 @@ export const updateUserPassword: updateUserPwdController = async (req, res) => {
                         throw new Error('Wrong body')
                 }
                 const account = await AccountModel._getDocByUid(uid)
+                const myUser = await UserModel._getUser(uid)
                 comparePassword(account.username, oldPwd)
                 const newHash = await hashPassword(newPwd)
                 account._updatePasswordHash(newHash)
+                // Audit
+                await AuditModel._createAudit({
+                        ...res.locals.audit,
+                        actor: { id: uid, name: myUser.name },
+                        target: { id: uid, name: myUser.name },
+                        type: EventType.userPasswordUpdated,
+                        labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+                })
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
-                logger.error(error.message)
+                logger.error({ msg: error.message, id: res.locals.reqId })
                 return responseBuilder(error.status, res, error.message)
         }
 }

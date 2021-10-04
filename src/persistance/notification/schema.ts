@@ -1,10 +1,11 @@
 import mongoose from 'mongoose'
 import { getNotifications, getDoc, createNotification, setStatus, setRead, findNotifications } from './statics'
-import { INotificationDocument, INotificationModel, NotificationType, NotificationStatus, NotificationObj } from './types'
+import { INotificationDocument, INotificationModel, NotificationStatus, NotificationObj } from './types'
+import { EventType } from '../../types/misc-types'
 
 const Schema = mongoose.Schema
 
-const notifTypes = Object.values(NotificationType)
+const notifTypes = Object.values(EventType)
 const statuses = Object.values(NotificationStatus)
 
 const NotificationObjSchema = new Schema<NotificationObj>({

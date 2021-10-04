@@ -14,9 +14,11 @@ import { notifyDevOpsOfNewRegistration, verificationMail, rejectRegistration } f
 import { AccountModel } from '../../../persistance/account/model'
 import { UserModel } from '../../../persistance/user/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
+import { AuditModel } from '../../../persistance/audit/model'
 import { RolesEnum } from '../../../types/roles' 
 import { NotificationModel } from '../../../persistance/notification/model'
-import { NotificationType, NotificationStatus } from '../../../persistance/notification/types'
+import { NotificationStatus } from '../../../persistance/notification/types'
+import { EventType, ResultStatusType } from '../../../types/misc-types'
 
 // Controllers
 
@@ -81,7 +83,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
         await NotificationModel._createNotification({
           owner: it.uid,
           actor: { id: registration.registrationId, name: registration.email },
-          type: NotificationType.registrationRequest,
+          type: EventType.registrationRequest,
           status: NotificationStatus.WAITING
         })
       })
@@ -152,6 +154,15 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             businessId: registrationObj.businessId,
             location: registrationObj.companyLocation
           })
+          const myUserName = (await UserModel._getUser(decoded.uid)).name
+           // Audit
+          await AuditModel._createAudit({
+            ...res.locals.audit,
+            actor: { id: decoded.uid, name: myUserName },
+            target: { id: registrationObj.cid, name: registrationObj.companyName },
+            type: EventType.companyCreated,
+            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+          })
           const uid = uuidv4() // Create unique id
           UserModel._createUser({
             uid,
@@ -161,6 +172,14 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             occupation: registrationObj.occupation,
             cid: registrationObj.cid,
             roles: [RolesEnum.USER, RolesEnum.ADMIN]
+          })
+           // Audit
+           await AuditModel._createAudit({
+            ...res.locals.audit,
+            actor: { id: uid, name: registrationObj.name + registrationObj.surname },
+            target: { id: uid, name: registrationObj.name + registrationObj.surname },
+            type: EventType.userCreated,
+            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
           })
           // TBD: Add organisation group to commServer
           // Add user to organisation
@@ -190,7 +209,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             const notificationsToUpdate = await NotificationModel._findNotifications({
               owners: [it.uid],
               status: NotificationStatus.WAITING,
-              type: NotificationType.registrationRequest,
+              type: EventType.registrationRequest,
               actor: { id: registrationObj.registrationId, name: registrationObj.email } // Notifications sent by my friend
             })
             // Update notification of registrationRequest --> accept it
@@ -234,7 +253,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
         const notificationsToUpdate = await NotificationModel._findNotifications({
           owners: [it.uid],
           status: NotificationStatus.WAITING,
-          type: NotificationType.registrationRequest,
+          type: EventType.registrationRequest,
           actor: { id: registrationObj.registrationId, name: registrationObj.email } // Notifications sent by my friend
         })
         // Update notification of registrationRequest --> decline it

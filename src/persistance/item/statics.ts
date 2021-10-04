@@ -13,7 +13,7 @@ export async function getItem(
   if (record) {
     return record
   } else {
-    logger.warn('Item not found')
+    // logger.warn('Item not found')
     throw new MyError('Item not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }
@@ -28,7 +28,7 @@ export async function getDoc(
   if (record) {
     return record
   } else {
-    logger.warn('Item not found')
+    // logger.warn('Item not found')
     throw new MyError('Item not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }
@@ -46,7 +46,7 @@ export async function getAllItems(
   if (record) {
     return record
   } else {
-    logger.warn('Item not found')
+    // logger.warn('Item not found')
     throw new MyError('Item not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }

@@ -12,7 +12,7 @@ dotenv.config()
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const MAX_FILES = 5
  
-const logFormat = format.printf(info => `${info.timestamp} ${info.level} [${info.label}]: ${parseMsg(info.message)}`)
+const logFormat = format.printf(info => `${info.timestamp} ${info.level} {${getId(info.message)}} [${info.label}]: ${parseMsg(info.message)}`)
 
 // define the custom settings for each transport (file, console)
 const options = {
@@ -64,6 +64,9 @@ export const logger = createLogger({
 })
 
 function parseMsg(x: any) {
-  const y = typeof x === 'object' ? JSON.stringify(x) : x
-  return y
+  return typeof x === 'object' ? x.msg : x
+}
+
+function getId(x: any) {
+  return typeof x === 'object' ? x.id : undefined
 }

@@ -2,17 +2,29 @@
 
 import { JWTDecodedToken } from './jwt-types'
 import { RolesEnum } from './roles'
+import { SourceType } from './misc-types'
 
 export enum Interfaces {
     UI = 'UI',
-    API = 'Api',
     GATEWAY = 'Gateway'
 }
 
 export type IOriginLocals = {
     interface: Interfaces,
-    originIp: string | string[]
+    originIp: string 
     realm: string
+}
+
+export type IAuditsLabelsLocals = {
+    ip?: string,
+    origin?:  Interfaces,
+    source?: SourceType
+}
+
+export type IAuditLocals = {
+    cid: string,
+    reqId: string
+    labels: IAuditsLabelsLocals
 }
 
 export type ILocals = {
@@ -20,6 +32,8 @@ export type ILocals = {
     decoded: JWTDecodedToken
     token: string
     roles: RolesEnum[]
+    audit: IAuditLocals
+    reqId: string
 }
 
 export type ILocalsGtw = {
@@ -29,4 +43,7 @@ export type ILocalsGtw = {
         aud: string
     } | null
     token: string | null
+    audit: IAuditLocals
+    reqId: string
+
 }

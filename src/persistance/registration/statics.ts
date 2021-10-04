@@ -10,7 +10,7 @@ export async function getDoc(
   if (record) {
     return record
   } else {
-    logger.warn('Registration not found')
+    // logger.warn('Registration not found')
     throw new MyError('Registration not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
@@ -22,7 +22,7 @@ export async function getRegistration(
   if (record) {
     return record
   } else {
-    logger.warn('Registration not found')
+    // logger.warn('Registration not found')
     throw new MyError('Registration not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
@@ -34,7 +34,7 @@ export async function getAllRegistration(
   if (record) {
     return record
   } else {
-    logger.warn('Registration not found')
+    // logger.warn('Registration not found')
     throw new MyError('Registration not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }

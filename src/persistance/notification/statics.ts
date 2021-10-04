@@ -20,7 +20,7 @@ export async function getNotifications(
   if (records) {
     return records
   } else {
-    logger.warn('Notification not found')
+    // logger.warn('Notification not found')
     throw new MyError('Notification not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
@@ -32,7 +32,7 @@ export async function getDoc(
   if (record) {
     return record
   } else {
-    logger.warn('Notification not found')
+    // logger.warn('Notification not found')
     throw new MyError('Notification not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }

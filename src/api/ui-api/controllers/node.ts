@@ -10,6 +10,11 @@ import { INodeCreate, INodeUI, INodeUpdate } from '../../../persistance/node/typ
 import { NodeModel } from '../../../persistance/node/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { NodeService } from '../../../core'
+import { NotificationModel } from '../../../persistance/notification/model'
+import { NotificationStatus } from '../../../persistance/notification/types'
+import { AuditModel } from '../../../persistance/audit/model'
+import { UserModel } from '../../../persistance/user/model'
+import { ResultStatusType, EventType } from '../../../types/misc-types'
 
 // Controllers
 
@@ -25,7 +30,7 @@ export const getNode: getNodeController = async (req, res) => {
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -40,7 +45,7 @@ export const getNodes: getNodesController = async (req, res) => {
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -53,10 +58,20 @@ export const createNode: postNodeController = async (req, res) => {
 	try {
     // Create node
     await NodeService.createOne(decoded.org, name, type, password)
+
+    const myUser = await UserModel._getUser(decoded.uid)
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: decoded.uid, name: myUser.name },
+      target: { id: '', name: name }, // TODO
+      type: EventType.nodeCreated,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -71,13 +86,29 @@ export const updateNode: putNodeController = async (req, res) => {
     const node = await NodeModel._getDoc(agid)
     const updatedNode = await node._updateNode(data) 
     // TBD: Update node in commServer
-    // TBD: Add notification
-    // TBD: Add audit
     // TBD: Consider updating password too 
+    // Notification
+    const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
+    const myUserName = (await UserModel._getUser(decoded.uid)).name
+    await NotificationModel._createNotification({
+      owner: decoded.org,
+      actor: { id: decoded.org, name: myOrgName },
+      target: { id: agid, name: node.name },
+      type: EventType.nodeUpdated,
+      status: NotificationStatus.INFO
+    })
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: decoded.uid, name: myUserName },
+      target: { id: agid, name: node.name },
+      type: EventType.nodeUpdated,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -89,12 +120,22 @@ export const removeNode: removeNodeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     // Validate that agid belongs to organisation by passing optional CID param to _getNode
+    const myUser = await UserModel._getUser(decoded.uid)
+    const myNode = await NodeModel._getNode(agid)
     // Remove node
     await NodeService.removeOne(agid, decoded.org)
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: decoded.uid, name: myUser.name },
+      target: { id: agid, name: myNode.name }, // TODO
+      type: EventType.nodeRemoved,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -108,7 +149,7 @@ export const getKey: getKeyController = async (req, res) => {
     return responseBuilder(HttpStatusCode.OK, res, null, key)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -120,10 +161,20 @@ export const removeKey: removeKeyController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     await NodeModel._removeKey(agid)
+    const myUser = await UserModel._getUser(decoded.uid)
+    const myNode = await NodeModel._getNode(agid)
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: decoded.uid, name: myUser.name },
+      target: { id: agid, name: myNode.name },
+      type: EventType.nodeUpdatedKey,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }

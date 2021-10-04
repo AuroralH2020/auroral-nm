@@ -14,7 +14,7 @@ export async function getUser(
   if (record) {
     return record
   } else {
-    logger.warn('User not found')
+    // logger.warn('User not found')
     throw new MyError('User not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.USER })
   }
 }
@@ -26,7 +26,7 @@ export async function getUserByRole(
     if (record) {
       return record
     } else {
-      logger.warn('User not found')
+      // logger.warn('User not found')
       throw new MyError('User not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.USER })
     }
   }
@@ -38,7 +38,7 @@ export async function getDoc(
   if (record) {
     return record
   } else {
-    logger.warn('User not found')
+    // logger.warn('User not found')
     throw new MyError('User not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.USER })
   }
 }
@@ -63,7 +63,7 @@ export async function getAllUsers(
   if (record) {
     return record
   } else {
-    logger.warn('User not found')
+    // logger.warn('User not found')
     throw new MyError('User not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.USER })
   }
 }

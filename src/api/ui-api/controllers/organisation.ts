@@ -6,8 +6,11 @@ import { responseBuilder } from '../../../utils/response-builder'
 import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
+import { AuditModel } from '../../../persistance/audit/model'
+import { ResultStatusType, EventType } from '../../../types/misc-types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { FriendshipsData, IOrganisationUI, IOrganisationUpdate, OrgConfiguration } from '../../../persistance/organisation/types'
+import { UserModel } from '../../../persistance/user/model'
 
 // Controllers
 
@@ -55,7 +58,7 @@ export const getOne: getOneController = async (req, res) => {
                 return responseBuilder(HttpStatusCode.OK, res, null, dataWithFriendships)
         } catch (err) {
                 const error = errorHandler(err)
-                logger.error(error.message)
+                logger.error({ msg: error.message, id: res.locals.reqId })
                 return responseBuilder(error.status, res, error.message)
         }
 }
@@ -70,7 +73,7 @@ export const getMany: getManyController = async (req, res) => {
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
                 const error = errorHandler(err)
-                logger.error(error.message)
+                logger.error({ msg: error.message, id: res.locals.reqId })
                 return responseBuilder(error.status, res, error.message)
         }
 }
@@ -80,13 +83,24 @@ type updateOrganisationController = expressTypes.Controller<{ cid: string }, IOr
 export const updateOrganisation: updateOrganisationController = async (req, res) => {
         const { cid } = req.params
         const payload = req.body
+        const decoded = res.locals.decoded
         try {
                 const orgDoc = await OrganisationModel._getDoc(cid)
+                const myUser = await UserModel._getUser(decoded.uid)
+                const myOrg = await OrganisationModel._getOrganisation(cid)
                 orgDoc._updateOrganisation(payload)
+                 // Audit
+                await AuditModel._createAudit({
+                        ...res.locals.audit,
+                        actor: { id: decoded.uid, name: myUser.name },
+                        target: { id: cid, name: myOrg.name },
+                        type: EventType.companyUpdated,
+                        labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+                })
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
-                logger.error(error.message)
+                logger.error({ msg: error.message, id: res.locals.reqId })
                 return responseBuilder(error.status, res, error.message)
         }
 }
@@ -100,7 +114,7 @@ export const getConfiguration: getConfigurationController = async (req, res) => 
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
                 const error = errorHandler(err)
-                logger.error(error.message)
+                logger.error({ msg: error.message, id: res.locals.reqId })
                 return responseBuilder(error.status, res, error.message)
         }
 }

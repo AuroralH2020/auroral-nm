@@ -7,9 +7,11 @@ import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { OrganisationModel } from '../../../persistance/organisation/model'
+import { ResultStatusType, EventType } from '../../../types/misc-types'
 import { NotificationModel } from '../../../persistance/notification/model'
 import { UserModel } from '../../../persistance/user/model'
-import { NotificationStatus, NotificationType } from '../../../persistance/notification/types'
+import { NotificationStatus } from '../../../persistance/notification/types'
+import { AuditModel } from '../../../persistance/audit/model'
 
 // Controllers
 
@@ -32,7 +34,7 @@ export const processFriendRequest: processFriendRequestController = async (req, 
       actor: { id: myUid, name: actorName },
       target: { id: friendCid, name: friendOrgName },
       object: { id: myCid, name: myOrgName },
-      type: NotificationType.partnershipRequest,
+      type: EventType.partnershipRequest,
       status: NotificationStatus.WAITING
     })
     await NotificationModel._createNotification({
@@ -40,15 +42,24 @@ export const processFriendRequest: processFriendRequestController = async (req, 
       actor: { id: myUid, name: actorName },
       target: { id: myCid, name: myOrgName },
       object: { id: friendCid, name: friendOrgName },
-      type: NotificationType.partnershipRequested,
+      type: EventType.partnershipRequested,
       status: NotificationStatus.INFO
     })
+    // // Audit
+    // await AuditModel._createAudit({
+    //   ...res.locals.audit,
+    //   actor: { id: decoded.uid, name: actorName },
+    //   target: { id: myCid, name: myOrgName },
+    //   object: { id: friendCid, name: friendOrgName },
+    //   type: EventType.partnershipRequested,
+    //   labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    // })
     // TBD: Add audits
-    logger.info('Friend request sent from ' + myCid + ' to ' + friendCid)
+    logger.info({ msg: 'Friend request sent from ' + myCid + ' to ' + friendCid, id: res.locals.reqId })
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -74,7 +85,7 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
     const notificationsToUpdate = await NotificationModel._findNotifications({
       owners: [myCid],
       status: NotificationStatus.WAITING,
-      type: NotificationType.partnershipRequest,
+      type: EventType.partnershipRequest,
       object: { id: friendCid, name: friendOrgName } // Notifications sent by my friend
     })
     // Update notification of friendshipRequest --> accept it
@@ -88,15 +99,34 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
       actor: { id: myUid, name: actorName },
       target: { id: friendCid, name: friendOrgName },
       object: { id: myCid, name: myOrgName },
-      type: NotificationType.partnershipAccepted,
+      type: EventType.partnershipAccepted,
       status: NotificationStatus.ACCEPTED
     })
-    // TBD: Add audits
-    logger.info('Friend request accepted between' + myCid + ' and ' + friendCid)
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: myUid, name: actorName },
+      target: { id: friendCid, name: friendOrgName },
+      object: { id: myCid, name: myOrgName },
+      type: EventType.partnershipAccepted,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      cid: friendCid,
+      actor: { id: myUid, name: actorName },
+      target: { id: myCid, name: myOrgName },
+      object: { id: friendCid, name: friendOrgName },
+      type: EventType.partnershipAccepted,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
+    logger.info({ msg: 'Friend request accepted between' + myCid + ' and ' + friendCid, id: res.locals.reqId })
+
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -119,7 +149,7 @@ export const rejectFriendRequest: rejectFriendRequestController = async (req, re
     const notificationsToUpdate = await NotificationModel._findNotifications({
       owners: [myCid],
       status: NotificationStatus.WAITING,
-      type: NotificationType.partnershipRequest,
+      type: EventType.partnershipRequest,
       object: { id: friendCid, name: friendOrgName } // Notifications sent by my friend
     })
     // Update notification of friendshipRequest --> reject it
@@ -133,15 +163,23 @@ export const rejectFriendRequest: rejectFriendRequestController = async (req, re
       actor: { id: myUid, name: actorName },
       target: { id: friendCid, name: friendOrgName },
       object: { id: myCid, name: myOrgName },
-      type: NotificationType.partnershipRejected,
+      type: EventType.partnershipRejected,
       status: NotificationStatus.REJECTED
     })
-    // TBD: Add audits
-    logger.info('Friend request rejected between' + myCid + ' and ' + friendCid)
+    //  // Audit
+    //  await AuditModel._createAudit({
+    //   ...res.locals.audit,
+    //   actor: { id: myUid, name: actorName },
+    //   target: { id: friendCid, name: friendOrgName },
+    //   object: { id: myCid, name: myOrgName },
+    //   type: EventType.partnershipRejected,
+    //   labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    // })
+    logger.info({ msg: 'Friend request rejected between' + myCid + ' and ' + friendCid, id: res.locals.reqId })
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -164,7 +202,7 @@ export const cancelFriendRequest: cancelFriendRequestController = async (req, re
     const notificationsToUpdate = await NotificationModel._findNotifications({
       owners: [friendCid],
       status: NotificationStatus.WAITING,
-      type: NotificationType.partnershipRequest,
+      type: EventType.partnershipRequest,
       object: { id: myCid, name: myOrgName } // Notifications sent by my organisation
     })
     // Update notification of friendshipRequest --> cancel it
@@ -178,15 +216,23 @@ export const cancelFriendRequest: cancelFriendRequestController = async (req, re
       actor: { id: myUid, name: actorName },
       target: { id: friendCid, name: friendOrgName },
       object: { id: myCid, name: myOrgName },
-      type: NotificationType.partnershipRequestCancelled,
+      type: EventType.partnershipRequestCancelled,
       status: NotificationStatus.INFO
     })
-    // TBD: Add audits
-    logger.info('Friend request cancelled between' + myCid + ' and ' + friendCid)
+    // // Audit
+    // await AuditModel._createAudit({
+    //   ...res.locals.audit,
+    //   actor: { id: myUid, name: actorName },
+    //   target: { id: friendCid, name: friendOrgName },
+    //   object: { id: myCid, name: myOrgName },
+    //   type: EventType.partnershipRequestCancelled,
+    //   labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    // })
+    logger.info({ msg: 'Friend request cancelled between' + myCid + ' and ' + friendCid, id: res.locals.reqId })
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
@@ -212,7 +258,7 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
       actor: { id: myUid, name: actorName },
       target: { id: friendCid, name: friendOrgName },
       object: { id: myCid, name: myOrgName },
-      type: NotificationType.partnershipCancelled,
+      type: EventType.partnershipCancelled,
       status: NotificationStatus.INFO
     })
     await NotificationModel._createNotification({
@@ -220,15 +266,33 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
       actor: { id: myUid, name: actorName },
       target: { id: myCid, name: myOrgName },
       object: { id: friendCid, name: friendOrgName },
-      type: NotificationType.partnershipCancelled,
+      type: EventType.partnershipCancelled,
       status: NotificationStatus.INFO
     })
-    // TBD: Add audits
-    logger.info('Friend cancelled between' + myCid + ' and ' + friendCid)
+     // Audit
+     await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: myUid, name: actorName },
+      target: { id: myCid, name: myOrgName },
+      object: { id: friendCid, name: friendOrgName },
+      type: EventType.partnershipCancelled,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
+    // Audit
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      cid: friendCid,
+      actor: { id: myUid, name: actorName },
+      target: { id: friendCid, name: friendOrgName },
+      object: { id: myCid, name: myOrgName },
+      type: EventType.partnershipCancelled,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
+    logger.info({ msg: 'Friend cancelled between' + myCid + ' and ' + friendCid, id: res.locals.reqId })
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)
-    logger.error(error.message)
+    logger.error({ msg: error.message, id: res.locals.reqId })
     return responseBuilder(error.status, res, error.message)
 	}
 }
