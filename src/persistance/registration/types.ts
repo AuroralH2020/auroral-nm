@@ -28,6 +28,7 @@ export interface IRegistration {
     termsAndConditions: boolean,
     status: RegistrationStatus,
     type: RegistrationType,
+    invitationId: string,
     lastUpdated?: number,
     created?: number
 }

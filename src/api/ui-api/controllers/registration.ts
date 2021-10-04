@@ -4,7 +4,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler } from '../../../utils/error-handler'
+import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { RegistrationModel } from '../../../persistance/registration/model'
@@ -17,6 +17,9 @@ import { OrganisationModel } from '../../../persistance/organisation/model'
 import { RolesEnum } from '../../../types/roles' 
 import { NotificationModel } from '../../../persistance/notification/model'
 import { NotificationType, NotificationStatus } from '../../../persistance/notification/types'
+import { cs } from '../../../microservices/commServer'
+import { InvitationModel } from '../../../persistance/invitation/model'
+import { InvitationStatus } from '../../../persistance/invitation/types'
 
 // Controllers
 
@@ -88,7 +91,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
     } else if (data.status === RegistrationStatus.PENDING) {
       // Validate if new user that we have CID to assign to (otherwise it is an invited organisation)
       if (!data.cid && data.type === RegistrationType.USER) {
-        throw new Error('New users need a CID to be assigned to')
+        throw new MyError('New user needs to have a CID assigned', HttpStatusCode.BAD_REQUEST)
       }
       const cid = data.cid ? data.cid : uuidv4()
       // Initialize account
@@ -162,11 +165,14 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             cid: registrationObj.cid,
             roles: [RolesEnum.USER, RolesEnum.ADMIN]
           })
-          // TBD: Add organisation group to commServer
+          // Add organisation group to commServer
+          await cs.postGroup(registrationObj.cid)
           // Add user to organisation
           OrganisationModel._addUserToCompany(registrationObj.cid, uid)
           // Verify account
           AccountModel._verifyAccount(registrationObj.email, uid)
+          // Update invitation status to DONE
+          await InvitationModel._setInvitationStatus(registrationObj.invitationId, InvitationStatus.DONE)
         } else if (registrationObj.type === RegistrationType.USER) {
           // Only user with role user
           const uid = uuidv4() // Create unique id
@@ -183,7 +189,6 @@ export const putRegistration: putRegistrationController = async (req, res) => {
           OrganisationModel._addUserToCompany(registrationObj.cid, uid)
           // Verify account
           AccountModel._verifyAccount(registrationObj.email, uid)
-          // Update registration notifications
           // Get users devOps and send notifications to them
           const devOpsIds = await UserModel._getUserByRole(RolesEnum.DEV_OPS)
           devOpsIds.forEach(async (it) => {
@@ -198,6 +203,8 @@ export const putRegistration: putRegistrationController = async (req, res) => {
               await NotificationModel._setRead(elem)
               await NotificationModel._setStatus(elem, NotificationStatus.RESPONDED)
             })
+            // Update invitation status to DONE
+            await InvitationModel._setInvitationStatus(registrationObj.invitationId, InvitationStatus.DONE)
           })
         } else {
           throw new Error('Wrong registration type')
@@ -248,6 +255,8 @@ export const putRegistration: putRegistrationController = async (req, res) => {
     }  
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
+    // Update invitation status to FAILED
+    // await InvitationModel._setInvitationStatus(registrationObj.invitationId, InvitationStatus.FAILED)
     const error = errorHandler(err)
     logger.error(error.message)
     return responseBuilder(error.status, res, error.message)

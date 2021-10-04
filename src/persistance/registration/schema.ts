@@ -10,14 +10,16 @@ const typesEnum = Object.values(RegistrationType)
 
 const RegistrationSchema = new Schema<IRegistrationDocument, IRegistrationModel>({
     registrationId: { type: String, unique: true, required: true, index: true },
+    invitationId: { type: String, required: true },
     name: { type: String, required: true },
     surname: { type: String, required: true },
     email: { type: String, required: true }, // username/id in the app
+    occupation: String,
     cid: String, // organisation ID -- CID
     companyName: String,
     companyLocation: String,  
     businessId: String,
-    termsAndConditions: Boolean,
+    termsAndConditions: { type: Boolean, default: true },
     status: { type: RegistrationStatus, enum: statusEnum },
     type: { type: RegistrationType, enum: typesEnum },
     lastUpdated: { type: Number, default: new Date().getTime() },
