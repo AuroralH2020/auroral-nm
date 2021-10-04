@@ -13,14 +13,14 @@ import { invitationMail } from '../../../auth-server/mailer'
 
 // Controllers
 
-type getInvitationController = expressTypes.Controller<{ invitationId: string }, {}, {}, IInvitation, localsTypes.ILocals>
+type getInvitationController = expressTypes.Controller<{ id: string }, {}, {}, IInvitation, localsTypes.ILocals>
  
 export const getInvitation: getInvitationController = async (req, res) => {
-        const { invitationId } = req.params
+        const { id } = req.params
         try {
-                const data = await InvitationModel._getInvitation(invitationId)
+                const data = await InvitationModel._getInvitation(id)
                 // Set invitation as used
-                await InvitationModel._setUsedInvitation(invitationId)
+                await InvitationModel._setUsedInvitation(id)
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
                 const error = errorHandler(err)

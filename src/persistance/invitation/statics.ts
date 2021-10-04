@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { IInvitationDocument, IInvitationModel, IInvitation, IInvitationCreate } from './types'
+import { IInvitationDocument, IInvitationModel, IInvitation, IInvitationCreate, InvitationStatus } from './types'
 
 export async function getDoc(
   this: IInvitationModel, invitationId: string
@@ -27,6 +27,12 @@ export async function setUsedInvitation(
   this: IInvitationModel, invitationId: string
 ): Promise<void> {
   await this.updateOne({ invitationId }, { $set: { used: true } }).lean().exec()
+}
+
+export async function setInvitationStatus(
+  this: IInvitationModel, invitationId: string, status: InvitationStatus
+): Promise<void> {
+  await this.updateOne({ invitationId }, { $set: { status, updated: new Date().getTime() } }).lean().exec()
 }
 
 export async function createInvitation(

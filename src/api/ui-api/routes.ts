@@ -42,7 +42,7 @@ UiRouter
 
 // INVITATIONS
 .get('/invitation/:id', addOrigin(Interfaces.UI), invitationCtrl.getInvitation)
-.post('/invitation', jwt(), addOrigin(Interfaces.UI), invitationCtrl.postInvitation)
+.post('/invitation', jwt([RolesEnum.ADMIN]), addOrigin(Interfaces.UI), invitationCtrl.postInvitation)
 
 // ORGANISATIONS
 .get('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getOne)

@@ -5,6 +5,12 @@ export enum InvitationType {
     USER = 'newUser'
 }
 
+export enum InvitationStatus {
+    PENDING = 'Pending',
+    DONE = 'Done',
+    FAILED = 'Failed'
+}
+
 export interface IInvitation {
     invitationId: string,
     emailTo: string, // Invited person mail
@@ -16,6 +22,8 @@ export interface IInvitation {
     },
     used: boolean,
     type: InvitationType,
+    status: InvitationStatus,
+    updated: number,
     created: number
 }
 
@@ -54,5 +62,10 @@ export interface IInvitationModel extends Model<IInvitationDocument> {
     _setUsedInvitation: (
         this: IInvitationModel,
         invitationId: string
+    ) => Promise<void>
+    _setInvitationStatus: (
+        this: IInvitationModel,
+        invitationId: string,
+        status: InvitationStatus
     ) => Promise<void>
 }
