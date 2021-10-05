@@ -33,10 +33,10 @@ UiRouter
 
 // REGISTRATION
 .get('/registration', jwt([RolesEnum.DEV_OPS]), addOrigin(Interfaces.UI), registrationCtrl.getAllRegistrations)
-.post('/registration', addOrigin(Interfaces.UI), validateBody(registrationSchema), registrationCtrl.postRegistration)
+.post('/registration', addOrigin(Interfaces.UI), validateBody(registrationSchema), createAudit(Interfaces.UI, SourceType.ORGANISATION), registrationCtrl.postRegistration)
 // .post('/registration', addOrigin(Interfaces.UI), registrationCtrl.postRegistration)
 .get('/registration/:registrationId', jwt([RolesEnum.DEV_OPS]), addOrigin(Interfaces.UI), registrationCtrl.getRegistration)
-.put('/registration/:token', addOrigin(Interfaces.UI), validateBody(registrationStatusSchema), registrationCtrl.putRegistration)
+.put('/registration/:token', addOrigin(Interfaces.UI), validateBody(registrationStatusSchema), createAudit(Interfaces.UI, SourceType.ORGANISATION), registrationCtrl.putRegistration)
 .post('/registration/duplicatesUser', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesUser)
 .post('/registration/duplicatesCompany', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesCompany)
 

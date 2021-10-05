@@ -10,7 +10,7 @@ const typesEnum = Object.values(RegistrationType)
 
 const RegistrationSchema = new Schema<IRegistrationDocument, IRegistrationModel>({
     registrationId: { type: String, unique: true, required: true, index: true },
-    invitationId: { type: String, required: true },
+    invitationId: String,
     name: { type: String, required: true },
     surname: { type: String, required: true },
     email: { type: String, required: true }, // username/id in the app

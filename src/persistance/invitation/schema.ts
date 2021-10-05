@@ -13,6 +13,7 @@ const InvitationSchema = new Schema<IInvitationDocument, IInvitationModel>({
     sentBy: {
         cid: { type: String, required: true }, // Organisation inviting id
         organisation: String, // Organisation inviting name
+        uid: { type: String, required: true }, // User inviting id
         email: { type: String, required: true } // Person inviting mail
     },
     used: { type: Boolean, default: false },

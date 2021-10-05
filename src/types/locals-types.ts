@@ -28,7 +28,7 @@ export type IAuditLocals = {
 }
 
 export type ILocals = {
-    origin: IOriginLocals | null
+    origin: IOriginLocals
     decoded: JWTDecodedToken
     token: string
     roles: RolesEnum[]
@@ -37,7 +37,7 @@ export type ILocals = {
 }
 
 export type ILocalsGtw = {
-    origin: IOriginLocals | null
+    origin: IOriginLocals
     decoded: {
         iss: string,
         aud: string

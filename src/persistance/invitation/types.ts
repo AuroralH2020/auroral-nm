@@ -18,6 +18,7 @@ export interface IInvitation {
     sentBy: {
         cid: string, // Organisation inviting id
         organisation: string, // Organisation inviting mail
+        uid: string, // User inviting ID
         email: string // Person inviting mail
     },
     used: boolean,
@@ -40,6 +41,7 @@ export interface IInvitationCreate {
     sentBy: {
         cid: string, // Organisation inviting id
         organisation: string, // Organisation inviting mail
+        uid: string, // User inviting ID
         email: string // Person inviting mail
     }
 }

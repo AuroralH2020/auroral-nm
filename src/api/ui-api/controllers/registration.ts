@@ -17,7 +17,7 @@ import { OrganisationModel } from '../../../persistance/organisation/model'
 import { AuditModel } from '../../../persistance/audit/model'
 import { RolesEnum } from '../../../types/roles' 
 import { NotificationModel } from '../../../persistance/notification/model'
-import { EventType, ResultStatusType } from '../../../types/misc-types'
+import { EventType, ResultStatusType, SourceType } from '../../../types/misc-types'
 import { NotificationStatus } from '../../../persistance/notification/types'
 import { cs } from '../../../microservices/commServer'
 import { InvitationModel } from '../../../persistance/invitation/model'
@@ -151,23 +151,14 @@ export const putRegistration: putRegistrationController = async (req, res) => {
         // Create org and user
         if (registrationObj.type === RegistrationType.COMPANY) {
           // Organisation and user with role admin
-          OrganisationModel._createOrganisation({
+          await OrganisationModel._createOrganisation({
             cid: registrationObj.cid,
             name: registrationObj.companyName,
             businessId: registrationObj.businessId,
             location: registrationObj.companyLocation
           })
-          const myUserName = (await UserModel._getUser(decoded.uid)).name
-           // Audit
-          await AuditModel._createAudit({
-            ...res.locals.audit,
-            actor: { id: decoded.uid, name: myUserName },
-            target: { id: registrationObj.cid, name: registrationObj.companyName },
-            type: EventType.companyCreated,
-            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
-          })
           const uid = uuidv4() // Create unique id
-          UserModel._createUser({
+          const newUser = await UserModel._createUser({
             uid,
             firstName: registrationObj.name,
             lastName: registrationObj.surname,
@@ -176,13 +167,23 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             cid: registrationObj.cid,
             roles: [RolesEnum.USER, RolesEnum.ADMIN]
           })
-           // Audit
+           // Audits
+          await AuditModel._createAudit({
+            ...res.locals.audit,
+            cid: registrationObj.cid,
+            actor: { id: uid, name: newUser.email },
+            target: { id: registrationObj.cid, name: registrationObj.companyName },
+            type: EventType.companyCreated,
+            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+          })
            await AuditModel._createAudit({
             ...res.locals.audit,
-            actor: { id: uid, name: registrationObj.name + registrationObj.surname },
-            target: { id: uid, name: registrationObj.name + registrationObj.surname },
+            cid: registrationObj.cid,
+            actor: { id: uid, name: newUser.email },
+            target: { id: uid, name: newUser.email },
+            object: { id: registrationObj.cid, name: registrationObj.name },
             type: EventType.userCreated,
-            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
           })
           // TBD: Add organisation group to commServer
           // Add organisation group to commServer
@@ -196,7 +197,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
         } else if (registrationObj.type === RegistrationType.USER) {
           // Only user with role user
           const uid = uuidv4() // Create unique id
-          UserModel._createUser({
+          const newUser = await UserModel._createUser({
             uid,
             firstName: registrationObj.name,
             lastName: registrationObj.surname,
@@ -217,6 +218,17 @@ export const putRegistration: putRegistrationController = async (req, res) => {
               status: NotificationStatus.WAITING,
               type: EventType.registrationRequest,
               actor: { id: registrationObj.registrationId, name: registrationObj.email } // Notifications sent by my friend
+            })
+            // Get Organisation that sent invitation
+            const invitation = await InvitationModel._getInvitation(registrationObj.invitationId)
+            // Audits
+            await AuditModel._createAudit({
+              ...res.locals.audit,
+              cid: invitation.sentBy.cid,
+              actor: { id: invitation.sentBy.uid, name: invitation.sentBy.email },
+              target: { id: uid, name: newUser.email },
+              type: EventType.userCreated,
+              labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
             })
             // Update notification of registrationRequest --> accept it
             notificationsToUpdate.forEach(async (elem) => {

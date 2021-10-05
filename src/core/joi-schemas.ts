@@ -22,9 +22,9 @@ export const registrationSchema = Joi.object({
   companyName: Joi.string(), // Not required
   companyLocation: Joi.string(), // Not required
   cid: Joi.string(), // Required for user only
-  invitationId: Joi.string().required(),
+  invitationId: Joi.string(), // Required for Users only
   status: Joi.string().required(),
-  // termsAndConditions: Joi.bool().required(), // Added in server + validation in UI
+  termsAndConditions: Joi.bool(), // Added in server + validation in UI
   type: Joi.string().required()
 })
 

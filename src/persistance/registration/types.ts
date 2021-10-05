@@ -34,6 +34,7 @@ export interface IRegistration {
 }
 
 export interface IRegistrationPre {
+    invitationId: string, // Obligatory for users only
     // User data
     name: string,
     surname: string,
@@ -52,6 +53,7 @@ export interface IRegistrationPre {
 }
 
 export interface IRegistrationPost {
+    invitationId: string, // Obligatory for users only
     registrationId: string // Add during registration
     // User data
     name: string,
