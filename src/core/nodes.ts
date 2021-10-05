@@ -15,7 +15,7 @@ import { errorHandler } from '../utils/error-handler'
 const PUBLIC_NODES = 'PUBLIC_NODES' // CS group for nodes
 
 // Functions
-export const createOne = async (cid: string, name: string, type: NodeType, password: string): Promise<void> => {
+export const createOne = async (cid: string, name: string, type: NodeType, password: string): Promise<string> => {
     try {
         const nodeData: INodeCreatePost = { name, type, cid }
         // Create node
@@ -28,8 +28,7 @@ export const createOne = async (cid: string, name: string, type: NodeType, passw
         await cs.addUserToGroup(node.agid, cid)
         // Add to nodes group in commServer (Initially public)
         await cs.addUserToGroup(node.agid, PUBLIC_NODES)
-        // TBD: Add audit
-        // TBD: Add notification
+        return node.agid
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)
