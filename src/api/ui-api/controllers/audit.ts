@@ -19,7 +19,6 @@ export const getNotifications: getAuditController = async (req, res) => {
 	const { decoded } = res.locals
 	try {
 		const cid = decoded.org
-		const uid = decoded.uid
 		const data = await AuditModel._getAudits(cid, id, days)
 		return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {

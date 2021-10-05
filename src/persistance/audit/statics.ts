@@ -13,7 +13,8 @@ export async function getAudits(
   d.setDate(d.getDate() - days)
   const query = { cid: cid, 'target.id': id, created: { $gte: d.getTime() } }
   const records = await this.find(
-    { ...query }
+    { ...query },
+    { 'label.ip': 0 }
   ).sort({ _id: -1 })
     .lean()
     .exec()

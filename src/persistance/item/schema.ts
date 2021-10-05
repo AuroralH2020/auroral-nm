@@ -10,7 +10,7 @@ const statuses = Object.values(ItemStatus)
 const privacyLevels = Object.values(ItemPrivacy)
 
 const ItemSchema = new Schema<IItemDocument, IItemModel>({
-    oid: { type: String, index: true, required: true },
+    oid: { type: String, index: true, unique: true, required: true },
     name: { type: String, required: true },
     cid: { type: String, required: true }, // unique organisation id
     agid: { type: String, required: true }, // agent that has item id
