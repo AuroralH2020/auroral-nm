@@ -10,6 +10,7 @@ const InvitationSchema = new Schema<IInvitationDocument, IInvitationModel>({
     invitationId: { type: String, required: true, index: true },
     emailTo: { type: String, required: true }, // Invited person mail
     nameTo: { type: String, required: true }, // Invited company name or person name
+    roles: [String], // When creating user, provides its initial roles
     sentBy: {
         cid: { type: String, required: true }, // Organisation inviting id
         organisation: String, // Organisation inviting name

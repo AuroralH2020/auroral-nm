@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { RolesEnum } from '../../types/roles'
 
 export enum RegistrationStatus {
     OPEN = 'open', // Waiting for devOps to validate mail/organisation
@@ -12,46 +13,55 @@ export enum RegistrationType {
     USER = 'newUser'
 }
 
+// Data model for MONGO
 export interface IRegistration {
+    type: RegistrationType,
     registrationId: string
-    // User data
     name: string,
     surname: string,
     email: string,
-    occupation: string,
-    // Organisation data
-    // companyId: mongo id,
-    cid: string,
     companyName: string,
     companyLocation: string,
     businessId?: string,
+    occupation: string,
+    cid: string,
+    roles: RolesEnum[],
     termsAndConditions: boolean,
     status: RegistrationStatus,
-    type: RegistrationType,
     invitationId: string,
-    lastUpdated?: number,
-    created?: number
+    lastUpdated: number,
+    created: number
 }
 
-export interface IRegistrationPre {
-    invitationId: string, // Obligatory for users only
-    // User data
+// Data model to be used in backend
+export type IRegisType<T> = T extends RegistrationType.COMPANY ? IRegistrationCompany : IRegistrationUser
+
+interface IRegis {
+    type: RegistrationType,
+    registrationId: string
     name: string,
     surname: string,
     email: string,
     occupation: string,
-    password: string, // Use to create hash in account
-    // Organisation data
-    // companyId: mongo id,
-    cid?: string, // Needed if registering user to an organisation
-    companyName?: string, // Needed if registering organisation
-    companyLocation?: string, // Needed if registering organisation
-    businessId?: string, // Needed if registering organisation
+    cid: string,
     termsAndConditions: boolean,
     status: RegistrationStatus,
-    type: RegistrationType,
+    invitationId: string,
+    lastUpdated: number,
+    created: number
 }
 
+interface IRegistrationUser extends IRegis {
+    roles: RolesEnum[]
+}
+
+interface IRegistrationCompany extends IRegis{
+    companyName: string,
+    companyLocation: string,
+    businessId?: string,
+}
+
+// Data receive from UI when posting new registration
 export interface IRegistrationPost {
     invitationId: string, // Obligatory for users only
     registrationId: string // Add during registration
@@ -60,13 +70,14 @@ export interface IRegistrationPost {
     surname: string,
     email: string,
     occupation: string,
+    password: string, // Use to create hash in account
     // Organisation data
     // companyId: mongo id,
     cid: string,
     companyName?: string,
     companyLocation?: string,
     businessId?: string,
-    termsAndConditions: boolean,
+    roles: RolesEnum[],
     status: RegistrationStatus,
     type: RegistrationType,
 }

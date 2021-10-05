@@ -8,7 +8,7 @@ import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { RegistrationModel } from '../../../persistance/registration/model'
-import { IRegistration, IRegistrationPre, RegistrationStatus, RegistrationType } from '../../../persistance/registration/types'
+import { IRegistration, IRegistrationPost, RegistrationStatus, RegistrationType, IRegisType } from '../../../persistance/registration/types'
 import { checkTempSecret, hashPassword, signMailToken, verifyToken } from '../../../auth-server/auth-server'
 import { notifyDevOpsOfNewRegistration, verificationMail, rejectRegistration } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
@@ -52,7 +52,7 @@ export const getAllRegistrations: getRegistrationsController = async (req, res) 
 	}
 }
 
-type postRegistrationController = expressTypes.Controller<{}, IRegistrationPre , {}, null, localsTypes.ILocals>
+type postRegistrationController = expressTypes.Controller<{}, IRegistrationPost , {}, null, localsTypes.ILocals>
  
 export const postRegistration: postRegistrationController = async (req, res) => {
   const data  = req.body
@@ -69,7 +69,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
         username: data.email,
         passwordHash: hash,
         cid,
-        roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN] : [RolesEnum.USER]
+        roles: [RolesEnum.USER, RolesEnum.ADMIN] // IF status open is organisation administrator
       })
       // Create registration obj
       const registration = await RegistrationModel._createRegistration({
@@ -102,7 +102,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
         username: data.email,
         passwordHash: hash,
         cid,
-        roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN] : [RolesEnum.USER]
+        roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN] : data.roles
       })
       // Create registration obj      
       const pendingDoc = await RegistrationModel._createRegistration({
@@ -136,20 +136,21 @@ export const putRegistration: putRegistrationController = async (req, res) => {
       const decoded = await verifyToken(token)
       const registrationId = decoded.iss
       // Retrieve the registration object
-      const registrationObj = await RegistrationModel._getDoc(registrationId)
+      const registrationObject = await RegistrationModel._getDoc(registrationId)
       // Validate if secret in token has not expired (email === username)
-      await checkTempSecret(registrationObj.email, decoded.sub)
+      await checkTempSecret(registrationObject.email, decoded.sub)
       // Check if registration is already validated
-      if (registrationObj.status === RegistrationStatus.VERIFIED) {
+      if (registrationObject.status === RegistrationStatus.VERIFIED) {
         throw new Error('Registration was already verified')
       }
       if (decoded.aud !== 'validate') {
         throw new Error('Invalid token type')
       } else {
         // Update status to verified
-        await registrationObj._updateStatus(status)
+        await registrationObject._updateStatus(status)
         // Create org and user
-        if (registrationObj.type === RegistrationType.COMPANY) {
+        if (registrationObject.type === RegistrationType.COMPANY) {
+          const registrationObj = registrationObject as IRegisType<RegistrationType.COMPANY>
           // Organisation and user with role admin
           await OrganisationModel._createOrganisation({
             cid: registrationObj.cid,
@@ -185,7 +186,6 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             type: EventType.userCreated,
             labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
           })
-          // TBD: Add organisation group to commServer
           // Add organisation group to commServer
           await cs.postGroup(registrationObj.cid)
           // Add user to organisation
@@ -194,7 +194,8 @@ export const putRegistration: putRegistrationController = async (req, res) => {
           AccountModel._verifyAccount(registrationObj.email, uid)
           // Update invitation status to DONE
           await InvitationModel._setInvitationStatus(registrationObj.invitationId, InvitationStatus.DONE)
-        } else if (registrationObj.type === RegistrationType.USER) {
+        } else if (registrationObject.type === RegistrationType.USER) {
+          const registrationObj = registrationObject as IRegisType<RegistrationType.USER>
           // Only user with role user
           const uid = uuidv4() // Create unique id
           const newUser = await UserModel._createUser({
