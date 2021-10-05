@@ -57,14 +57,14 @@ export const createNode: postNodeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     // Create node
-    await NodeService.createOne(decoded.org, name, type, password)
+    const agid = await NodeService.createOne(decoded.org, name, type, password)
 
     const myUser = await UserModel._getUser(decoded.uid)
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
       actor: { id: decoded.uid, name: myUser.name },
-      target: { id: '', name: name }, // TODO
+      target: { id: agid, name: name }, 
       type: EventType.nodeCreated,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })

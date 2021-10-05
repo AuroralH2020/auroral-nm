@@ -13,7 +13,7 @@ import { IAudit } from '../../../persistance/audit/types'
 
 type getAuditController = expressTypes.Controller<{ id: string }, {}, { days: number }, IAudit[], localsTypes.ILocals>
  
-export const getNotifications: getAuditController = async (req, res) => {
+export const getAudits: getAuditController = async (req, res) => {
     const { id } = req.params
     const { days } = req.query
 	const { decoded } = res.locals
