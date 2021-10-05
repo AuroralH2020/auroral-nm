@@ -4,4 +4,4 @@ import { guard } from './gtw-guard'
 import { createAudit } from './create-audit'
 import { validateBody } from './body-validator'
 
-export { addOrigin, jwt, guard, createAudit, validateBody}
+export { addOrigin, jwt, guard, createAudit, validateBody }
