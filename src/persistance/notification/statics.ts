@@ -68,9 +68,9 @@ export async function setStatus(
 export async function findNotifications(
   this: INotificationModel, data: NotifFinderType
 ): Promise<string[]> {
-  const { owners, status, type, actor, target, object } = data
-
-  const records = await this.find({ owner: { $in: owners }, status, type, target }, { notificationId: 1 }).lean().exec()
+  const query = { ...data, owner: { $in: data.owners } } 
+  delete query.owners // Need to remove to avoid conflicts with MONGO query
+  const records = await this.find(query, { notificationId: 1 }).lean().exec()
   if (records) {
     return records.map(it => it.notificationId)
   } else {

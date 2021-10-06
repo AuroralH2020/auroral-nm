@@ -64,7 +64,7 @@ export interface INotificationCreate {
 }
 
 export interface NotifFinderType {
-    owners: string[]
+    owners?: string[]
     type: EventType
     status: NotificationStatus
     actor?: NotificationObj
