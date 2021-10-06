@@ -85,7 +85,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
       devOpsIds.forEach(async (it) => {
         await NotificationModel._createNotification({
           owner: it.uid,
-          actor: { id: registration.registrationId, name: registration.email },
+          actor: { id: registration.registrationId, name: registration.name },
           type: EventType.registrationRequest,
           status: NotificationStatus.WAITING
         })
@@ -218,18 +218,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
               owners: [it.uid],
               status: NotificationStatus.WAITING,
               type: EventType.registrationRequest,
-              actor: { id: registrationObj.registrationId, name: registrationObj.email } // Notifications sent by my friend
-            })
-            // Get Organisation that sent invitation
-            const invitation = await InvitationModel._getInvitation(registrationObj.invitationId)
-            // Audits
-            await AuditModel._createAudit({
-              ...res.locals.audit,
-              cid: invitation.sentBy.cid,
-              actor: { id: invitation.sentBy.uid, name: invitation.sentBy.email },
-              target: { id: uid, name: newUser.email },
-              type: EventType.userCreated,
-              labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
+              actor: { id: registrationObj.registrationId, name: registrationObj.name } // Notifications sent by my friend
             })
             // Update notification of registrationRequest --> accept it
             notificationsToUpdate.forEach(async (elem) => {
@@ -238,6 +227,17 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             })
             // Update invitation status to DONE
             await InvitationModel._setInvitationStatus(registrationObj.invitationId, InvitationStatus.DONE)
+          })
+          // Get Organisation that sent invitation
+          const invitation = await InvitationModel._getInvitation(registrationObj.invitationId)
+          // Create audit
+          await AuditModel._createAudit({
+            ...res.locals.audit,
+            cid: invitation.sentBy.cid,
+            actor: { id: invitation.sentBy.uid, name: invitation.sentBy.email },
+            target: { id: uid, name: newUser.email },
+            type: EventType.userCreated,
+            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
           })
         } else {
           throw new Error('Wrong registration type')
@@ -255,6 +255,21 @@ export const putRegistration: putRegistrationController = async (req, res) => {
       logger.info('Registration pending to ' + token)
       // Notify user by mail
       verificationMail(registrationObj.email, newToken, registrationObj.type, locals.origin?.realm)
+      // Get users devOps and send notifications to them
+      const devOpsIds = await UserModel._getUserByRole(RolesEnum.DEV_OPS)
+      devOpsIds.forEach(async (it) => {
+        const notificationsToUpdate = await NotificationModel._findNotifications({
+          owners: [it.uid],
+          status: NotificationStatus.WAITING,
+          type: EventType.registrationRequest,
+          actor: { id: registrationObj.registrationId, name: registrationObj.name } // Notifications sent by my friend
+        })
+        // Update notification of registrationRequest --> decline it
+        notificationsToUpdate.forEach(async (elem) => {
+          await NotificationModel._setRead(elem)
+          await NotificationModel._setStatus(elem, NotificationStatus.RESPONDED)
+        })
+      })
     } else if (status === RegistrationStatus.DECLINED) {
       // For status pending token === registrationId
       const registrationId = token
@@ -275,7 +290,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
           owners: [it.uid],
           status: NotificationStatus.WAITING,
           type: EventType.registrationRequest,
-          actor: { id: registrationObj.registrationId, name: registrationObj.email } // Notifications sent by my friend
+          actor: { id: registrationObj.registrationId, name: registrationObj.name } // Notifications sent by my friend
         })
         // Update notification of registrationRequest --> decline it
         notificationsToUpdate.forEach(async (elem) => {
