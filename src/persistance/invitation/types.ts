@@ -61,6 +61,10 @@ export interface IInvitationModel extends Model<IInvitationDocument> {
         this: IInvitationModel,
         invitationId: string
     ) => Promise<IInvitationDocument>
+    _getAllInvitations: (
+        this: IInvitationModel,
+        cid: string
+    ) => Promise<IInvitation[]>
     _createInvitation: (
         this: IInvitationModel,
         data: IInvitationCreate

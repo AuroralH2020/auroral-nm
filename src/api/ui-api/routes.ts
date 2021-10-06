@@ -42,6 +42,7 @@ UiRouter
 
 // INVITATIONS
 .get('/invitation/:id', addOrigin(Interfaces.UI), invitationCtrl.getInvitation)
+.get('/invitations/all', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), invitationCtrl.getAllInvitations)
 .post('/invitation', jwt([RolesEnum.ADMIN]), addOrigin(Interfaces.UI), invitationCtrl.postInvitation)
 
 // ORGANISATIONS

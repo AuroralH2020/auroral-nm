@@ -205,7 +205,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             email: registrationObj.email,
             occupation: registrationObj.occupation,
             cid: registrationObj.cid,
-            roles: [RolesEnum.USER]
+            roles: registrationObj.roles
           })
           // Add user to organisation
           OrganisationModel._addUserToCompany(registrationObj.cid, uid)

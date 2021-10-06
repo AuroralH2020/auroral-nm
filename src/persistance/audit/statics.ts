@@ -50,9 +50,9 @@ export async function createAudit(
 }
 
 // Helpers
-const generateMessage: (data: IAuditCreate) => String = function (
+const generateMessage: (data: IAuditCreate) => string = (
   data: IAuditCreate
-): String {
+): string => {
   let message = ''
   switch (data.type) {
     // Item

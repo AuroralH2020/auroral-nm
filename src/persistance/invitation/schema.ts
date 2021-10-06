@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getInvitation, getDoc, createInvitation, setUsedInvitation, setInvitationStatus } from './statics'
+import { getInvitation, getDoc, getAllInvitations, createInvitation, setUsedInvitation, setInvitationStatus } from './statics'
 import { IInvitationDocument, IInvitationModel, InvitationType, InvitationStatus } from './types'
 
 const Schema = mongoose.Schema
@@ -29,6 +29,7 @@ InvitationSchema.statics._getDoc = getDoc
 InvitationSchema.statics._createInvitation = createInvitation
 InvitationSchema.statics._setUsedInvitation = setUsedInvitation
 InvitationSchema.statics._setInvitationStatus = setInvitationStatus
+InvitationSchema.statics._getAllInvitations = getAllInvitations
 
 // eslint-disable-next-line import/no-default-export
 export default InvitationSchema

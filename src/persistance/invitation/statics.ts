@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { IInvitationDocument, IInvitationModel, IInvitation, IInvitationCreate, InvitationStatus } from './types'
+import { IInvitationDocument, IInvitationModel, IInvitation, InvitationType, IInvitationCreate, InvitationStatus } from './types'
 
 export async function getDoc(
   this: IInvitationModel, invitationId: string
@@ -18,6 +18,17 @@ export async function getInvitation(
   const record = await this.findOne({ invitationId }).lean().exec()
   if (record) {
     return record
+  } else {
+    throw new Error('Invitation not found')
+  }
+}
+
+export async function getAllInvitations(
+  this: IInvitationModel, cid: string
+): Promise<IInvitation[]> {
+  const records = await this.find({ 'sentBy.cid': cid, type: InvitationType.USER }).lean().exec()
+  if (records) {
+    return records
   } else {
     throw new Error('Invitation not found')
   }

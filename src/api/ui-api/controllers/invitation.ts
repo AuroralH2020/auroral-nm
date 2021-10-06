@@ -29,6 +29,20 @@ export const getInvitation: getInvitationController = async (req, res) => {
         }
 }
 
+type getAllInvitations = expressTypes.Controller<{}, {}, {}, IInvitation[], localsTypes.ILocals>
+ 
+export const getAllInvitations: getAllInvitations = async (req, res) => {
+        const { decoded } = res.locals
+        try {
+                const data = await InvitationModel._getAllInvitations(decoded.org)
+                return responseBuilder(HttpStatusCode.OK, res, null, data)
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
+        }
+}
+
 type postInvitationController = expressTypes.Controller<{}, IInvitationPre, {}, null, localsTypes.ILocals>
  
 export const postInvitation: postInvitationController = async (req, res) => {
