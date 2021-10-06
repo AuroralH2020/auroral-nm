@@ -98,10 +98,10 @@ export const removeOne: RemoveOneController = async (req, res) => {
   const { oid } = req.params
   const { decoded } = res.locals
 	try {
-    await ItemService.removeOne(oid, decoded.uid)
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
     const myItemName = (await ItemModel._getItem(oid)).name
     const myUserName = (await UserModel._getUser(decoded.uid)).name
+    await ItemService.removeOne(oid, decoded.uid)
     // Notification
     await NotificationModel._createNotification({
       owner: decoded.org,

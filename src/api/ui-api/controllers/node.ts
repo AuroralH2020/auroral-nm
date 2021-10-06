@@ -90,6 +90,10 @@ export const updateNode: putNodeController = async (req, res) => {
     // Notification
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
     const myUserName = (await UserModel._getUser(decoded.uid)).name
+    let eventType = EventType.nodeUpdated
+    if ('key' in data) {
+      eventType = EventType.nodeUpdatedKey
+    }
     await NotificationModel._createNotification({
       owner: decoded.org,
       actor: { id: decoded.org, name: myOrgName },
@@ -102,9 +106,10 @@ export const updateNode: putNodeController = async (req, res) => {
       ...res.locals.audit,
       actor: { id: decoded.uid, name: myUserName },
       target: { id: agid, name: node.name },
-      type: EventType.nodeUpdated,
+      type: eventType,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })
+
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     const error = errorHandler(err)

@@ -127,11 +127,11 @@ export const deleteItems: deleteItemsController = async (req, res) => {
       const agid = decoded ? decoded.iss : req.body.agid
       oids.forEach(async (it) => {
         try {
-          await ItemService.removeOne(it, agid)
-          // Create Notification
           const myItem = (await ItemModel._getItem(it))
           const myNode = (await NodeModel._getNode(agid))
           const myOrg = (await OrganisationModel._getOrganisation(myItem.cid))
+          await ItemService.removeOne(it, agid)
+          // Create Notification
           await NotificationModel._createNotification({
             owner: myOrg.cid,
             actor: { id: agid, name: myNode.name },
