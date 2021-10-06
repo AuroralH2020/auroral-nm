@@ -76,7 +76,7 @@ const generateMessage: (data: IAuditCreate) => string = (
       break
     // User
     case EventType.userCreated:
-      message += 'User \'' + data.target.name + '\' has been created'
+      message += 'User \'' + data.target.name + '\' has been created by user ' + data.actor.name
       break
     case EventType.userRemoved:
       message += 'User \'' + data.target.name + '\' has been removed by user ' + data.actor.name

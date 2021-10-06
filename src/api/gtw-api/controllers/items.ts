@@ -65,6 +65,7 @@ export const registration: registrationController = async (req, res) => {
           // Audit
           await AuditModel._createAudit({
             ...res.locals.audit,
+            cid: node.cid,
             actor: { id: agid, name: node.name },
             target: { id: it.oid, name: it.name },
             type: EventType.itemDiscovered,
