@@ -86,7 +86,7 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
       owners: [myCid],
       status: NotificationStatus.WAITING,
       type: EventType.partnershipRequest,
-      object: { id: friendCid, name: friendOrgName } // Notifications sent by my friend
+      target: { id: myCid, name: myOrgName } // Notifications sent by my friend
     })
     // Update notification of friendshipRequest --> accept it
     notificationsToUpdate.forEach(async (it) => {
@@ -121,7 +121,7 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
       type: EventType.partnershipAccepted,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })
-    logger.info({ msg: 'Friend request accepted between' + myCid + ' and ' + friendCid, id: res.locals.reqId })
+    logger.info({ msg: 'Friend request accepted between ' + myCid + ' and ' + friendCid, id: res.locals.reqId })
 
     return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
@@ -150,7 +150,7 @@ export const rejectFriendRequest: rejectFriendRequestController = async (req, re
       owners: [myCid],
       status: NotificationStatus.WAITING,
       type: EventType.partnershipRequest,
-      object: { id: friendCid, name: friendOrgName } // Notifications sent by my friend
+      target: { id: myCid, name: myOrgName } // Notifications sent by my friend
     })
     // Update notification of friendshipRequest --> reject it
     notificationsToUpdate.forEach(async (it) => {
@@ -203,7 +203,7 @@ export const cancelFriendRequest: cancelFriendRequestController = async (req, re
       owners: [friendCid],
       status: NotificationStatus.WAITING,
       type: EventType.partnershipRequest,
-      object: { id: myCid, name: myOrgName } // Notifications sent by my organisation
+      target: { id: myCid, name: myOrgName } // Notifications sent by my organisation
     })
     // Update notification of friendshipRequest --> cancel it
     notificationsToUpdate.forEach(async (it) => {

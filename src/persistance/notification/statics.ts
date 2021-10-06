@@ -69,7 +69,8 @@ export async function findNotifications(
   this: INotificationModel, data: NotifFinderType
 ): Promise<string[]> {
   const { owners, status, type, actor, target, object } = data
-  const records = await this.find({ owner: { $in: owners }, status, type, actor, target, object }, { notificationId: 1 }).lean().exec()
+
+  const records = await this.find({ owner: { $in: owners }, status, type, target }, { notificationId: 1 }).lean().exec()
   if (records) {
     return records.map(it => it.notificationId)
   } else {
