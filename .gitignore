@@ -7,8 +7,12 @@
 node_modules/
 dist/
 
+# Scripts
+*.sh
+
 # Log files
 *.log
+*.logs
 
 # Env Files
 .env

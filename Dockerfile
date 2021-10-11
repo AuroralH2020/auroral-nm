@@ -1,5 +1,7 @@
-# TODO add testing step
 FROM node:12-slim as base
+LABEL version="1.0"
+LABEL maintaner="jorge.almela@bavenir.eu"
+LABEL release-date="11-10-2021"
 EXPOSE 4000
 RUN mkdir /app && chown -R node:node /app
 RUN npm install -g typescript concurrently
