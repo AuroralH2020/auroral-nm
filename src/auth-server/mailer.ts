@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
 
 const sendMail = async (mails: string | string[], cc: string | string[] | undefined, bcc: string | string[] | undefined, html: string, subject: string, attachments?: Attachment[]) => {
     try {
-        await transporter.sendMail({
+        const mail_msg = await transporter.sendMail({
             from: Config.SMTP.USER, // sender address
             to: mails, // list of receivers
             cc: cc, // list of cc receivers
@@ -37,6 +37,7 @@ const sendMail = async (mails: string | string[], cc: string | string[] | undefi
             html: html, // html body
             attachments: attachments
         })
+        logger.debug('Mail sent to: ' + mails + ' with subject ' + subject)
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)
@@ -46,9 +47,9 @@ const sendMail = async (mails: string | string[], cc: string | string[] | undefi
 // Mail types 
 
 export const recoverPassword = async (username: string, token: string, realm?: string) => {
-    const dns = realm === 'localhost' || !realm ? 'localhost:8000' : realm
+    const dns = realm === 'localhost' || !realm ? 'http://localhost:8000/app/#' : 'https://' + realm + '/nm/#'
     const subject = 'Password recovery email VICINITY'
-    const link = `${dns}/app/#/authentication/recoverPassword/${token}`
+    const link = `${dns}/authentication/recoverPassword/${token}`
     // TBD: remove after testing
     // logger.debug(link)
     // Replace info
@@ -60,10 +61,10 @@ export const recoverPassword = async (username: string, token: string, realm?: s
 }
 
 export const verificationMail = async (username: string, token: string, type: RegistrationType, realm?: string) => {
-    const dns = realm === 'localhost' || !realm ? 'localhost:8000' : realm
+    const dns = realm === 'localhost' || !realm ? 'http://localhost:8000/app/#' : 'https://' + realm + '/nm/#'
     const subject = 'Verification email to join VICINITY'
     const templateName = type === RegistrationType.COMPANY ? TEMP_ACTIVATE_COMPANY : TEMP_ACTIVATE_USER
-    const link = `${dns}/app/#/registration/${type}/${token}`
+    const link = `${dns}/registration/${type}/${token}`
     // TBD: remove after testing
     // logger.debug(link)
     // Replace info
@@ -96,10 +97,10 @@ export const rejectRegistration = async (username: string, company: string) => {
 }
 
 export const invitationMail = async (username: string, id: string, type: InvitationType, realm?: string) => {
-    const dns = realm === 'localhost' || !realm ? 'localhost:8000' : realm
+    const dns = realm === 'localhost' || !realm ? 'http://localhost:8000/app/#' : 'https://' + realm + '/nm/#'
     const subject = 'Invitation email to join VICINITY'
     const templateName = type === InvitationType.COMPANY ? TEMP_INVITE_COMPANY : TEMP_INVITE_USER
-    const link = `${dns}/app/#/invitation/${type}/${id}`
+    const link = `${dns}/invitation/${type}/${id}`
     // Replace info
     const view = {
         LINK: link

@@ -19,13 +19,13 @@ export const registrationSchema = Joi.object({
       'any.required': '"password" is a required field'
     }),
   occupation: Joi.string().required(),
-  companyName: Joi.string(), // Not required
-  companyLocation: Joi.string(), // Not required
-  cid: Joi.string(), // Required for user only
+  companyName: Joi.string().allow(null, ''), // Not required
+  companyLocation: Joi.string().allow(null, ''), // Not required
+  cid: Joi.string().allow(null, ''), // Required for user only
   roles: Joi.array().items(Joi.valid(...Object.values(RolesEnum))), // Required for user only
-  invitationId: Joi.string(), // Required for Users only
+  invitationId: Joi.string().allow(null, ''), // Required for Users only
   status: Joi.string().required(),
-  termsAndConditions: Joi.bool(), // Added in server + validation in UI
+  termsAndConditions: Joi.bool().allow(null, ''), // Added in server + validation in UI
   type: Joi.string().required()
 })
 
