@@ -22,7 +22,7 @@ const NotificationSchema = new Schema<INotificationDocument, INotificationModel>
     isUnread: { type: Boolean, default: true },
     status: { type: String, required: true, enum: statuses },
     type: { type: Number, required: true, enum: notifTypes },
-    created: { type: Number, default: new Date().getTime() }
+    created: { type: Number, default: Date.now }
 })
 
 // Statics

@@ -28,8 +28,8 @@ const UserSchema = new Schema<IUserDocument, IUserModel>({
     hasAudits: [{ type: String, default: [] }],
     hasItems: [{ type: String, default: [] }],
     hasContracts: [{ type: String, default: [] }],
-    lastUpdated: { type: Number, default: new Date().getTime() },
-    created: { type: Number, default: new Date().getTime() }
+    lastUpdated: { type: Number, default: Date.now },
+    created: { type: Number, default: Date.now }
 })
 
 // Statics

@@ -22,8 +22,8 @@ const RegistrationSchema = new Schema<IRegistrationDocument, IRegistrationModel>
     termsAndConditions: { type: Boolean, default: true },
     status: { type: RegistrationStatus, enum: statusEnum },
     type: { type: RegistrationType, enum: typesEnum },
-    lastUpdated: { type: Number, default: new Date().getTime() },
-    created: { type: Number, default: new Date().getTime() }
+    lastUpdated: { type: Number, default: Date.now },
+    created: { type: Number, default: Date.now }
 })
 
 RegistrationSchema.statics._getRegistration = getRegistration

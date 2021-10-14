@@ -33,7 +33,7 @@ const AuditSchema = new Schema<IAuditDocument, IAuditModel>({
     actor: { type: AuditObjSchema, required: true },
     target: { type: AuditObjSchema, required: true },
     object: { type: AuditObjSchema, required: false },
-    created: { type: Number, default: new Date().getTime() },
+    created: { type: Number, default: Date.now },
     labels: { type: LabelObjSchema }
 })
 

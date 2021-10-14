@@ -41,8 +41,8 @@ const OrganisationSchema = new Schema<IOrganisationDocument, IOrganisationModel>
     knows: [{ type: String, default: [] }],
     knowsRequestsFrom: [{ type: String, default: [] }],
     knowsRequestsTo: [{ type: String, default: [] }],
-    lastUpdated: { type: Number, default: new Date().getTime() },
-    created: { type: Number, default: new Date().getTime() }
+    lastUpdated: { type: Number, default: Date.now },
+    created: { type: Number, default: Date.now }
     // auto: boolean // Activate for fast registration
 })
 

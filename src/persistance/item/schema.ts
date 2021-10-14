@@ -25,8 +25,8 @@ const ItemSchema = new Schema<IItemDocument, IItemModel>({
     // hasContracts: string[],
     // hasAudits: string[],
     // mode: Production and testing ??
-    lastUpdated: { type: Number, default: new Date().getTime() },
-    created: { type: Number, default: new Date().getTime() }
+    lastUpdated: { type: Number, default: Date.now },
+    created: { type: Number, default: Date.now }
 })
 
 // Statics

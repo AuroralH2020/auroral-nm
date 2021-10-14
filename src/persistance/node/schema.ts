@@ -20,8 +20,8 @@ const NodeSchema = new Schema<INodeDocument, INodeModel>({
     itemsCount: { type: Number, default: 0 },
     hasKey: { type: Boolean, default: false },
     key: String,
-    lastUpdated: { type: Number, default: new Date().getTime() },
-    created: { type: Number, default: new Date().getTime() }
+    lastUpdated: { type: Number, default: Date.now },
+    created: { type: Number, default: Date.now }
 })
 
 // Statics
