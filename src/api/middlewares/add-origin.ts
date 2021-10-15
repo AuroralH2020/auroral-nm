@@ -5,7 +5,6 @@ import { responseBuilder } from '../../utils'
 import { ILocals, Interfaces } from '../../types/locals-types'
 import { errorHandler } from '../../utils/error-handler'
 
-
 type originController = Controller<{}, {}, {}, null, ILocals>
 
 export const addOrigin = (_type: Interfaces) => {

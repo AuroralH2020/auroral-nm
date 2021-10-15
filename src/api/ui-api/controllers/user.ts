@@ -3,12 +3,14 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler } from '../../../utils/error-handler'
+import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { UserModel } from '../../../persistance/user/model'
 import { AuditModel } from '../../../persistance/audit/model'
-import { IUserUI, IUserUIProfile, IUserUpdate, UserVisibility } from '../../../persistance/user/types'
+import { NotificationModel } from '../../../persistance/notification/model'
+import { NotificationStatus } from '../../../persistance/notification/types'
+import { IUserUI, IUserUIProfile, IUserUpdate, UserVisibility, UserStatus} from '../../../persistance/user/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { AccountModel } from '../../../persistance/account/model'
 import { hashPassword, comparePassword } from '../../../auth-server/auth-server'
@@ -51,6 +53,52 @@ export const getMany: getManyController = async (req, res) => {
                 }
                 const data = await UserModel._getAllUsers(accessLevel, users)
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error({ msg: error.message, id: res.locals.reqId })
+                return responseBuilder(error.status, res, error.message)
+        }
+}
+type removeUserController = expressTypes.Controller<{ uid: string }, {}, {}, null, localsTypes.ILocals>
+
+export const removeUser: removeUserController = async (req, res) => {
+        const { uid } = req.params
+        const  decoded  = res.locals.decoded
+        
+        try {
+                if (uid === decoded.uid) {
+                        throw new MyError('Users cannot delete their accounts', HttpStatusCode.FORBIDDEN)
+                }
+                const userDoc = await UserModel._getDoc(uid)
+                if ((userDoc.hasItems.length) !== 0) {
+                        throw new MyError('User has some enabled items', HttpStatusCode.FORBIDDEN)
+                }
+                const deletedUser = await UserModel._getUser(uid)
+                const adminUser = await UserModel._getUser(decoded.uid)
+                const company = await OrganisationModel._getOrganisation(adminUser.cid)
+                
+
+                logger.debug('User:' + deletedUser.name + ' was deleted')
+                // Audit
+                await AuditModel._createAudit({
+                        ...res.locals.audit,
+                        actor: { id: adminUser.uid, name: adminUser.name },
+                        target: { id: company.cid, name: company.name },
+                        object: { id: deletedUser.uid, name: deletedUser.name },
+                        type: EventType.userRemoved,
+                        labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+                })
+                 // Notification
+                await NotificationModel._createNotification({
+                        owner: decoded.org,
+                        actor: { id: adminUser.uid, name: adminUser.name },
+                        target: { id: deletedUser.uid, name: deletedUser.name },
+                        type: EventType.userRemoved,
+                        status: NotificationStatus.INFO
+                })
+                // remove user in MONGO
+                userDoc._removeUser()
+                return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
                 logger.error({ msg: error.message, id: res.locals.reqId })
