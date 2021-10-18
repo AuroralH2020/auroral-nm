@@ -181,8 +181,8 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             ...res.locals.audit,
             cid: registrationObj.cid,
             actor: { id: uid, name: newUser.email },
-            target: { id: uid, name: newUser.email },
-            object: { id: registrationObj.cid, name: registrationObj.name },
+            target: { id: registrationObj.cid, name: registrationObj.companyName },
+            object: { id: uid, name: newUser.email },
             type: EventType.userCreated,
             labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
           })
@@ -235,7 +235,8 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             ...res.locals.audit,
             cid: invitation.sentBy.cid,
             actor: { id: invitation.sentBy.uid, name: invitation.sentBy.email },
-            target: { id: uid, name: newUser.email },
+            target: { id: invitation.sentBy.cid, name: invitation.sentBy.organisation },
+            object: { id: newUser.uid, name: newUser.name },
             type: EventType.userCreated,
             labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
           })
