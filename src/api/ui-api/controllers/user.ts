@@ -10,7 +10,7 @@ import { UserModel } from '../../../persistance/user/model'
 import { AuditModel } from '../../../persistance/audit/model'
 import { NotificationModel } from '../../../persistance/notification/model'
 import { NotificationStatus } from '../../../persistance/notification/types'
-import { IUserUI, IUserUIProfile, IUserUpdate, UserVisibility, UserStatus} from '../../../persistance/user/types'
+import { IUserUI, IUserUIProfile, IUserUpdate, UserVisibility, UserStatus } from '../../../persistance/user/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { AccountModel } from '../../../persistance/account/model'
 import { hashPassword, comparePassword } from '../../../auth-server/auth-server'
@@ -73,18 +73,16 @@ export const removeUser: removeUserController = async (req, res) => {
                 if ((userDoc.hasItems.length) !== 0) {
                         throw new MyError('User has some enabled items', HttpStatusCode.FORBIDDEN)
                 }
-                const deletedUser = await UserModel._getUser(uid)
+   
                 const adminUser = await UserModel._getUser(decoded.uid)
                 const company = await OrganisationModel._getOrganisation(adminUser.cid)
-                
 
-                logger.debug('User:' + deletedUser.name + ' was deleted')
                 // Audit
                 await AuditModel._createAudit({
                         ...res.locals.audit,
                         actor: { id: adminUser.uid, name: adminUser.name },
                         target: { id: company.cid, name: company.name },
-                        object: { id: deletedUser.uid, name: deletedUser.name },
+                        object: { id: userDoc.uid, name: userDoc.name },
                         type: EventType.userRemoved,
                         labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
                 })
@@ -92,12 +90,15 @@ export const removeUser: removeUserController = async (req, res) => {
                 await NotificationModel._createNotification({
                         owner: decoded.org,
                         actor: { id: adminUser.uid, name: adminUser.name },
-                        target: { id: deletedUser.uid, name: deletedUser.name },
+                        target: { id: userDoc.uid, name: userDoc.name },
                         type: EventType.userRemoved,
                         status: NotificationStatus.INFO
                 })
+
                 // remove user in MONGO
                 userDoc._removeUser()
+                logger.debug('User:' + userDoc.name + ' was deleted')
+
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)

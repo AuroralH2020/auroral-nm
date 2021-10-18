@@ -76,12 +76,12 @@ const generateMessage: (data: IAuditCreate) => string = (
       break
     // User
     case EventType.userCreated:
-      data.object ??= { id: '', name: 'undefined' }
-      message += 'User \'' + data.object.name + '\' has been created by user ' + data.actor.name
+      // data.object ??= { id: '', name: 'undefined' }
+      message += 'User \'' + data.object?.name + '\' has been created by user ' + data.actor.name
       break
     case EventType.userRemoved:
-      data.object ??= { id: '', name: 'undefined' }
-      message += 'User \'' + data.object.name + '\' has been removed by user ' + data.actor.name
+      // data.object ??= { id: '', name: 'undefined' }
+      message += 'User \'' + data.object?.name + '\' has been removed by user ' + data.actor.name
       break
     case EventType.userUpdated:
       message += 'User \'' + data.target.name + '\' has been updated by user ' + data.actor.name
