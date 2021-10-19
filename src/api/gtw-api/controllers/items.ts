@@ -72,8 +72,10 @@ export const registration: registrationController = async (req, res) => {
             labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
           })
           return true
-        } catch (error) {
+        } catch (err) {
           // Create response
+          const error = errorHandler(err)
+          logger.error({ msg: error.message, id: res.locals.reqId })
           response.push({ name: it.name, oid: it.oid, password: null, error: true })
           return false
         }

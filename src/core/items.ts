@@ -41,7 +41,7 @@ import { HttpStatusCode } from '../utils/http-status-codes'
         }))
     } catch (err) {
         const error = errorHandler(err)
-        throw new Error(error.message)
+        throw error
     }
 }
 
@@ -105,7 +105,7 @@ import { HttpStatusCode } from '../utils/http-status-codes'
     } catch (err) {
         const error = errorHandler(err)
         // logger.error(error.message)
-        throw new Error(error.message)
+        throw error
     }
 }
 
@@ -139,7 +139,7 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         // TBD: Audits and notifications
     } catch (err) {
         const error = errorHandler(err)
-        throw new Error(error.message)
+        throw error
     }
 }
 
@@ -176,7 +176,7 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
         }
     } catch (err) {
         const error = errorHandler(err)
-        throw new Error(error.message)
+        throw error
     }
 }
 
