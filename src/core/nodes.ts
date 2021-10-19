@@ -57,8 +57,6 @@ export const removeOne = async (agid: string, cid?: string): Promise<void> => {
         await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
         // Delete node user from CS
         await cs.deleteUser(node.agid)
-        // TBD: Add notification
-        // TBD: Add audit
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)

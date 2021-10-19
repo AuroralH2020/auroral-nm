@@ -69,6 +69,8 @@ export const removeUser: removeUserController = async (req, res) => {
                 if (uid === decoded.uid) {
                         throw new MyError('Users cannot delete their accounts', HttpStatusCode.FORBIDDEN)
                 }
+
+                // Ger user
                 const userDoc = await UserModel._getDoc(uid)
                 if ((userDoc.hasItems.length) !== 0) {
                         throw new MyError('User has some enabled items', HttpStatusCode.FORBIDDEN)

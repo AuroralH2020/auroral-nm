@@ -4,5 +4,6 @@
  */
 import * as ItemService from './items'
 import * as NodeService from './nodes'
+import * as OrganisationService from './organisations'
 
-export { ItemService, NodeService }
+export { ItemService, NodeService, OrganisationService }

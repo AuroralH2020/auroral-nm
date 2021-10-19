@@ -11,6 +11,7 @@ import { ResultStatusType, EventType } from '../../../types/misc-types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { FriendshipsData, IOrganisationUI, IOrganisationUpdate, OrgConfiguration } from '../../../persistance/organisation/types'
 import { UserModel } from '../../../persistance/user/model'
+import { OrganisationService } from '../../../core'
 
 // Controllers
 
@@ -112,6 +113,34 @@ export const getConfiguration: getConfigurationController = async (req, res) => 
         try {
                 const data = await OrganisationModel._getConfiguration(cid)
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error({ msg: error.message, id: res.locals.reqId })
+                return responseBuilder(error.status, res, error.message)
+        }
+}
+
+type removeOrganisationController = expressTypes.Controller<{}, {}, {}, null, localsTypes.ILocals>
+ 
+export const removeOrganisation: removeOrganisationController = async (req, res) => {
+        const decoded = res.locals.decoded
+        try {
+                const orgDoc = await OrganisationModel._getDoc(decoded.org)
+                const orgName = orgDoc.name
+                const userName = (await UserModel._getUser(decoded.uid)).name
+
+                // Remove organisation
+                await OrganisationService.remove(orgDoc)
+                 
+                // Audit
+                await AuditModel._createAudit({
+                        ...res.locals.audit,
+                        actor: { id: decoded.uid, name: userName },
+                        target: { id: decoded.org, name: orgName },
+                        type: EventType.companyRemoved,
+                        labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+                })
+                return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
                 logger.error({ msg: error.message, id: res.locals.reqId })

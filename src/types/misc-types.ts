@@ -18,7 +18,7 @@ export enum SourceType{
 
 export enum ResultStatusType{
     ERROR = 'error',
-    SUCCESS = 'succes'
+    SUCCESS = 'success'
 }
 
 export enum EventType {

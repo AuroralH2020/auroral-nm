@@ -50,7 +50,7 @@ UiRouter
 .get('/organisations/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getMany)
 .get('/organisation/:cid/configuration', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getConfiguration)
 .put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), validateBody(updateOrganisationSchema), createAudit(SourceType.ORGANISATION), organisationCtrl.updateOrganisation)
-// .delete
+.delete('/organisation', jwt([RolesEnum.ADMIN]), addOrigin(Interfaces.UI), createAudit(SourceType.ORGANISATION), organisationCtrl.removeOrganisation)
 // Send friendship request to cid by autenticated user
 .post('/organisation/:cid/friendship/request', jwt(), addOrigin(Interfaces.UI), createAudit(SourceType.ORGANISATION), friendingCtrl.processFriendRequest)
 // Send friendship request approval to cid from authenticated user
