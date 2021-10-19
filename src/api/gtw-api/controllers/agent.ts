@@ -7,6 +7,8 @@ import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { NodeModel } from '../../../persistance/node/model'
+import { OrganisationModel } from '../../../persistance/organisation/model'
+import { RelationshipType } from '../../../types/misc-types'
 import { NodeService } from '../../../core'
 
 // Controllers
@@ -51,6 +53,38 @@ export const getAgentItems: getAgentItemsController = async (req, res) => {
       }
       const data = (await NodeModel._getNode(agid)).hasItems
       return responseBuilder(HttpStatusCode.OK, res, null, data)
+    } else {
+      logger.error('Gateway unauthorized access attempt')
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+    }
+	} catch (err) {
+    const error = errorHandler(err)
+		logger.error(error.message)
+		return responseBuilder(error.status, res, error.message)
+	}
+}
+
+type getAgentRelationship = expressTypes.Controller<{ agid: string }, {}, {}, RelationshipType, localsTypes.ILocalsGtw>
+ 
+export const getRelationship: getAgentRelationship = async (req, res) => {
+  const { agid } = req.params
+  const { decoded } = res.locals
+	try {
+    if (decoded) {
+      // get data from Mongo
+      const myNodeCid = (await NodeModel._getNode(decoded.iss)).cid
+      const reqNodeCid = (await NodeModel._getNode(agid)).cid
+      const myOrg = await OrganisationModel._getOrganisation(myNodeCid)
+      let relation = RelationshipType.OTHER
+      // Search if my company node 
+      if (myNodeCid === reqNodeCid) {
+        relation = RelationshipType.ME
+      } 
+      // Search if friends node 
+      if (myOrg.knows.includes(reqNodeCid)) {
+        relation = RelationshipType.FRIEND 
+      }
+      return responseBuilder(HttpStatusCode.OK, res, null, relation)
     } else {
       logger.error('Gateway unauthorized access attempt')
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
