@@ -7,6 +7,12 @@ export type KeyValue = {
     value: string
 }
 
+export enum RelationshipType{
+    ME = 'me',
+    FRIEND = 'friend',
+    OTHER = 'other'
+}
+
 export enum SourceType{
     USER = 'User',
     ORGANISATION = 'Organisation',
