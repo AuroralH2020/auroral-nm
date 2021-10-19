@@ -4,14 +4,14 @@
 
 // Imports
 import * as crypto from 'crypto'
-import { MyError, errorHandler, ErrorType, ErrorSource } from '../utils/error-handler'
+import { MyError, errorHandler, ErrorSource } from '../utils/error-handler'
 import { logger } from '../utils/logger'
 import { cs } from '../microservices/commServer'
 import { ItemModel } from '../persistance/item/model'
 import { UserModel } from '../persistance/user/model'
 import { NodeModel } from '../persistance/node/model'
 import { OrganisationModel } from '../persistance/organisation/model'
-import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, IItemUpdate } from '../persistance/item/types'
+import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, IItemUpdate, IItemDocument } from '../persistance/item/types'
 import { HttpStatusCode } from '../utils/http-status-codes'
 
 // Functions
@@ -121,7 +121,7 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         // Validate agid provided by agent or uid by UI
         if (owner != null && owner !== item.agid && owner !== item.uid) {
             logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
-            throw new Error(ErrorType.UNAUTHORIZED)
+            throw new MyError('Item does not belong to requester', HttpStatusCode.UNAUTHORIZED)
         }
         // Remove item from user
         if (item.uid) {
@@ -156,7 +156,7 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
     // Validate agid provided by agent or uid by UI
         if (owner != null && owner !== item.agid && owner !== item.uid && item.status !== ItemStatus.DISABLED) {
             // logger.error('Cannot update ' + oid + ' because it does not belong to user or agent requester: ' + owner)
-            throw new Error(ErrorType.UNAUTHORIZED)
+            throw new MyError('Item does not belong to requester', HttpStatusCode.UNAUTHORIZED)
         }
     // TBD: Do checks before updating
     // Check contracts
@@ -166,27 +166,11 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
     
     // Update
         if (data.status && owner) {
-            // Add privacy if disabling
-            const dataWithPrivacy = data.status === ItemStatus.DISABLED ?
-                { status: data.status, accessLevel: ItemPrivacy.PRIVATE } : 
-                data
-            // Update status
-            await item._updateItem(dataWithPrivacy)
-            if (data.status === ItemStatus.DISABLED) {
-                // Remove item from user AND user from item
-                await UserModel._removeItemFromUser(owner, oid)
-                // Remove user from item document
-                await ItemModel._removeUserFromItem(oid)
-                // Remove item from CS organisation group
-                await cs.deleteUserFromGroup(oid, item.cid)
-            } else {
-                // Add item to user
-                await UserModel._addItemToUser(owner, oid)
-                // Add item user to item document
-                await ItemModel._addUserToItem(oid, owner)
-                // Add item to CS organisation group
-                await cs.addUserToGroup(oid, item.cid)
-            }
+            // Enable/Disable
+            await updateStatus(item, data.status, owner, oid)
+        } else if (data.accessLevel && owner) {
+            // If access level is less restrictive than user's then forbid
+            await updateAccessLevel(item, data.accessLevel, owner)
         } else {
             await item._updateItem(data)
         }
@@ -197,6 +181,41 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
 }
 
 // Private functions
+
+const updateStatus = async (item: IItemDocument, status: ItemStatus , owner: string, oid: string) => { 
+    // TBD check also contracts when disabling
+    // Add privacy if disabling
+    const dataWithPrivacy = status === ItemStatus.DISABLED ?
+        { status, accessLevel: ItemPrivacy.PRIVATE } : 
+        { status }
+    // Update status
+    await item._updateItem(dataWithPrivacy)
+    if (status === ItemStatus.DISABLED) {
+        // Remove item from user AND user from item
+        await UserModel._removeItemFromUser(owner, oid)
+        // Remove user from item document
+        await ItemModel._removeUserFromItem(oid)
+        // Remove item from CS organisation group
+        await cs.deleteUserFromGroup(oid, item.cid)
+    } else {
+        // Add item to user
+        await UserModel._addItemToUser(owner, oid)
+        // Add item user to item document
+        await ItemModel._addUserToItem(oid, owner)
+        // Add item to CS organisation group
+        await cs.addUserToGroup(oid, item.cid)
+    }
+}
+
+const updateAccessLevel = async (item: IItemDocument, accessLevel: ItemPrivacy , owner: string) => {
+    // TBD check also contracts when lowering privacy
+    const user = await UserModel._getUser(owner)
+    if (user.accessLevel < accessLevel) {
+        throw new MyError('User owner privacy must be less restrictive', HttpStatusCode.FORBIDDEN)
+    } else {
+        await item._updateItem({ accessLevel })
+    }
+}
 
 const buildGetManyQuery = (cid: string | { $in: string[] }, type: ItemType, filter: number): GetAllQuery => {
     switch (Number(filter)) {
@@ -244,7 +263,7 @@ const buildGetManyQuery = (cid: string | { $in: string[] }, type: ItemType, filt
             return {
                 cid,
                 type,
-                accessLevel: { $or: [ItemPrivacy.FOR_FRIENDS, ItemPrivacy.PUBLIC] },
+                $or: [{ accessLevel: ItemPrivacy.FOR_FRIENDS } , { accessLevel: ItemPrivacy.PUBLIC }],
                 status: { $ne: ItemStatus.DELETED }
             }
         case 6:

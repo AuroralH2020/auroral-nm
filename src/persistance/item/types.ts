@@ -88,8 +88,8 @@ export interface IItemUpdate {
 export type GetAllQuery = {
     cid?: string | { $in: string[] },
     type: ItemType,
-    accessLevel?: ItemPrivacy |
-                { $or: ItemPrivacy[] },
+    accessLevel?: ItemPrivacy,
+    $or?: { accessLevel: ItemPrivacy }[],
     status?: ItemStatus | 
             { $ne: ItemStatus }
 }
