@@ -32,7 +32,7 @@ export const createOne = async (cid: string, name: string, type: NodeType, passw
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)
-        throw new Error(error.message)
+        throw error
     }
 }
 
@@ -60,6 +60,6 @@ export const removeOne = async (agid: string, cid?: string): Promise<void> => {
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)
-        throw new Error(error.message)
+        throw error
     }
 }
