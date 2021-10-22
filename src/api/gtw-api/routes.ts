@@ -1,7 +1,7 @@
 // Express router
 import { Router } from 'express'
 // Middlewares
-import { guard, addOrigin, createAudit } from '../middlewares/index'
+import { guard, addOrigin, createAudit, validateBody } from '../middlewares/index'
 // Controllers
 import * as miscCtrl from './controllers/misc'
 import * as agentCtrl from './controllers/agent'
@@ -9,6 +9,7 @@ import * as itemsCtrl from './controllers/items'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { SourceType } from '../../types/misc-types'
+import { createItemSchema } from '../../core/joi-schemas'
 
 const GtwRouter = Router()
 
@@ -17,7 +18,7 @@ GtwRouter
 .get('/counters', addOrigin(Interfaces.GATEWAY), guard(), miscCtrl.getCounters)
 .post('/counters', addOrigin(Interfaces.GATEWAY), guard(), miscCtrl.sendCounters)
 .get('/items/:oid', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.neighbourhood)
-.post('/items/register', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), itemsCtrl.registration)
+.post('/items/register', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), validateBody(createItemSchema), itemsCtrl.registration)
 .post('/items/remove', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), itemsCtrl.deleteItems)
 .put('/items/modify', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), itemsCtrl.updateItem) // Update item
 .delete('/agent/:agid', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.NODE), agentCtrl.deleteAgent)
