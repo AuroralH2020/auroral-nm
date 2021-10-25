@@ -56,6 +56,12 @@ export interface IItem {
     created: number
 }
 
+// Interface used to send item  privacy value to Nodes
+export interface IItemPrivacy {
+    oid: string, // Auroral Id
+    privacy: ItemPrivacy, // Privacy level of the item
+}
+
 // Interface to Items returned to UI
 export interface IItemUI extends IItem {
     // Query enrichment
@@ -138,6 +144,10 @@ export interface IItemModel extends Model<IItemDocument> {
         params: GetAllQuery,
         offset: number
     ) => Promise<IItem[]>
+    _getItemsPrivacy: (
+        this: IItemModel,
+        oids: string[],
+    ) => Promise<IItemPrivacy[]>
     _addUserToItem: (
         this: IItemModel,
         oid: string,
