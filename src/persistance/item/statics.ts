@@ -1,4 +1,4 @@
-import { IItemDocument, IItemModel, IItemCreatePost, IItem, ItemStatus, GetAllQuery } from './types'
+import { IItemDocument, IItemModel, IItemCreatePost, IItem, ItemStatus, GetAllQuery, IItemPrivacy } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
 import { logger } from '../../utils/logger'
@@ -60,6 +60,21 @@ export async function createItem(
     return this.create(newItem)
 }
 
+export async function getItemsPrivacy(
+  this: IItemModel, oids: string[]
+): Promise<IItemPrivacy[]> {
+  // get from mongo
+  const record = await this.aggregate([
+    { $match: { oid: { $in: oids }, status: ItemStatus.ENABLED } },
+    { $project: {  oid: 1, privacy: '$accessLevel', _id: 0 } },
+  ])
+  .exec()
+  if (record) {
+    return record
+  } else {
+    throw new MyError('Items not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+  }
+}
 export async function addUserToItem (
   this: IItemModel, oid: string, uid: string
 ): Promise<void> {
