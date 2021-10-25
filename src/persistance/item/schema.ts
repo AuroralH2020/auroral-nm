@@ -1,13 +1,18 @@
 import mongoose from 'mongoose'
 import { getItem, getDoc, createItem, getAllItems, addUserToItem, removeUserFromItem } from './statics'
 import { updateItem, removeItem } from './methods'
-import { IItemDocument, IItemModel, ItemType, ItemStatus, ItemPrivacy } from './types'
+import { IItemDocument, IItemModel, ItemType, ItemStatus, ItemPrivacy, ItemLabelsObj, ItemDomainType } from './types'
 
 const Schema = mongoose.Schema
 
 const itemTypes = Object.values(ItemType)
 const statuses = Object.values(ItemStatus)
 const privacyLevels = Object.values(ItemPrivacy)
+const domainType = Object.values(ItemDomainType)
+
+const ItemLabelsObjSchema = new Schema<ItemLabelsObj>({
+    domain: { type: String, required: true, enum: domainType, default: ItemDomainType.UNDEFINED }
+}, { _id: false })
 
 const ItemSchema = new Schema<IItemDocument, IItemModel>({
     oid: { type: String, index: true, unique: true, required: true },
@@ -18,6 +23,7 @@ const ItemSchema = new Schema<IItemDocument, IItemModel>({
     status: { type: String, default: ItemStatus.DISABLED, enum: statuses },
     type: { type: String, required: true, enum: itemTypes },
     accessLevel: { type: Number, default: ItemPrivacy.PRIVATE, enum: privacyLevels },
+    labels: { type: ItemLabelsObjSchema, required: true, default: { domain: ItemDomainType.UNDEFINED } },
     avatar: String,
     description: String,
     // semanticType: string,

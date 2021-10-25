@@ -7,6 +7,7 @@ export async function updateItem(this: IItemDocument, data: IItemUpdate): Promis
     this.status = data.status ? data.status : this.status
     this.description = data.description ? data.description : this.description
     this.accessLevel = typeof data.accessLevel === 'number' ? data.accessLevel : this.accessLevel
+    this.labels = data.labels ? data.labels : this.labels
     this.lastUpdated = new Date().getTime()
     await this.save()
     return this

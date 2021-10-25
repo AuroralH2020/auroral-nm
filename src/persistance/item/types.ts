@@ -2,7 +2,8 @@ import { Document, Model } from 'mongoose'
 
 export enum ItemType {
     DEVICE = 'Device',
-    SERVICE = 'Service'
+    SERVICE = 'Service',
+    MARKETPLACE = 'Marketplace'
 }
 
 export enum ItemStatus {
@@ -17,6 +18,21 @@ export enum ItemPrivacy {
     PRIVATE = 0
 }
 
+export enum ItemDomainType {
+    ENERGY = 'Energy',
+    UNDEFINED = 'Undefined',
+    MOBILITY = 'Mobility',
+    HEALTH = 'Health',
+    FARMING = 'Farming',
+    TOURISM = 'Tourism',
+    WEATHER = 'Weather',
+    INDOORQUALITY = 'Indoor quality'
+}
+
+export type ItemLabelsObj = {
+    domain: ItemDomainType
+}
+
 export interface IItem {
     // context: string
     name: string, // Name of item given by user
@@ -29,6 +45,7 @@ export interface IItem {
     type: ItemType, // Subtype of the item
     status: ItemStatus,
     description?: string,
+    labels: ItemLabelsObj,
     // semanticType: string,
     // interactionPatterns: ??[],
     // hasContracts: string[],
@@ -51,13 +68,15 @@ export interface IItemUI extends IItem {
     gateway?: { // Item gateway
         name: string
     }
+    labels: ItemLabelsObj
 }
 
 // Input to create a new Item
 export interface IItemCreate {
     name: string, // fullName
     type: ItemType,
-    oid: string
+    oid: string,
+    labels: ItemLabelsObj
     // semanticType: string,
     // interactionPatterns: ??[]
 }
@@ -68,7 +87,8 @@ export interface IItemCreatePost {
     agid: string,
     cid: string, // unique organisation id
     type?: ItemType,
-    oid?: string
+    oid?: string,
+    labels?: ItemLabelsObj
     // semanticType: string,
     // interactionPatterns: ??[]
 }
@@ -81,7 +101,8 @@ export interface IItemUpdate {
     avatar?: string,
     accessLevel?: ItemPrivacy,
     status?: ItemStatus,
-    description?: string
+    description?: string,
+    labels?: ItemLabelsObj
     // interactionPatterns: ??[]
 }
 
