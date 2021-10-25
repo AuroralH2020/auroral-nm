@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import { UserVisibility } from '../persistance/user/types'
 import { RegistrationStatus } from '../persistance/registration/types'
-import { ItemStatus, ItemPrivacy } from '../persistance/item/types'
+import { ItemStatus, ItemPrivacy, ItemDomainType, ItemType } from '../persistance/item/types'
 import { RolesEnum } from '../types/roles'
 
 // For registration in the UI
@@ -68,6 +68,10 @@ export const updateNodeSchema = Joi.object({
   // location: Joi.string()
 })
 
+export const updateItemLabelsSchema = Joi.object({
+  domain: Joi.valid(...Object.values(ItemDomainType))
+})
+
 export const updateItemSchema = Joi.object({
   oid: Joi.string(),
   name: Joi.string(), // fullName
@@ -75,7 +79,21 @@ export const updateItemSchema = Joi.object({
   avatar: Joi.string(),
   accessLevel: Joi.valid(...Object.values(ItemPrivacy)),
   status: Joi.valid(...Object.values(ItemStatus)),
-  description: Joi.string()
+  description: Joi.string(),
+  labels: updateItemLabelsSchema
+})
+
+export const createItemSchema = Joi.object({
+  agid: Joi.string(),
+  items: Joi.array().items(Joi.object(
+    {
+      oid: Joi.string(),
+      name: Joi.string(),
+      avatar: Joi.string(),
+      type: Joi.valid(...Object.values(ItemType)),
+      adapterId: Joi.string(),
+      labels: updateItemLabelsSchema
+    }))
 })
 
 export const emptyItemSchema = Joi.object({
