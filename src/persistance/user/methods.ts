@@ -10,7 +10,7 @@ export async function updateUser(this: IUserDocument, data: IUserUpdate): Promis
     this.occupation = data.occupation ? data.occupation : this.occupation
     this.location = data.location ? data.location : this.location
     this.avatar = data.avatar ? data.avatar : this.avatar
-    this.accessLevel = data.accessLevel ? Number(data.accessLevel) - 1 : this.accessLevel // AccessLevel from UI is 1 - 3, need to substract 1
+    this.accessLevel = data.accessLevel !== undefined ? Number(data.accessLevel)  : this.accessLevel // AccessLevel from UI is 0-3
     this.lastUpdated = new Date().getTime()
     this.roles = data.roles ? data.roles : this.roles
     await this.save()

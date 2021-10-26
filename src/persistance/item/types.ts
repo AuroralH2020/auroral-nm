@@ -121,6 +121,16 @@ export type GetAllQuery = {
             { $ne: ItemStatus }
 }
 
+export type GetByOwnerQuery = {
+    cid: string,
+    uid?: string, 
+    type: ItemType,
+    accessLevel?: ItemPrivacy,
+    $or?: { accessLevel?: ItemPrivacy }[],
+    status: ItemStatus | 
+            { $ne: ItemStatus }
+}
+
 export interface IItemDocument extends IItem, Document {
     _updateItem: (this: IItemDocument, data: IItemUpdate) => Promise<IItemDocument>
     _removeItem: (this: IItemDocument) => Promise<void>
@@ -148,6 +158,11 @@ export interface IItemModel extends Model<IItemDocument> {
         this: IItemModel,
         oids: string[],
     ) => Promise<IItemPrivacy[]>
+    _getByOwner: (
+        this: IItemModel,
+        params: GetByOwnerQuery,
+        offset: number,
+    )=> Promise<IItem[]>
     _addUserToItem: (
         this: IItemModel,
         oid: string,

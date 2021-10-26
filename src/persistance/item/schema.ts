@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getItem, getDoc, createItem, getAllItems, addUserToItem, removeUserFromItem, getItemsPrivacy } from './statics'
+import { getItem, getDoc, createItem, getAllItems, addUserToItem, removeUserFromItem, getByOwner, getItemsPrivacy } from './statics'
 import { updateItem, removeItem } from './methods'
 import { IItemDocument, IItemModel, ItemType, ItemStatus, ItemPrivacy, ItemLabelsObj, ItemDomainType } from './types'
 
@@ -44,6 +44,7 @@ ItemSchema.statics._getAllItems = getAllItems
 ItemSchema.statics._addUserToItem = addUserToItem
 ItemSchema.statics._removeUserFromItem = removeUserFromItem
 ItemSchema.statics._getItemsPrivacy = getItemsPrivacy
+ItemSchema.statics._getByOwner = getByOwner
 
 // Methods
 

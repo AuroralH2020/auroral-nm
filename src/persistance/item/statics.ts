@@ -1,4 +1,4 @@
-import { IItemDocument, IItemModel, IItemCreatePost, IItem, ItemStatus, GetAllQuery, IItemPrivacy } from './types'
+import { IItemDocument, IItemModel, IItemCreatePost, IItem, ItemStatus, GetAllQuery, GetByOwnerQuery, IItemPrivacy } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
 import { logger } from '../../utils/logger'
@@ -48,6 +48,24 @@ export async function getAllItems(
   } else {
     // logger.warn('Item not found')
     throw new MyError('Item not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+  }
+}
+
+export async function getByOwner(
+  this: IItemModel, params: GetByOwnerQuery, offset: number
+): Promise<IItem[]> {
+  const record = await this.find(
+    params
+  )
+  .skip(offset)
+  .limit(12)
+  .lean()
+  .exec()
+  if (record) {
+    return record
+  } else {
+    // logger.warn('Item not found')
+    throw new MyError('Items not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }
 
