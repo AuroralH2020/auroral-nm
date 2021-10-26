@@ -7,7 +7,7 @@ import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { ItemService } from '../../../core'
-import { IItemUI, IItemUpdate, ItemStatus, ItemType } from '../../../persistance/item/types'
+import { IItemUI, IItemUpdate, ItemStatus, ItemType, ItemPrivacy, GetByOwnerQuery } from '../../../persistance/item/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { NotificationModel } from '../../../persistance/notification/model'
 import { AuditModel } from '../../../persistance/audit/model'
@@ -24,8 +24,8 @@ export const getMany: getManyController = async (req, res) => {
   const { type, offset, filter } = req.query
   const { decoded } = res.locals
 	try {
-        const data = await ItemService.getMany(decoded.org, type, offset, filter)
-        return responseBuilder(HttpStatusCode.OK, res, null, data)
+      const data = await ItemService.getMany(decoded.org, type, offset, filter)
+      return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
     logger.error({ msg: error.message, id: res.locals.reqId })
@@ -45,6 +45,72 @@ export const getOne: getOneController = async (req, res) => {
     const error = errorHandler(err)
     return responseBuilder(error.status, res, error.message)
 	}
+}
+
+type getByCompanyController = expressTypes.Controller<{ cid: string }, {}, { type: ItemType, offset: number }, IItemUI[], localsTypes.ILocals>
+ 
+export const getByCompany: getByCompanyController = async (req, res) => {
+  const { cid } = req.params
+  const { type, offset } = req.query
+  const { decoded } = res.locals
+  try {
+    const reqParam: GetByOwnerQuery = {
+      cid,
+      type,
+      status: ItemStatus.ENABLED
+    }
+    const foreignOrg = (await OrganisationModel._getOrganisation(cid))
+    if (foreignOrg.knows.includes(decoded.org)) {
+      // We are friends
+      reqParam.$or = [{ accessLevel: ItemPrivacy.FOR_FRIENDS }, { accessLevel: ItemPrivacy.PUBLIC }]
+    } else if (cid === decoded.org) {
+      // My org
+      reqParam.status = { $ne: ItemStatus.DELETED }
+    } else {
+      // Foreign company 
+      reqParam.$or = [{ accessLevel: ItemPrivacy.PUBLIC }]
+    }
+    const data = await ItemModel._getByOwner(reqParam, Number(offset))
+    return responseBuilder(HttpStatusCode.OK, res, null, data)
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error({ msg: error.message, id: res.locals.reqId })
+    return responseBuilder(error.status, res, error.message)
+  }
+}
+
+type GetByUserController = expressTypes.Controller<{ uid: string }, {}, { type: ItemType, offset: number }, IItemUI[], localsTypes.ILocals>
+
+export const getByUser: GetByUserController = async (req, res) => {
+  const { uid } = req.params
+  const { type, offset } = req.query
+  const { decoded } = res.locals
+  try {
+    const reqUser = (await UserModel._getUser(uid))
+    const reqParam: GetByOwnerQuery = {
+      cid: reqUser.cid,
+      uid,
+      status: ItemStatus.ENABLED,
+      type,
+    }
+    const foreignOrg = (await OrganisationModel._getOrganisation(reqUser.cid))
+    if (foreignOrg.knows.includes(decoded.org)) {
+      // We are friends
+      reqParam.$or = [{ accessLevel: ItemPrivacy.FOR_FRIENDS }, { accessLevel: ItemPrivacy.PUBLIC }]
+    } else if (reqUser.cid === decoded.org) {
+      // My org
+      reqParam.status = { $ne: ItemStatus.DELETED }
+    } else {
+      // Foreign company 
+      reqParam.$or = [{ accessLevel: ItemPrivacy.PUBLIC }]
+    }
+    const data = await ItemModel._getByOwner(reqParam, Number(offset))
+    return responseBuilder(HttpStatusCode.OK, res, null, data)
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error({ msg: error.message, id: res.locals.reqId })
+    return responseBuilder(error.status, res, error.message)
+  }
 }
 
 type UpdateOneController = expressTypes.Controller<{ oid: string }, IItemUpdate, {}, null, localsTypes.ILocals>
