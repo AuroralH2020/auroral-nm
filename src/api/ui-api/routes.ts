@@ -81,6 +81,8 @@ UiRouter
 
 // ITEMS
 .get('/items', jwt(), addOrigin(Interfaces.UI),  itemsCtrl.getMany)
+.get('/items/company/:cid', jwt(), addOrigin(Interfaces.UI),  itemsCtrl.getByCompany)
+.get('/items/user/:uid', jwt(), addOrigin(Interfaces.UI),  itemsCtrl.getByUser)
 .get('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getOne)
 .put('/items/:oid', jwt(), addOrigin(Interfaces.UI), validateBody(updateItemSchema), createAudit(SourceType.ITEM), itemsCtrl.updateOne)
 .delete('/items/:oid', jwt(), addOrigin(Interfaces.UI), createAudit(SourceType.ITEM), itemsCtrl.removeOne)
