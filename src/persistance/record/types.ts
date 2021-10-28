@@ -1,6 +1,6 @@
 import { Document, Model } from 'mongoose'
 
-export enum RecordType {
+export enum MessageType {
     CANCELTASK = 'CANCELTASK',
     GETLISTOFACTIONS = 'GETLISTOFACTIONS',
     GETTASKSTATUS = 'GETTASKSTATUS',
@@ -13,7 +13,8 @@ export enum RecordType {
     GETLISTOFPROPERTIES = 'GETLISTOFPROPERTIES',
     GETPROPERTYVALUE = 'GETPROPERTYVALUE',
     GETTHINGDESCRIPTION = 'GETTHINGDESCRIPTION',
-    SETPROPERTYVALUE = 'SETPROPERTYVALUE'
+    SETPROPERTYVALUE = 'SETPROPERTYVALUE',
+    UNKNOWN = 'Unknown'
 }
 
 export interface IRecord {
@@ -24,8 +25,8 @@ export interface IRecord {
     timestamp: number
     reqInitiator: boolean
     messageSize: number
-    messageType: string
-    requestType: RecordType
+    messageType: MessageType
+    requestType: string
     cid: string
     agid: string
     isProcessed: boolean
@@ -40,7 +41,7 @@ export interface IRecordCreate {
     timestamp: number
     reqInitiator: boolean
     messageSize: number
-    messageType: string
+    messageType: MessageType
 }
 
 export interface  IRecordCreatePost {

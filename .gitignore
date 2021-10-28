@@ -8,7 +8,7 @@ node_modules/
 dist/
 
 # Scripts
-*.sh
+# *.sh
 
 # Log files
 *.log
