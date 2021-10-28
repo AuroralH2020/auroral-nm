@@ -20,7 +20,7 @@ let pub_cert: Buffer | null = null
 
 if (Config.NODE_ENV === 'development') {
     logger.debug('Using development authorization server')
-    secret_key = 'mysupersecretkey'
+    secret_key = Config.SECRET_TOKEN
 } else {
     // Load keys
     try {
