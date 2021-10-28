@@ -18,7 +18,7 @@ let algorithm: Algorithms
 
 if (Config.NODE_ENV === 'development') {
     logger.debug('Using development jwt verifier')
-    secret = 'mysupersecretkey'
+    secret = Config.SECRET_TOKEN
     algorithm = Algorithms.SYNC
 } else {
     // Load keys
@@ -39,12 +39,12 @@ const defaultJwtOptions: jwt.SignOptions = {
 }
 
 export const Auth = {
-    verify: (rawToken: string) => {
+    verify: (rawToken: string, ip: string) => {
         try {
             const options: jwt.SignOptions = defaultJwtOptions
             return jwt.verify(rawToken, secret!, options) as JWTDecodedToken
         } catch (err) {
-            console.log('Problem extracting roles from token')
+            logger.debug('Problem extracting roles from token: ' + ip)
             throw err
         }
     },

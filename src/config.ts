@@ -16,6 +16,7 @@ export const Config = {
 	NODE_ENV: process.env.NODE_ENV!,
 	IP: process.env.IP!,
 	PORT: process.env.PORT!,
+	SECRET_TOKEN: process.env.SECRET_TOKEN!,
 	CS: {
 		URL: process.env.CS_URL!, 
 		SECRET_KEY: process.env.CS_SECRET_KEY!

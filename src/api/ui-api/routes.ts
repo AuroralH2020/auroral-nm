@@ -32,10 +32,10 @@ UiRouter
 // .put('/remember/:id', loginCtrl.updateCookie)
 
 // REGISTRATION
-.get('/registration', jwt([RolesEnum.DEV_OPS]), addOrigin(Interfaces.UI), registrationCtrl.getAllRegistrations)
+.get('/registration', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getAllRegistrations)
 .post('/registration', addOrigin(Interfaces.UI), validateBody(registrationSchema), createAudit(SourceType.ORGANISATION), registrationCtrl.postRegistration)
 // .post('/registration', addOrigin(Interfaces.UI), registrationCtrl.postRegistration)
-.get('/registration/:registrationId', jwt([RolesEnum.DEV_OPS]), addOrigin(Interfaces.UI), registrationCtrl.getRegistration)
+.get('/registration/:registrationId', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getRegistration)
 .put('/registration/:token', addOrigin(Interfaces.UI), validateBody(registrationStatusSchema), createAudit(SourceType.ORGANISATION), registrationCtrl.putRegistration)
 .post('/registration/duplicatesUser', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesUser)
 .post('/registration/duplicatesCompany', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesCompany)
@@ -43,56 +43,56 @@ UiRouter
 // INVITATIONS
 .get('/invitation/:id', addOrigin(Interfaces.UI), invitationCtrl.getInvitation)
 .get('/invitations/all', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), invitationCtrl.getAllInvitations)
-.post('/invitation', jwt([RolesEnum.ADMIN]), addOrigin(Interfaces.UI), invitationCtrl.postInvitation)
+.post('/invitation', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), invitationCtrl.postInvitation)
 
 // ORGANISATIONS
-.get('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getOne)
-.get('/organisations/:cid', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getMany)
-.get('/organisation/:cid/configuration', jwt(), addOrigin(Interfaces.UI), organisationCtrl.getConfiguration)
-.put('/organisation/:cid', jwt(), addOrigin(Interfaces.UI), validateBody(updateOrganisationSchema), createAudit(SourceType.ORGANISATION), organisationCtrl.updateOrganisation)
-.delete('/organisation', jwt([RolesEnum.ADMIN]), addOrigin(Interfaces.UI), createAudit(SourceType.ORGANISATION), organisationCtrl.removeOrganisation)
+.get('/organisation/:cid', addOrigin(Interfaces.UI), jwt(), organisationCtrl.getOne)
+.get('/organisations/:cid', addOrigin(Interfaces.UI), jwt(), organisationCtrl.getMany)
+.get('/organisation/:cid/configuration', addOrigin(Interfaces.UI), jwt(), organisationCtrl.getConfiguration)
+.put('/organisation/:cid', addOrigin(Interfaces.UI), jwt(), validateBody(updateOrganisationSchema), createAudit(SourceType.ORGANISATION), organisationCtrl.updateOrganisation)
+.delete('/organisation', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), createAudit(SourceType.ORGANISATION), organisationCtrl.removeOrganisation)
 // Send friendship request to cid by autenticated user
-.post('/organisation/:cid/friendship/request', jwt(), addOrigin(Interfaces.UI), createAudit(SourceType.ORGANISATION), friendingCtrl.processFriendRequest)
+.post('/organisation/:cid/friendship/request', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.processFriendRequest)
 // Send friendship request approval to cid from authenticated user
-.post('/organisation/:cid/friendship/accept', jwt(), addOrigin(Interfaces.UI), createAudit(SourceType.ORGANISATION), friendingCtrl.acceptFriendRequest)
+.post('/organisation/:cid/friendship/accept', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.acceptFriendRequest)
 // Send friendship request rejection to cid from authenticated user
-.post('/organisation/:cid/friendship/reject', jwt(), addOrigin(Interfaces.UI), createAudit(SourceType.ORGANISATION), friendingCtrl.rejectFriendRequest)
+.post('/organisation/:cid/friendship/reject', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.rejectFriendRequest)
 // Send friendship request cancelation to cid from authenticated user
-.post('/organisation/:cid/friendship/cancelRequest', jwt(), addOrigin(Interfaces.UI), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendRequest)
+.post('/organisation/:cid/friendship/cancelRequest', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendRequest)
 // Send friendship cancelation to cid from authenticated user
-.post('/organisation/:cid/friendship/cancel', jwt(), addOrigin(Interfaces.UI), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendship)
+.post('/organisation/:cid/friendship/cancel', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendship)
 
 // USERS
-.get('/user/:uid', jwt(), addOrigin(Interfaces.UI), userCtrl.getOne)
-.delete('/user/:uid', jwt(), jwt([RolesEnum.ADMIN]), addOrigin(Interfaces.UI),createAudit(SourceType.USER), userCtrl.removeUser)
-.get('/users/:cid', jwt(), addOrigin(Interfaces.UI), userCtrl.getMany)
-.put('/user/:uid', jwt(), addOrigin(Interfaces.UI), validateBody(updateUserSchema), createAudit(SourceType.USER), userCtrl.updateUser)
-.put('/user/password/:uid', jwt(), addOrigin(Interfaces.UI), validateBody(updatePasswordSchema), createAudit(SourceType.USER), userCtrl.updateUserPassword)
+.get('/user/:uid', addOrigin(Interfaces.UI), jwt(), userCtrl.getOne)
+.delete('/user/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), createAudit(SourceType.USER), userCtrl.removeUser)
+.get('/users/:cid', addOrigin(Interfaces.UI), jwt(), userCtrl.getMany)
+.put('/user/:uid', addOrigin(Interfaces.UI), jwt(), validateBody(updateUserSchema), createAudit(SourceType.USER), userCtrl.updateUser)
+.put('/user/password/:uid', addOrigin(Interfaces.UI), jwt(), validateBody(updatePasswordSchema), createAudit(SourceType.USER), userCtrl.updateUserPassword)
 // .delete
 
 // NODES
-.get('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getNode)
-.get('/nodes', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), nodeCtrl.getNodes)
-.post('/node', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), createAudit(SourceType.NODE), nodeCtrl.createNode)
-.put('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), validateBody(updateNodeSchema), createAudit(SourceType.NODE), nodeCtrl.updateNode)
-.get('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI), createAudit(SourceType.NODE), nodeCtrl.getKey)
-.delete('/node/:agid/key', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI),createAudit(SourceType.NODE), nodeCtrl.removeKey)
-.delete('/node/:agid', jwt([RolesEnum.SYS_INTEGRATOR]), addOrigin(Interfaces.UI),createAudit(SourceType.NODE), nodeCtrl.removeNode)
+.get('/node/:agid', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), nodeCtrl.getNode)
+.get('/nodes', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), nodeCtrl.getNodes)
+.post('/node', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), createAudit(SourceType.NODE), nodeCtrl.createNode)
+.put('/node/:agid', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), validateBody(updateNodeSchema), createAudit(SourceType.NODE), nodeCtrl.updateNode)
+.get('/node/:agid/key', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]),createAudit(SourceType.NODE), nodeCtrl.getKey)
+.delete('/node/:agid/key', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), createAudit(SourceType.NODE), nodeCtrl.removeKey)
+.delete('/node/:agid', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), createAudit(SourceType.NODE), nodeCtrl.removeNode)
 
 // ITEMS
-.get('/items', jwt(), addOrigin(Interfaces.UI),  itemsCtrl.getMany)
-.get('/items/company/:cid', jwt(), addOrigin(Interfaces.UI),  itemsCtrl.getByCompany)
-.get('/items/user/:uid', jwt(), addOrigin(Interfaces.UI),  itemsCtrl.getByUser)
-.get('/items/:oid', jwt(), addOrigin(Interfaces.UI), itemsCtrl.getOne)
-.put('/items/:oid', jwt(), addOrigin(Interfaces.UI), validateBody(updateItemSchema), createAudit(SourceType.ITEM), itemsCtrl.updateOne)
-.delete('/items/:oid', jwt(), addOrigin(Interfaces.UI), createAudit(SourceType.ITEM), itemsCtrl.removeOne)
+.get('/items',  addOrigin(Interfaces.UI), jwt(), itemsCtrl.getMany)
+.get('/items/company/:cid', addOrigin(Interfaces.UI), jwt(), itemsCtrl.getByCompany)
+.get('/items/user/:uid', addOrigin(Interfaces.UI), jwt(), itemsCtrl.getByUser)
+.get('/items/:oid', addOrigin(Interfaces.UI), jwt(), itemsCtrl.getOne)
+.put('/items/:oid', addOrigin(Interfaces.UI), jwt(), validateBody(updateItemSchema), createAudit(SourceType.ITEM), itemsCtrl.updateOne)
+.delete('/items/:oid', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ITEM), itemsCtrl.removeOne)
 
 // NOTIFICATIONS
-.get('/notifications/', jwt(), addOrigin(Interfaces.UI), notificationCtrl.getNotifications)
-.get('/notifications/refresh', jwt(), addOrigin(Interfaces.UI), notificationCtrl.refreshNotifications)
-.put('/notifications/read/:notificationId', jwt(), addOrigin(Interfaces.UI), validateBody(emptyItemSchema), notificationCtrl.setRead)
+.get('/notifications/', addOrigin(Interfaces.UI), jwt(), notificationCtrl.getNotifications)
+.get('/notifications/refresh', addOrigin(Interfaces.UI), jwt(), notificationCtrl.refreshNotifications)
+.put('/notifications/read/:notificationId', addOrigin(Interfaces.UI), jwt(), validateBody(emptyItemSchema), notificationCtrl.setRead)
 
 // AUDITS
-.get('/audits/:id', jwt(), addOrigin(Interfaces.UI), auditCtrl.getAudits)
+.get('/audits/:id', addOrigin(Interfaces.UI), jwt(), auditCtrl.getAudits)
 
 export { UiRouter }

@@ -23,7 +23,7 @@ export const jwt = (roles?: RolesEnum[]) => {
             if (!token) {
                 throw new Error('Unauthorized, missing token')
             }
-            const decoded = Auth.verify(token)
+            const decoded = Auth.verify(token, res.locals.origin.originIp)
             // When roles are included in the validation of the route
             // Check that they are present in the token
             if (roles && roles.length > 0) {
