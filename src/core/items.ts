@@ -137,12 +137,11 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         // Remove item in Mongo
         await item._removeItem()
         // Send notification to NODE
-        xmpp.notifyPrivacy(item.agid)
+        await xmpp.notifyPrivacy(item.agid)
         // TBD: Remove contracts
         // TBD: Audits and notifications
     } catch (err) {
-        const error = errorHandler(err)
-        throw error
+        throw errorHandler(err)
     }
 }
 
@@ -172,19 +171,18 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
             // Enable/Disable
             await updateStatus(item, data.status, owner, oid)
             // Send notification to NODE
-            xmpp.notifyPrivacy(item.agid)
+            await xmpp.notifyPrivacy(item.agid)
         } else if (data.accessLevel && owner) {
             // If access level is less restrictive than user's then forbid
             await updateAccessLevel(item, data.accessLevel, owner)
             // Send notification to NODE
-            xmpp.notifyPrivacy(item.agid)
+            await xmpp.notifyPrivacy(item.agid)
         } else {
             await item._updateItem(data)
             // no need for NODE to be updated
         }
     } catch (err) {
-        const error = errorHandler(err)
-        throw error
+        throw errorHandler(err)
     }
 }
 

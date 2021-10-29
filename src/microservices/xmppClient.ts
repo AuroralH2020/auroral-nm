@@ -19,7 +19,6 @@ const callApi = got.extend({
 })
 
 const ApiHeader = { 
-    Authorization: Config.CS.SECRET_KEY, 
     'Content-Type': 'application/json; charset=utf-8',
     Accept: 'application/json',
     simple: 'false' } 
@@ -27,7 +26,7 @@ const ApiHeader = {
 // FUNCTIONS
 
 export const xmpp = {
-    notifyPrivacy: async (agid?: string) => {
+    notifyPrivacy: async (agid?: string): Promise<void> => {
         if (agid) {
             // send notification to Node
             try {
