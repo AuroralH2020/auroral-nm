@@ -27,6 +27,10 @@ export enum ResultStatusType{
     SUCCESS = 'success'
 }
 
+export enum XmppNotificationTypes{
+    PRIVACY = 'privacyUpdate',
+}
+
 export enum EventType {
     registrationRequest = 1, // toAnswer
     itemEnabled = 11, // info

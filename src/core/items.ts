@@ -13,6 +13,7 @@ import { NodeModel } from '../persistance/node/model'
 import { OrganisationModel } from '../persistance/organisation/model'
 import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, IItemUpdate, IItemDocument } from '../persistance/item/types'
 import { HttpStatusCode } from '../utils/http-status-codes'
+import { xmpp } from '../microservices/xmppClient'
 
 // Functions
 
@@ -135,6 +136,8 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         await cs.deleteUser(oid)
         // Remove item in Mongo
         await item._removeItem()
+        // Send notification to NODE
+        xmpp.notifyPrivacy(item.agid)
         // TBD: Remove contracts
         // TBD: Audits and notifications
     } catch (err) {
@@ -168,11 +171,16 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
         if (data.status && owner) {
             // Enable/Disable
             await updateStatus(item, data.status, owner, oid)
+            // Send notification to NODE
+            xmpp.notifyPrivacy(item.agid)
         } else if (data.accessLevel && owner) {
             // If access level is less restrictive than user's then forbid
             await updateAccessLevel(item, data.accessLevel, owner)
+            // Send notification to NODE
+            xmpp.notifyPrivacy(item.agid)
         } else {
             await item._updateItem(data)
+            // no need for NODE to be updated
         }
     } catch (err) {
         const error = errorHandler(err)
