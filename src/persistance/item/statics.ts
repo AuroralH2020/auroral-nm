@@ -78,21 +78,6 @@ export async function createItem(
     return this.create(newItem)
 }
 
-export async function getItemsPrivacy(
-  this: IItemModel, oids: string[]
-): Promise<IItemPrivacy[]> {
-  // get from mongo
-  const record = await this.aggregate([
-    { $match: { oid: { $in: oids }, status: ItemStatus.ENABLED } },
-    { $project: {  oid: 1, privacy: '$accessLevel', _id: 0 } },
-  ])
-  .exec()
-  if (record) {
-    return record
-  } else {
-    throw new MyError('Items not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
-  }
-}
 export async function addUserToItem (
   this: IItemModel, oid: string, uid: string
 ): Promise<void> {
@@ -103,4 +88,20 @@ export async function removeUserFromItem (
   this: IItemModel, oid: string
 ): Promise<void> {
   await this.updateOne({ oid }, { $set: { uid: undefined } }).exec()
+}
+
+export async function getItemsPrivacy(
+  this: IItemModel, oids: string[]
+): Promise<IItemPrivacy[]> {
+  // get from mongo
+  const record = await this.aggregate([
+    { $match: { oid: { $in: oids }, status: { $ne: ItemStatus.DELETED } } },
+    { $project: { oid: 1, privacy: '$accessLevel', _id: 0 } },
+  ])
+  .exec()
+  if (record) {
+    return record
+  } else {
+    throw new MyError('Items not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+  }
 }

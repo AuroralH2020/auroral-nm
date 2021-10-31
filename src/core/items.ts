@@ -172,7 +172,7 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
             await updateStatus(item, data.status, owner, oid)
             // Send notification to NODE
             await xmpp.notifyPrivacy(item.agid)
-        } else if (data.accessLevel && owner) {
+        } else if (typeof data.accessLevel === 'number' && owner) {
             // If access level is less restrictive than user's then forbid
             await updateAccessLevel(item, data.accessLevel, owner)
             // Send notification to NODE

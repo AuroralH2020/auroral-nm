@@ -110,7 +110,6 @@ type getAgentPrivacy = expressTypes.Controller<{}, {}, {}, IItemPrivacy[], local
 
 export const getPrivacy: getAgentPrivacy = async (req, res) => {
   const { decoded } = res.locals
-  // const decoded = { iss: 'testAgid' } 
 	try {
     if (decoded) {
       const myNode = (await NodeModel._getNode(decoded.iss))
