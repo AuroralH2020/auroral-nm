@@ -9,6 +9,7 @@ import { errorHandler, MyError } from '../../../utils/error-handler'
 import { NodeModel } from '../../../persistance/node/model'
 import { IItemPrivacy, ItemStatus } from '../../../persistance/item/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
+import { OrgGatewayType } from '../../../persistance/organisation/types'
 import { ItemModel } from '../../../persistance/item/model'
 import { RelationshipType } from '../../../types/misc-types'
 import { NodeService } from '../../../core'
@@ -66,13 +67,81 @@ export const getAgentItems: getAgentItemsController = async (req, res) => {
 	}
 }
 
+type getPartnerController = expressTypes.Controller<{ cid: string }, {}, {}, OrgGatewayType, localsTypes.ILocalsGtw>
+// returns name and nodes AGIDs for given CID 
+export const getPartner: getPartnerController = async (req, res) => {
+  const { cid } = req.params
+  const { decoded } = res.locals
+  try {
+    if (decoded) {
+      // const myOrg = await OrganisationModel._getOrganisation(decoded.aud)
+      const org = await OrganisationModel._getOrganisation(cid)
+      return responseBuilder(HttpStatusCode.OK, res, null, { nodes: org.hasNodes, name: org.name })
+    } else {
+      logger.error('Gateway unauthorized access attempt')
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+    }
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, 'Not valid CID')
+  }
+}
+
+type getPartnersController = expressTypes.Controller<{}, {}, {}, [string], localsTypes.ILocalsGtw>
+// returns nodes organisation knows array 
+export const getPartners: getPartnersController = async (req, res) => {
+  const { decoded } = res.locals
+  try {
+    if (decoded) {
+      // get data from Mongo
+      const knows = (await OrganisationModel._getOrganisation(decoded.aud)).knows
+      return responseBuilder(HttpStatusCode.OK, res, null, knows)
+    } else {
+      logger.error('Gateway unauthorized access attempt')
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+    }
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, 'Organisation does not exists')
+  }
+}
+
+type getCidController = expressTypes.Controller<{ reqid: string }, {}, {}, string, localsTypes.ILocalsGtw>
+// returns CID for given OID or AGID
+export const getCid: getCidController = async (req, res) => {
+  const { reqid } = req.params
+  const { decoded } = res.locals
+  try {
+    if (decoded) {
+      // get data from Mongo
+      let reqNodeCid
+      try {
+        // test id reqid is agid
+        reqNodeCid = (await NodeModel._getNode(reqid)).cid
+      } catch (err: unknown) {
+        // test id reqid is oid
+        reqNodeCid = (await ItemModel._getItem(reqid)).cid
+      }
+      return responseBuilder(HttpStatusCode.OK, res, null, reqNodeCid)
+    } else {
+      logger.error('Gateway unauthorized access attempt')
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+    }
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, 'Not valid AGID or OID')
+  }
+}
+
 type getAgentRelationship = expressTypes.Controller<{ reqid: string }, {}, {}, RelationshipType, localsTypes.ILocalsGtw>
- 
+
 export const getRelationship: getAgentRelationship = async (req, res) => {
   const { reqid } = req.params
   const { decoded } = res.locals
-  // const decoded = { iss: 'testAgid' } 
-	try {
+  try {
     if (decoded) {
       // get data from Mongo
       let reqNodeCid
@@ -89,21 +158,21 @@ export const getRelationship: getAgentRelationship = async (req, res) => {
       // Search if my company node 
       if (myNodeCid === reqNodeCid) {
         relation = RelationshipType.ME
-      } 
+      }
       // Search if friends node 
       if (myOrg.knows.includes(reqNodeCid)) {
-        relation = RelationshipType.FRIEND 
+        relation = RelationshipType.FRIEND
       }
       return responseBuilder(HttpStatusCode.OK, res, null, relation)
     } else {
       logger.error('Gateway unauthorized access attempt')
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
-	} catch (err) {
+  } catch (err) {
     const error = errorHandler(err)
-		logger.error(error.message)
-		return responseBuilder(error.status, res, 'Not valid AGID or OID')
-	}
+    logger.error(error.message)
+    return responseBuilder(error.status, res, 'Not valid AGID or OID')
+  }
 }
 
 type getAgentPrivacy = expressTypes.Controller<{}, {}, {}, IItemPrivacy[], localsTypes.ILocalsGtw>
