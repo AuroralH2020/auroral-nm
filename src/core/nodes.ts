@@ -6,7 +6,7 @@
 import { logger } from '../utils/logger'
 import { cs } from '../microservices/commServer'
 import { OrganisationModel } from '../persistance/organisation/model'
-import { INodeCreatePost, NodeType } from '../persistance/node/types'
+import { INodeCreatePost, INodeUpdate, NodeType } from '../persistance/node/types'
 import { NodeModel } from '../persistance/node/model'
 import { ItemService } from '../core'
 import { errorHandler } from '../utils/error-handler'
@@ -29,6 +29,26 @@ export const createOne = async (cid: string, name: string, type: NodeType, passw
         // Add to nodes group in commServer (Initially public)
         await cs.addUserToGroup(node.agid, PUBLIC_NODES)
         return node.agid
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.error(error.message)
+        throw error
+    }
+}
+
+// Update
+export const updateOne = async (agid: string, data: INodeUpdate): Promise<void> => {
+    try {
+        // Update node in commServer
+        const node = await NodeModel._getDoc(agid)
+        await node._updateNode(data)
+        if (data.visible !== undefined) {
+            if (data.visible) {
+                await cs.addUserToGroup(node.agid, PUBLIC_NODES)
+            } else {
+                await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
+            }
+        }
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)

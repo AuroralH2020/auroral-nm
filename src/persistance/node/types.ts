@@ -1,5 +1,4 @@
 import { Document, Model } from 'mongoose'
-import { RolesEnum } from '../../types/roles' 
 
 export enum NodeType {
     VICINITY = 'Vicinity',
@@ -40,6 +39,7 @@ export interface INodeUI {
     hasItems: string[],
     itemsCount: number,
     hasKey: boolean,
+    visible: boolean,
     lastUpdated: number,
     created: number
 }
@@ -63,7 +63,8 @@ export interface INodeCreatePost {
 // Input to update a Node
 export interface INodeUpdate {
     name?: string,
-    key?: string
+    key?: string,
+    visible?: boolean
     // location: string
 }
 

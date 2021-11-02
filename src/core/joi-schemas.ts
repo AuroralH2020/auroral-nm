@@ -64,7 +64,8 @@ export const updatePasswordSchema = Joi.object({
 
 export const updateNodeSchema = Joi.object({
   name: Joi.string(),
-  key: Joi.string()
+  key: Joi.string(),
+  visible: Joi.boolean()
   // location: Joi.string()
 })
 

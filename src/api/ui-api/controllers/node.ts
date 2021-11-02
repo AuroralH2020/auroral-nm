@@ -84,9 +84,10 @@ export const updateNode: putNodeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     const node = await NodeModel._getDoc(agid)
-    const updatedNode = await node._updateNode(data) 
-    // TBD: Update node in commServer
+
+    await NodeService.updateOne(agid, data)
     // TBD: Consider updating password too 
+    
     // Notification
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
     const myUserName = (await UserModel._getUser(decoded.uid)).name
