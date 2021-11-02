@@ -3,7 +3,6 @@ import { INodeDocument, INodeUpdate, NodeStatus } from './types'
 export async function updateNode(this: INodeDocument, data: INodeUpdate): Promise<INodeDocument> {
     this.name = data.name ? data.name : this.name
     this.key = data.key ? data.key : this.key
-    this.visible = data.visible ? data.visible : this.visible
     this.visible = data.visible !== undefined ?  data.visible : this.visible
     this.hasKey = data.key ? true : this.hasKey
     this.lastUpdated = new Date().getTime()
