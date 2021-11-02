@@ -80,6 +80,11 @@ export interface IOrganisationUpdate {
     notes?: string
 }
 
+export type OrgGatewayType = {
+    name: string,
+    nodes: [string]
+}
+
 export interface OrgConfiguration {
     skinColor: UISkins
 }
