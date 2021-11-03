@@ -15,6 +15,9 @@ app.set('ip', Config.IP || 'localhost')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// Trust proxy, accepting only last hop (1)
+app.set('trust proxy', 1)
+
 // Basic cors setup
 app.use(cors())
 
