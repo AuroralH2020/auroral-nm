@@ -95,7 +95,8 @@ export const getPartners: getPartnersController = async (req, res) => {
   try {
     if (decoded) {
       // get data from Mongo
-      const knows = (await OrganisationModel._getOrganisation(decoded.aud)).knows
+      const cid = (await NodeModel._getNode(decoded.iss)).cid
+      const knows = (await OrganisationModel._getOrganisation(cid)).knows
       return responseBuilder(HttpStatusCode.OK, res, null, knows)
     } else {
       logger.error('Gateway unauthorized access attempt')
