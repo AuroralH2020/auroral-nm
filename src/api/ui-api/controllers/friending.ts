@@ -80,8 +80,8 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
     // TBD: Add all gateways in CS to friendships group
     // Create notification
     const actorName = (await UserModel._getUser(myUid)).name
-    const myOrg = (await OrganisationModel._getOrganisation(myCid))
-    const friendOrg = (await OrganisationModel._getOrganisation(friendCid))
+    const myOrg = await OrganisationModel._getOrganisation(myCid)
+    const friendOrg = await OrganisationModel._getOrganisation(friendCid)
     // Send notifications to nodes from both organisations
     myOrg.hasNodes.forEach(agid => {
       xmpp.notifyPartnersChanged(agid)
