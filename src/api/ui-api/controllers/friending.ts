@@ -12,6 +12,7 @@ import { NotificationModel } from '../../../persistance/notification/model'
 import { UserModel } from '../../../persistance/user/model'
 import { NotificationStatus } from '../../../persistance/notification/types'
 import { AuditModel } from '../../../persistance/audit/model'
+import { xmpp } from '../../../microservices/xmppClient'
 
 // Controllers
 
@@ -79,14 +80,21 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
     // TBD: Add all gateways in CS to friendships group
     // Create notification
     const actorName = (await UserModel._getUser(myUid)).name
-    const myOrgName = (await OrganisationModel._getOrganisation(myCid)).name
-    const friendOrgName = (await OrganisationModel._getOrganisation(friendCid)).name
+    const myOrg = (await OrganisationModel._getOrganisation(myCid))
+    const friendOrg = (await OrganisationModel._getOrganisation(friendCid))
+    // Send notifications to nodes from both organisations
+    myOrg.hasNodes.forEach(agid => {
+      xmpp.notifyPartnersChanged(agid)
+    })
+    friendOrg.hasNodes.forEach(agid => {
+      xmpp.notifyPartnersChanged(agid)
+    })
     // Find notification of friendship sent to friendCid --> Cannot let them respond to it anymore
     const notificationsToUpdate = await NotificationModel._findNotifications({
       owners: [myCid],
       status: NotificationStatus.WAITING,
       type: EventType.partnershipRequest,
-      target: { id: myCid, name: myOrgName } // Notifications sent by my friend
+      target: { id: myCid, name: myOrg.name } // Notifications sent by my friend
     })
     // Update notification of friendshipRequest --> accept it
     notificationsToUpdate.forEach(async (it) => {
@@ -97,8 +105,8 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
     await NotificationModel._createNotification({
       owner: friendCid,
       actor: { id: myUid, name: actorName },
-      target: { id: friendCid, name: friendOrgName },
-      object: { id: myCid, name: myOrgName },
+      target: { id: friendCid, name: friendOrg.name },
+      object: { id: myCid, name: myOrg.name },
       type: EventType.partnershipAccepted,
       status: NotificationStatus.ACCEPTED
     })
@@ -106,8 +114,8 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
     await AuditModel._createAudit({
       ...res.locals.audit,
       actor: { id: myUid, name: actorName },
-      target: { id: friendCid, name: friendOrgName },
-      object: { id: myCid, name: myOrgName },
+      target: { id: friendCid, name: friendOrg.name },
+      object: { id: myCid, name: myOrg.name },
       type: EventType.partnershipAccepted,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })
@@ -116,8 +124,8 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
       ...res.locals.audit,
       cid: friendCid,
       actor: { id: myUid, name: actorName },
-      target: { id: myCid, name: myOrgName },
-      object: { id: friendCid, name: friendOrgName },
+      target: { id: myCid, name: myOrg.name },
+      object: { id: friendCid, name: friendOrg.name },
       type: EventType.partnershipAccepted,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })
@@ -249,23 +257,31 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
     await OrganisationModel._delFriendship(friendCid, myCid)
     // TBD: Remove all gateways from CS to friendships group
     // TBD: Check all contracts that need to be broken
-    // Create notification
     const actorName = (await UserModel._getUser(myUid)).name
-    const myOrgName = (await OrganisationModel._getOrganisation(myCid)).name
-    const friendOrgName = (await OrganisationModel._getOrganisation(friendCid)).name
+    const myOrg = await OrganisationModel._getOrganisation(myCid)
+    const friendOrg = await OrganisationModel._getOrganisation(friendCid)
+    // Send notifications to nodes from both organisations
+    myOrg.hasNodes.forEach(agid => {
+      xmpp.notifyPartnersChanged(agid)
+    })
+    friendOrg.hasNodes.forEach(agid => {
+      xmpp.notifyPartnersChanged(agid)
+    })
+    // Create notification
+
     await NotificationModel._createNotification({
       owner: friendCid,
       actor: { id: myUid, name: actorName },
-      target: { id: friendCid, name: friendOrgName },
-      object: { id: myCid, name: myOrgName },
+      target: { id: friendCid, name: friendOrg.name },
+      object: { id: myCid, name: myOrg.name },
       type: EventType.partnershipCancelled,
       status: NotificationStatus.INFO
     })
     await NotificationModel._createNotification({
       owner: myCid,
       actor: { id: myUid, name: actorName },
-      target: { id: myCid, name: myOrgName },
-      object: { id: friendCid, name: friendOrgName },
+      target: { id: myCid, name: myOrg.name },
+      object: { id: friendCid, name: friendOrg.name },
       type: EventType.partnershipCancelled,
       status: NotificationStatus.INFO
     })
@@ -273,8 +289,8 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
      await AuditModel._createAudit({
       ...res.locals.audit,
       actor: { id: myUid, name: actorName },
-      target: { id: myCid, name: myOrgName },
-      object: { id: friendCid, name: friendOrgName },
+      target: { id: myCid, name: myOrg.name },
+      object: { id: friendCid, name: friendOrg.name },
       type: EventType.partnershipCancelled,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })
@@ -283,8 +299,8 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
       ...res.locals.audit,
       cid: friendCid,
       actor: { id: myUid, name: actorName },
-      target: { id: friendCid, name: friendOrgName },
-      object: { id: myCid, name: myOrgName },
+      target: { id: friendCid, name: friendOrg.name },
+      object: { id: myCid, name: myOrg.name },
       type: EventType.partnershipCancelled,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })

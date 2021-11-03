@@ -29,6 +29,7 @@ export enum ResultStatusType{
 
 export enum XmppNotificationTypes{
     PRIVACY = 'privacyUpdate',
+    PARTNERS = 'partnersUpdate'
 }
 
 export enum EventType {

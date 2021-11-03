@@ -31,10 +31,22 @@ export const xmpp = {
             // send notification to Node
             try {
                 await request(agid + '/' + XmppNotificationTypes.PRIVACY, 'GET', undefined, ApiHeader)
-                logger.debug('XMPP notif sent to: ' + agid)
+                logger.debug('XMPP notif [' + XmppNotificationTypes.PRIVACY + '] sent to: ' + agid)
             } catch (err) {
                 const error = errorHandler(err)
-                logger.error('XMPP notif not sent: ' + agid + ' [' + error.message + ']')              
+                logger.error('XMPP notif [' + XmppNotificationTypes.PRIVACY + '] not sent: ' + agid + ' [' + error.message + ']')              
+            }
+        }
+    },
+    notifyPartnersChanged: async (agid?: string): Promise<void> => {
+        if (agid) {
+            // send notification to Node
+            try {
+                await request(agid + '/' + XmppNotificationTypes.PARTNERS, 'GET', undefined, ApiHeader)
+                logger.debug('XMPP notif [' + XmppNotificationTypes.PARTNERS + '] sent to: ' + agid)
+            } catch (err) {
+                const error = errorHandler(err)
+                logger.error('XMPP notif [' + XmppNotificationTypes.PARTNERS + '] not sent: ' + agid + ' [' + error.message + ']')              
             }
         }
     }
