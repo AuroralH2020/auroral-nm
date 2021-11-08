@@ -3,11 +3,11 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler } from '../../../utils/error-handler'
+import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { InvitationModel } from '../../../persistance/invitation/model'
-import { IInvitationPre, IInvitation } from '../../../persistance/invitation/types'
+import { IInvitationPre, IInvitation, InvitationStatus } from '../../../persistance/invitation/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { invitationMail } from '../../../auth-server/mailer'
 
@@ -67,6 +67,37 @@ export const postInvitation: postInvitationController = async (req, res) => {
                         invitationMail(data.emailTo, newInvitation.invitationId, data.type, origin?.realm)
                         return responseBuilder(HttpStatusCode.OK, res, null, null)
                 }
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
+        }
+}
+
+type resendInvitationController = expressTypes.Controller<{id: string}, {}, {}, null, localsTypes.ILocals>
+ 
+export const resendInvitation: resendInvitationController = async (req, res) => {
+        const { decoded, origin } = res.locals
+        const { id } = req.params
+        try {
+                if (!decoded) {
+                        throw new Error('Problem decoding token')
+                }
+                const inv = await InvitationModel._getInvitation(id)
+                // test if admin from same organisation is trying to resend
+                if (inv.status === InvitationStatus.DONE || inv.sentBy.cid !== decoded.org) {
+                        throw new MyError('Not aproved to resend invitation')
+                }
+                // test if lastly updated is more thand before 1 minute
+                if ((new Date().getTime() - inv.updated) < 60000) {
+                        console.log(new Date().getTime() - inv.updated)
+                        throw new MyError('Too early to resend', HttpStatusCode.TOO_MANY_REQUESTS)
+                }
+                // Set status to pending and set updatedTime
+                await InvitationModel._setInvitationStatus(id, InvitationStatus.PENDING)
+                // Send invitation mail
+                invitationMail(inv.emailTo, inv.invitationId, inv.type, origin?.realm)
+                return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
                 logger.error(error.message)

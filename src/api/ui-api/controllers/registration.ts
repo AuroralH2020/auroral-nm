@@ -52,6 +52,18 @@ export const getAllRegistrations: getRegistrationsController = async (req, res) 
 	}
 }
 
+type getCompanyRegistrationsController = expressTypes.Controller<{}, {}, {}, IRegistration[], localsTypes.ILocals>
+ 
+export const getAllCompanyRegistrations: getCompanyRegistrationsController = async (req, res) => {
+	try {
+    const data = await RegistrationModel._getAllCompanyTypeRegistration()
+    return responseBuilder(HttpStatusCode.OK, res, null, data)
+	} catch (err) {
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
+	}
+}
 type postRegistrationController = expressTypes.Controller<{}, IRegistrationPost , {}, null, localsTypes.ILocals>
  
 export const postRegistration: postRegistrationController = async (req, res) => {

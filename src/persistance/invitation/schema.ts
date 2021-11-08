@@ -20,8 +20,8 @@ const InvitationSchema = new Schema<IInvitationDocument, IInvitationModel>({
     used: { type: Boolean, default: false },
     type: { type: String, enum: invitationTypes },
     status: { type: String, default: InvitationStatus.PENDING },
-    updated: { type: Number, default: new Date().getTime() },
-    created: { type: Number, default: new Date().getTime() }
+    updated: { type: Number, default: Date.now },
+    created: { type: Number, default: Date.now }
 })
 
 InvitationSchema.statics._getInvitation = getInvitation

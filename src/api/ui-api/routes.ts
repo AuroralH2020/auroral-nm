@@ -33,6 +33,7 @@ UiRouter
 
 // REGISTRATION
 .get('/registration', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getAllRegistrations)
+.get('/registration/company', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getAllCompanyRegistrations)
 .post('/registration', addOrigin(Interfaces.UI), validateBody(registrationSchema), createAudit(SourceType.ORGANISATION), registrationCtrl.postRegistration)
 // .post('/registration', addOrigin(Interfaces.UI), registrationCtrl.postRegistration)
 .get('/registration/:registrationId', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getRegistration)
@@ -42,6 +43,7 @@ UiRouter
 
 // INVITATIONS
 .get('/invitation/:id', addOrigin(Interfaces.UI), invitationCtrl.getInvitation)
+.get('/invitation/:id/resend', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), invitationCtrl.resendInvitation)
 .get('/invitations/all', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), invitationCtrl.getAllInvitations)
 .post('/invitation', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), invitationCtrl.postInvitation)
 

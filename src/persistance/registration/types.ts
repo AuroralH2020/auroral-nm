@@ -94,6 +94,9 @@ export interface IRegistrationModel extends Model<IRegistrationDocument> {
     _getAllRegistration: (
         this: IRegistrationModel
     ) => Promise<IRegistration[]>
+    _getAllCompanyTypeRegistration: (
+        this: IRegistrationModel
+    ) => Promise<IRegistration[]>
     _getDoc: (
         this: IRegistrationModel,
         registrationId: string

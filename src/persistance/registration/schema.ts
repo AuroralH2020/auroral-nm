@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getRegistration, getAllRegistration, getDoc, createRegistration, findDuplicatesUser, findDuplicatesCompany } from './statics'
+import { getRegistration, getAllRegistration, getDoc, createRegistration, findDuplicatesUser, findDuplicatesCompany, getAllCompanyTypeRegistration } from './statics'
 import { updateStatus } from './methods'
 import { RolesEnum } from '../../types/roles'
 import { IRegistrationDocument, IRegistrationModel, RegistrationStatus, RegistrationType  } from './types'
@@ -33,6 +33,7 @@ const RegistrationSchema = new Schema<IRegistrationDocument, IRegistrationModel>
 
 RegistrationSchema.statics._getRegistration = getRegistration
 RegistrationSchema.statics._getAllRegistration = getAllRegistration
+RegistrationSchema.statics._getAllCompanyTypeRegistration = getAllCompanyTypeRegistration
 RegistrationSchema.statics._getDoc = getDoc
 RegistrationSchema.statics._createRegistration = createRegistration
 RegistrationSchema.statics._findDuplicatesUser = findDuplicatesUser

@@ -20,8 +20,8 @@ const AccountSchema = new Schema<IAccountDocument, IAccountModel>({
     lastLogin: Date,
     // originIp: [String], // IPs originating request for the user
     // realm: [String], // Realms where authentication was initiated (App originating)
-    lastUpdated: { type: Number, default: new Date().getTime() },
-    created: { type: Number, default: new Date().getTime() },
+    lastUpdated: { type: Number, default: Date.now },
+    created: { type: Number, default: Date.now },
     verified: { type: Boolean, default: false }
 })
 

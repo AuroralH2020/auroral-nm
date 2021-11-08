@@ -1,4 +1,4 @@
-import { IRegistrationDocument, IRegistrationModel, IRegistrationPost, IRegistration, RegistrationStatus } from './types'
+import { IRegistrationDocument, IRegistrationModel, IRegistrationPost, IRegistration, RegistrationStatus, RegistrationType } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
 import { logger } from '../../utils/logger'
@@ -31,6 +31,18 @@ export async function getAllRegistration(
   this: IRegistrationModel
 ): Promise<IRegistration[]> {
   const record = await this.find({}).lean().exec()
+  if (record) {
+    return record
+  } else {
+    // logger.warn('Registration not found')
+    throw new MyError('Registration not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
+  }
+}
+
+export async function getAllCompanyTypeRegistration(
+  this: IRegistrationModel
+): Promise<IRegistration[]> {
+  const record = await this.find({ type: RegistrationType.COMPANY }).lean().exec()
   if (record) {
     return record
   } else {
