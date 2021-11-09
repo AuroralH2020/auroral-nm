@@ -29,9 +29,9 @@ export const getInvitation: getInvitationController = async (req, res) => {
         }
 }
 
-type getAllInvitations = expressTypes.Controller<{}, {}, {}, IInvitation[], localsTypes.ILocals>
+type getAllInvitationsCtrl = expressTypes.Controller<{}, {}, {}, IInvitation[], localsTypes.ILocals>
  
-export const getAllInvitations: getAllInvitations = async (req, res) => {
+export const getAllInvitations: getAllInvitationsCtrl = async (req, res) => {
         const { decoded } = res.locals
         try {
                 const data = await InvitationModel._getAllInvitations(decoded.org)
@@ -89,8 +89,7 @@ export const resendInvitation: resendInvitationController = async (req, res) => 
                         throw new MyError('Not aproved to resend invitation')
                 }
                 // test if lastly updated is more thand before 1 minute
-                if ((new Date().getTime() - inv.updated) < 60000) {
-                        console.log(new Date().getTime() - inv.updated)
+                if ((new Date().getTime() - inv.updated) < 360000) {
                         throw new MyError('Too early to resend', HttpStatusCode.TOO_MANY_REQUESTS)
                 }
                 // Set status to pending and set updatedTime
