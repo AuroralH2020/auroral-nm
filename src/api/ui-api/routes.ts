@@ -68,7 +68,7 @@ UiRouter
 .get('/user/:uid', addOrigin(Interfaces.UI), jwt(), userCtrl.getOne)
 .delete('/user/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), createAudit(SourceType.USER), userCtrl.removeUser)
 .get('/users/:cid', addOrigin(Interfaces.UI), jwt(), userCtrl.getMany)
-.put('/user/:uid', addOrigin(Interfaces.UI), jwt(), validateBody(updateUserSchema), createAudit(SourceType.USER), userCtrl.updateUser)
+.put('/user/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), validateBody(updateUserSchema), createAudit(SourceType.USER), userCtrl.updateUser)
 .put('/user/password/:uid', addOrigin(Interfaces.UI), jwt(), validateBody(updatePasswordSchema), createAudit(SourceType.USER), userCtrl.updateUserPassword)
 // .delete
 

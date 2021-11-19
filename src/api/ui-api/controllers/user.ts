@@ -10,11 +10,12 @@ import { UserModel } from '../../../persistance/user/model'
 import { AuditModel } from '../../../persistance/audit/model'
 import { NotificationModel } from '../../../persistance/notification/model'
 import { NotificationStatus } from '../../../persistance/notification/types'
-import { IUserUI, IUserUIProfile, IUserUpdate, UserVisibility, UserStatus } from '../../../persistance/user/types'
+import { IUserUI, IUserUIProfile, IUserUpdate, UserVisibility } from '../../../persistance/user/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { AccountModel } from '../../../persistance/account/model'
 import { hashPassword, comparePassword } from '../../../auth-server/auth-server'
 import { ResultStatusType, EventType } from '../../../types/misc-types'
+import { UserService } from '../../../core'
 
 // Controllers
 
@@ -116,12 +117,15 @@ export const updateUser: updateUserController = async (req, res) => {
         const payload = req.body
         try {
                 const userDoc = await UserModel._getDoc(uid)
-                userDoc._updateUser(payload)
-                // If updating roles add also to account
+                // If updating roles verify there are no conflicts
                 if (payload.roles) {
+                        UserService.checkRoles(userDoc, payload.roles)
+                        // If updating roles add also to account
                         const account = await AccountModel._getDocByUid(uid)
                         account._updateRoles(payload.roles)
                 }
+                // Update user document
+                userDoc._updateUser(payload)
                 // Audit
                 await AuditModel._createAudit({
                         ...res.locals.audit,
