@@ -14,7 +14,7 @@ import { HttpStatusCode } from '../utils'
 /**
  * Validate roles
  */
- export const checkRoles = async (user: IUserDocument, roles: RolesEnum[]): Promise<void> => {
+ export const checkRoles = (my_uid: string, user: IUserDocument, roles: RolesEnum[]): void => {
     // Validate that the user is an admin
     if (!user.roles.includes(RolesEnum.ADMIN)) {
         logger.warn('User has to be an admin to update roles')
@@ -25,10 +25,13 @@ import { HttpStatusCode } from '../utils'
     const diff = findDifferentRoles(user.roles, roles)
 
     // Validate at least one user with role admin remains
-    // Currently done in UI, ADMIN cannot remove its admin role if there is no other admin in the organisation
+    if (my_uid === user.uid && diff.removed.includes(RolesEnum.ADMIN)) {
+        logger.warn('User cannot remove admin from from itself')
+        throw new MyError('User cannot remove admin from from itself', HttpStatusCode.FORBIDDEN)
+    }
 
     // Validate we do not remove 'ItemOwner' related roles if user hasItems
-    if (user.hasItems.length > 1 && removingItemOwnerRoles(diff.removed)) {
+    if (user.hasItems.length >= 1 && removingItemOwnerRoles(diff.removed)) {
         logger.warn('User that has items cannot remove an itemOwner roles')
         throw new MyError('User that has items cannot remove an itemOwner roles', HttpStatusCode.FORBIDDEN)
     }
@@ -40,8 +43,8 @@ import { HttpStatusCode } from '../utils'
  // Private functions
 
  const findDifferentRoles = (newRoles: RolesEnum[], oldRoles: RolesEnum[]): { added: RolesEnum[], removed: RolesEnum[]} => {
-    const added = newRoles.filter(it => oldRoles.includes(it))
-    const removed = oldRoles.filter(it => newRoles.includes(it))
+    const removed = newRoles.filter(it => !oldRoles.includes(it))
+    const added = oldRoles.filter(it => !newRoles.includes(it))
     return {
         added, removed
     }

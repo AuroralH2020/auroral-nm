@@ -115,11 +115,12 @@ type updateUserController = expressTypes.Controller<{ uid: string }, IUserUpdate
 export const updateUser: updateUserController = async (req, res) => {
         const { uid } = req.params
         const payload = req.body
+        const my_uid = res.locals.decoded.uid
         try {
                 const userDoc = await UserModel._getDoc(uid)
                 // If updating roles verify there are no conflicts
                 if (payload.roles) {
-                        UserService.checkRoles(userDoc, payload.roles)
+                        UserService.checkRoles(my_uid, userDoc, payload.roles)
                         // If updating roles add also to account
                         const account = await AccountModel._getDocByUid(uid)
                         account._updateRoles(payload.roles)

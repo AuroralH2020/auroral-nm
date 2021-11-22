@@ -21,8 +21,9 @@ async function bootstrap() {
     const sessions = (await cs.getSessions()).sessions.length
     logger.info(`Communication server connected, there are ${sessions} sessions active`)
     logger.info('All services initialized')
-  } catch (err) {
-    logger.error(err)
+  } catch (error: unknown) {
+    const err = error as Error
+    logger.error(err.message)
     logger.error('There were errors initializing the server...')
   }
 }
