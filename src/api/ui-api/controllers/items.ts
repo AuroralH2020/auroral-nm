@@ -7,7 +7,7 @@ import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { ItemService } from '../../../core'
-import { IItemUI, IItemUpdate, ItemStatus, ItemType, ItemPrivacy, GetByOwnerQuery } from '../../../persistance/item/types'
+import { IItemUI, IItemUpdate, ItemStatus, ItemType, ItemPrivacy, GetByOwnerQuery, ItemDomainType } from '../../../persistance/item/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { NotificationModel } from '../../../persistance/notification/model'
 import { AuditModel } from '../../../persistance/audit/model'
@@ -18,13 +18,13 @@ import { ResultStatusType, EventType } from '../../../types/misc-types'
 
 // Controllers
 
-type getManyController = expressTypes.Controller<{}, {}, { type: ItemType, offset: number, filter: number }, IItemUI[], localsTypes.ILocals>
+type getManyController = expressTypes.Controller<{}, {}, { type: ItemType, domain: ItemDomainType,  offset: number, filter: number }, IItemUI[], localsTypes.ILocals>
  
 export const getMany: getManyController = async (req, res) => {
-  const { type, offset, filter } = req.query
+  const { type, offset, filter, domain } = req.query
   const { decoded } = res.locals
 	try {
-      const data = await ItemService.getMany(decoded.org, type, offset, filter)
+      const data = await ItemService.getMany(decoded.org, type, offset, filter, domain)
       return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
