@@ -1,5 +1,15 @@
 import mongoose from 'mongoose'
-import { getItem, getDoc, createItem, getAllItems, addUserToItem, removeUserFromItem, getByOwner, getItemsPrivacy } from './statics'
+import {
+    getItem,
+    getDoc,
+    createItem,
+    getAllItems,
+    addUserToItem,
+    removeUserFromItem,
+    getByOwner,
+    getItemsPrivacy,
+    addContractToItem, removeContractFromItem, removeContractFromCompanyItems, getAllCompanyItemsContractView
+} from './statics'
 import { updateItem, removeItem } from './methods'
 import { IItemDocument, IItemModel, ItemType, ItemStatus, ItemPrivacy, ItemLabelsObj, ItemDomainType } from './types'
 
@@ -26,9 +36,10 @@ const ItemSchema = new Schema<IItemDocument, IItemModel>({
     labels: { type: ItemLabelsObjSchema, required: true, default: { domain: ItemDomainType.UNDEFINED } },
     avatar: String,
     description: String,
+    hasContracts: [{ type: String, default: [] }],
+    hasCommunities: [{ type: String, default: [] }],
     // semanticType: string,
     // interactionPatterns: ??[],
-    // hasContracts: string[],
     // hasAudits: string[],
     // mode: Production and testing ??
     lastUpdated: { type: Number, default: Date.now },
@@ -45,6 +56,11 @@ ItemSchema.statics._addUserToItem = addUserToItem
 ItemSchema.statics._removeUserFromItem = removeUserFromItem
 ItemSchema.statics._getItemsPrivacy = getItemsPrivacy
 ItemSchema.statics._getByOwner = getByOwner
+ItemSchema.statics._addContract = addContractToItem
+ItemSchema.statics._removeContract = removeContractFromItem
+ItemSchema.statics._removeContractFromCompanyItems = removeContractFromCompanyItems
+ItemSchema.statics._getAllCompanyItemsContractView = getAllCompanyItemsContractView
+
 
 // Methods
 

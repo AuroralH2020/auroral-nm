@@ -9,7 +9,8 @@ export enum ErrorSource {
     UNKNOWN = 'unknown',
     ITEM = 'item',
     USER = 'user',
-    NODE = 'user',
+    NODE = 'node',
+    CONTRACT = 'contract',
     ORGANISATION = 'organisation',
 }
 

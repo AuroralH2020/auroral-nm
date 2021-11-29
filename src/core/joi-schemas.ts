@@ -97,5 +97,14 @@ export const createItemSchema = Joi.object({
     }))
 })
 
+export const editContractSchema = Joi.object({
+    description: Joi.string(),
+})
+
+export const editItemContractSchema = Joi.object({
+    rw: Joi.boolean(),
+    enabled: Joi.boolean()
+})
+
 export const emptyItemSchema = Joi.object({
 })

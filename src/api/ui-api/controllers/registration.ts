@@ -22,6 +22,7 @@ import { NotificationStatus } from '../../../persistance/notification/types'
 import { cs } from '../../../microservices/commServer'
 import { InvitationModel } from '../../../persistance/invitation/model'
 import { InvitationStatus } from '../../../persistance/invitation/types'
+import { Config } from '../../../config'
 
 // Controllers
 
@@ -199,11 +200,12 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
           })
           // Add organisation group to commServer
-          await cs.postGroup(registrationObj.cid)
+          await cs.postGroup(registrationObj.cid, registrationObj.name)
+          await cs.addUserToGroup(Config.XMPP_CLIENT.NAME, registrationObj.cid)
           // Add user to organisation
-          OrganisationModel._addUserToCompany(registrationObj.cid, uid)
+          await OrganisationModel._addUserToCompany(registrationObj.cid, uid)
           // Verify account
-          AccountModel._verifyAccount(registrationObj.email, uid)
+          await AccountModel._verifyAccount(registrationObj.email, uid)
           // Update invitation status to DONE
           await InvitationModel._setInvitationStatus(registrationObj.invitationId, InvitationStatus.DONE)
         } else if (registrationObject.type === RegistrationType.USER) {
@@ -220,9 +222,9 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             roles: registrationObj.roles
           })
           // Add user to organisation
-          OrganisationModel._addUserToCompany(registrationObj.cid, uid)
+          await OrganisationModel._addUserToCompany(registrationObj.cid, uid)
           // Verify account
-          AccountModel._verifyAccount(registrationObj.email, uid)
+          await AccountModel._verifyAccount(registrationObj.email, uid)
           // Get users devOps and send notifications to them
           const devOpsIds = await UserModel._getUserByRole(RolesEnum.DEV_OPS)
           devOpsIds.forEach(async (it) => {

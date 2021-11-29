@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { getAllCompanyItemsContractView } from './statics'
 
 export enum ItemType {
     DEVICE = 'Device',
@@ -30,7 +31,20 @@ export enum ItemDomainType {
 }
 
 export type ItemLabelsObj = {
-    domain: ItemDomainType
+    domain: ItemDomainType,
+}
+export interface ContractItemSelect {
+    rw: boolean,
+    enabled: boolean,
+    name: string,
+    oid: string,
+    uid: string,
+    owner: string,
+    status: ItemStatus,
+    accessLevel: ItemPrivacy,
+    type: ItemType,
+    labels: ItemLabelsObj,
+    contracted: boolean
 }
 
 export interface IItem {
@@ -48,7 +62,8 @@ export interface IItem {
     labels: ItemLabelsObj,
     // semanticType: string,
     // interactionPatterns: ??[],
-    // hasContracts: string[],
+    hasContracts: string[],  // NOT USED
+    hasCommunities: string[],  // NOT USED
     // hasAudits: string[],
     // mode: Production and testing ??
     // Timestamps
@@ -74,7 +89,12 @@ export interface IItemUI extends IItem {
     gateway?: { // Item gateway
         name: string
     }
-    labels: ItemLabelsObj
+    labels: ItemLabelsObj,
+    contract?:{
+        contracted: boolean,
+        ctid: string,
+        contractable: boolean
+    }
 }
 
 // Input to create a new Item
@@ -117,8 +137,7 @@ export type GetAllQuery = {
     type: ItemType,
     accessLevel?: ItemPrivacy,
     $or?: { accessLevel: ItemPrivacy }[],
-    status?: ItemStatus | 
-            { $ne: ItemStatus }
+    status?: ItemStatus | { $ne: ItemStatus }
 }
 
 export type GetByOwnerQuery = {
@@ -172,4 +191,24 @@ export interface IItemModel extends Model<IItemDocument> {
         this: IItemModel,
         oid: string
     ) => Promise<void>
+    _addContract: (
+        this: IItemModel,
+        oid: string,
+        ctid: string
+    ) => Promise<void>
+    _removeContract: (
+        this: IItemModel,
+        oid: string,
+        ctid: string
+    ) => Promise<void>
+    _removeContractFromCompanyItems: (
+        this: IItemModel,
+        cid: string,
+        ctid: string
+    ) => Promise<void>
+    _getAllCompanyItemsContractView: (
+        this: IItemModel,
+        cid: string,
+        ctid: string
+    ) => Promise<ContractItemSelect[]>
 }

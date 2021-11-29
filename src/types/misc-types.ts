@@ -18,8 +18,8 @@ export enum SourceType{
     ORGANISATION = 'Organisation',
     NODE = 'Node',
     ITEM = 'Item',
+    CONTRACT = 'Contract',
     PARTNERSHIP = 'Partnership'
-    // CONTRACT = 'contract',
 }
 
 export enum ResultStatusType{
@@ -29,7 +29,8 @@ export enum ResultStatusType{
 
 export enum XmppNotificationTypes{
     PRIVACY = 'privacyUpdate',
-    PARTNERS = 'partnersUpdate'
+    PARTNERS = 'partnersUpdate',
+    CONTRACTS = 'contractsUpdate'
 }
 
 export enum EventType {
@@ -40,12 +41,15 @@ export enum EventType {
     itemUpdatedByNode = 14, // info
     itemUpdatedByUser = 15, // info
     itemRemoved = 16, // info
-    contractRequest = 21, // info
+    contractCreated = 20, // info
+    contractRequest = 21, // toAnswer
     contractAccepted = 22, // info
-    contractCancelled = 23, // info
-    contractJoined = 24, // info
-    contractAbandoned = 25, // info
-    contractUpdated = 26, // info
+    contractRejected = 23, // info
+    contractDeleted = 24, // info
+    contractJoined = 25, // info
+    contractAbandoned = 26, // info
+    contractUpdated = 27, // info
+    contractItemUpdated = 28, // info
     partnershipRequest = 31, // toAnswer
     partnershipCancelled = 32, // info
     partnershipRejected = 33, // info

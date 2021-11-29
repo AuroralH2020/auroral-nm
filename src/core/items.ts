@@ -4,16 +4,26 @@
 
 // Imports
 import * as crypto from 'crypto'
-import { MyError, errorHandler, ErrorSource } from '../utils/error-handler'
-import { logger } from '../utils/logger'
+import { number } from 'joi'
+import { errorHandler, ErrorSource, MyError } from '../utils/error-handler'
+import { HttpStatusCode, logger } from '../utils'
 import { cs } from '../microservices/commServer'
 import { ItemModel } from '../persistance/item/model'
 import { UserModel } from '../persistance/user/model'
 import { NodeModel } from '../persistance/node/model'
 import { OrganisationModel } from '../persistance/organisation/model'
-import { IItemUI, IItemCreate, ItemType, GetAllQuery, ItemStatus, ItemPrivacy, IItemUpdate, IItemDocument } from '../persistance/item/types'
-import { HttpStatusCode } from '../utils/http-status-codes'
+import {
+    GetAllQuery,
+    IItemCreate,
+    IItemDocument,
+    IItemUI,
+    IItemUpdate,
+    ItemPrivacy,
+    ItemStatus,
+    ItemType
+} from '../persistance/item/types'
 import { xmpp } from '../microservices/xmppClient'
+import { ContractModel } from '../persistance/contract/model'
 
 // Functions
 
@@ -25,7 +35,7 @@ import { xmpp } from '../microservices/xmppClient'
         // Get your organisation data
         const myOrganisation = await OrganisationModel._getOrganisation(cid)
         // Find out if you need to get partnerships
-        const organisations = filter !== 5 ? cid : { $in: [cid].concat(myOrganisation.knows) }
+        const organisations = Number(filter) !== 5 ? cid : { '$in': (myOrganisation.knows) }
         // Get my company Name
         const myCompanyName = myOrganisation.name
         // Build query based on filter
@@ -41,8 +51,7 @@ import { xmpp } from '../microservices/xmppClient'
             }
         }))
     } catch (err) {
-        const error = errorHandler(err)
-        throw error
+        throw errorHandler(err)
     }
 }
 
@@ -132,13 +141,16 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         if (item.agid) {
             await NodeModel._removeItemFromNode(item.agid, oid)
         }
+        // Remove item from contracts
+        if (item.hasContracts.length > 0) {
+            await ContractModel._removeItemFromAllContracts(oid)
+        }
         // Remove item in CS
         await cs.deleteUser(oid)
         // Remove item in Mongo
         await item._removeItem()
         // Send notification to NODE
         await xmpp.notifyPrivacy(item.agid)
-        // TBD: Remove contracts
         // TBD: Audits and notifications
     } catch (err) {
         throw errorHandler(err)
@@ -160,13 +172,14 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
             // logger.error('Cannot update ' + oid + ' because it does not belong to user or agent requester: ' + owner)
             throw new MyError('Item does not belong to requester', HttpStatusCode.UNAUTHORIZED)
         }
-    // TBD: Do checks before updating
-    // Check contracts
-    // Check conflicts
-    // Authorizations
-    // Dependencies
-    
-    // Update
+        // TBD: Do checks before updating
+        // Check conflicts
+        // Authorizations
+        // Dependencies
+
+        // check conflicts
+        await checkBeforeItemUpdate(item.oid, data)
+        // Update
         if (data.status && owner) {
             // Enable/Disable
             await updateStatus(item, data.status, owner, oid)
@@ -189,8 +202,11 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
 // Private functions
 
 const updateStatus = async (item: IItemDocument, status: ItemStatus , owner: string, oid: string) => { 
-    // TBD check also contracts when disabling
     // Add privacy if disabling
+
+    // Check conflicts
+    await checkBeforeItemUpdate(item.oid,{ status })
+
     const dataWithPrivacy = status === ItemStatus.DISABLED ?
         { status, accessLevel: ItemPrivacy.PRIVATE } : 
         { status }
@@ -216,11 +232,34 @@ const updateStatus = async (item: IItemDocument, status: ItemStatus , owner: str
 const updateAccessLevel = async (item: IItemDocument, accessLevel: ItemPrivacy , owner: string) => {
     // TBD check also contracts when lowering privacy
     const user = await UserModel._getUser(owner)
+    await checkBeforeItemUpdate(item.oid,{ accessLevel })
     if (user.accessLevel < accessLevel) {
         throw new MyError('User owner privacy must be less restrictive', HttpStatusCode.FORBIDDEN)
     } else {
         await item._updateItem({ accessLevel })
     }
+}
+
+const checkBeforeItemUpdate = async (oid: string, data: IItemUpdate) => {
+    const item = await ItemModel._getItem(oid)
+    // test if conflicting operations
+    if (data.status || data.accessLevel) {
+        // test if item is in contract
+        if (item.hasContracts && item.hasContracts.length > 0) {
+            if (data.status === ItemStatus.DISABLED) {
+                throw new MyError('Item can not be disabled - it is included in contract')
+            }
+            if (data.status === ItemStatus.DELETED) {
+                throw new MyError('Item can not be deleted - it is included in contract')
+            }
+            if (data.accessLevel && data.accessLevel < ItemPrivacy.FOR_FRIENDS) {
+                throw new MyError('Item privacy can not be lowered - it is included in contract')
+            }
+        }
+    }
+
+    // check if update breaks contract
+
 }
 
 const buildGetManyQuery = (cid: string | { $in: string[] }, type: ItemType, filter: number): GetAllQuery => {

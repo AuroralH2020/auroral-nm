@@ -15,6 +15,7 @@ import { UserModel } from '../../../persistance/user/model'
 import { NotificationStatus } from '../../../persistance/notification/types'
 import { ItemModel } from '../../../persistance/item/model'
 import { ResultStatusType, EventType } from '../../../types/misc-types'
+import { ContractModel } from '../../../persistance/contract/model'
 
 // Controllers
 
@@ -40,6 +41,23 @@ export const getOne: getOneController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     const data = await ItemService.getOne(decoded.org, oid)
+    const contract = await  ContractModel._getCommonPrivateContracts(decoded.org, data.cid)
+    if (contract.length > 0) {
+      // there is common contract
+      if (data.hasContracts.includes(contract[0].ctid)) {
+        data.contract = {
+          ctid: contract[0].ctid,
+          contracted: true,
+          contractable: false
+        }
+      } else {
+        data.contract = {
+          ctid: contract[0].ctid,
+          contracted: false,
+          contractable: true
+        }
+      }
+    }
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
@@ -63,6 +81,7 @@ export const getByCompany: getByCompanyController = async (req, res) => {
     if (foreignOrg.knows.includes(decoded.org)) {
       // We are friends
       reqParam.$or = [{ accessLevel: ItemPrivacy.FOR_FRIENDS }, { accessLevel: ItemPrivacy.PUBLIC }]
+
     } else if (cid === decoded.org) {
       // My org
       reqParam.status = { $ne: ItemStatus.DELETED }
@@ -71,7 +90,7 @@ export const getByCompany: getByCompanyController = async (req, res) => {
       reqParam.$or = [{ accessLevel: ItemPrivacy.PUBLIC }]
     }
     const data = await ItemModel._getByOwner(reqParam, Number(offset))
-    return responseBuilder(HttpStatusCode.OK, res, null, data)
+      return responseBuilder(HttpStatusCode.OK, res, null, data)
   } catch (err) {
     const error = errorHandler(err)
     logger.error({ msg: error.message, id: res.locals.reqId })

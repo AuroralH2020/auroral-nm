@@ -127,4 +127,14 @@ export interface IUserModel extends Model<IUserDocument> {
         uid: string,
         oid: string
     ) => Promise<void>
+    _addContract: (
+        this: IUserModel,
+        uid: string,
+        ctid: string
+    ) => Promise<void>
+    _removeContract: (
+        this: IUserModel,
+        uid: string,
+        ctid: string
+    ) => Promise<void>
 }

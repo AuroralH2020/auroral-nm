@@ -22,7 +22,8 @@ export const Config = {
 		SECRET_KEY: process.env.CS_SECRET_KEY!
 	},
 	XMPP_CLIENT: {
-		URL: process.env.XMPP_CLIENT_URL
+		URL: process.env.XMPP_CLIENT_URL!,
+		NAME: process.env.XMPP_CLIENT_NAME!
 	},
 	MONGO: {
 		USER: process.env.MONGO_USER!, 

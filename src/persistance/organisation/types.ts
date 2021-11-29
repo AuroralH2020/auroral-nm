@@ -30,6 +30,10 @@ export interface IOrganisation {
     hasAudits: string[],
     hasUsers: string[],
     hasNodes: string[],
+    hasContracts: string[],
+    hasContractRequests: string[],
+    hasCommunities: string[], // NOT USED
+    hasCommunityRequests: string[], // NOT USED
     // Stores IDs of other organsations (Friendship process)
     knows: string[],
     knowsRequestsFrom: string[],
@@ -53,6 +57,8 @@ export interface IOrganisationUI {
     hasAudits: string[],
     hasUsers: string[],
     hasNodes: string[],
+    hasContracts: string[],
+    hasContractRequests: string[],
     knows: string[],
     knowsRequestsFrom: string[],
     knowsRequestsTo: string[],
@@ -91,6 +97,8 @@ export interface OrgConfiguration {
 
 export interface FriendshipsData {
     isNeighbour: boolean
+    contracted: boolean
+    contractRequested: boolean
     canSendNeighbourRequest: boolean
     canCancelNeighbourRequest: boolean
     canAnswerNeighbourRequest: boolean
@@ -177,5 +185,35 @@ export interface IOrganisationModel extends Model<IOrganisationDocument> {
         this: IOrganisationModel,
         cid: string,
         friendCid: string
+    ) => Promise<void>
+    _addContract: (
+        this: IOrganisationModel,
+        cid: string,
+        ctid: string
+    ) => Promise<void>
+    _removeContract: (
+        this: IOrganisationModel,
+        cid: string,
+        ctid: string
+    ) => Promise<void>
+    _addContractRequest: (
+        this: IOrganisationModel,
+        cid: string,
+        ctid: string
+    ) => Promise<void>
+    _removeContractRequest: (
+        this: IOrganisationModel,
+        cid: string,
+        ctid: string
+    ) => Promise<void>
+    _addMultipleContractRequests: (
+        this: IOrganisationModel,
+        cid: string,
+        ctid: string
+    ) => Promise<void>
+    _removeMultipleContractRequests: (
+        this: IOrganisationModel,
+        cid: string,
+        ctid: string
     ) => Promise<void>
 }

@@ -26,6 +26,8 @@ export async function removeOrganisation(this: IOrganisationDocument): Promise<v
     // this.hasAudits
     this.hasNodes = []
     this.hasUsers = []
+    this.hasContracts = []
+    this.hasContractRequests = []
     this.knows = []
     this.knowsRequestsFrom = []
     this.knowsRequestsTo = []

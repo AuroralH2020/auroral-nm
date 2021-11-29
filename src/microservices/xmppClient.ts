@@ -49,6 +49,20 @@ export const xmpp = {
                 logger.error('XMPP notif [' + XmppNotificationTypes.PARTNERS + '] not sent: ' + agid + ' [' + error.message + ']')              
             }
         }
+    },
+    notifyContractChanged: async (agid: string, ctid: string): Promise<void> => {
+        // send notification to Node
+        if (true) {
+            logger.warn('PARAMETER SENDING NOT IMPLEMENTED')
+            return
+        }
+        try {
+            await request(agid + '/' + XmppNotificationTypes.CONTRACTS, 'GET', undefined, ApiHeader)
+            logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACTS + '] sent to: ' + agid)
+        } catch (err) {
+            const error = errorHandler(err)
+            logger.error('XMPP notif [' + XmppNotificationTypes.CONTRACTS + '] not sent: ' + agid + ' [' + error.message + ']')
+        }
     }
 }
 

@@ -1,11 +1,11 @@
 import mongoose from 'mongoose'
-import { 
-    getOrganisation, 
-    getOrganisations, 
-    getDoc, 
-    createOrganisation, 
-    findDuplicatesCompany, 
-    getConfiguration, 
+import {
+    getOrganisation,
+    getOrganisations,
+    getDoc,
+    createOrganisation,
+    findDuplicatesCompany,
+    getConfiguration,
     addUserToCompany,
     removeUserFromCompany,
     addNodeToCompany,
@@ -15,7 +15,13 @@ import {
     addOutgoingFriendReq,
     delOutgoingFriendReq,
     addFriendship,
-    delFriendship
+    delFriendship,
+    addContract,
+    removeContract,
+    removeContractRequest,
+    addContractRequest,
+    addMultipleContractRequests,
+    removeMultipleContractRequests
 } from './statics'
 import { updateOrganisation, removeOrganisation } from './methods'
 import { IOrganisationDocument, IOrganisationModel, OrganisationStatus, UISkins } from './types'
@@ -38,6 +44,10 @@ const OrganisationSchema = new Schema<IOrganisationDocument, IOrganisationModel>
     hasAudits: [{ type: String, default: [] }],
     hasUsers: [{ type: String, default: [] }],
     hasNodes: [{ type: String, default: [] }],
+    hasContracts: [{ type: String, default: [] }],
+    hasContractRequests: [{ type: String, default: [] }],
+    hasCommunities: [{ type: String, default: [] }],
+    hasCommunityRequests: [{ type: String, default: [] }],
     knows: [{ type: String, default: [] }],
     knowsRequestsFrom: [{ type: String, default: [] }],
     knowsRequestsTo: [{ type: String, default: [] }],
@@ -64,6 +74,12 @@ OrganisationSchema.statics._addOutgoingFriendReq = addOutgoingFriendReq
 OrganisationSchema.statics._delOutgoingFriendReq = delOutgoingFriendReq
 OrganisationSchema.statics._addFriendship = addFriendship
 OrganisationSchema.statics._delFriendship = delFriendship
+OrganisationSchema.statics._addContract = addContract
+OrganisationSchema.statics._removeContract = removeContract
+OrganisationSchema.statics._addContractRequest = addContractRequest
+OrganisationSchema.statics._removeContractRequest = removeContractRequest
+OrganisationSchema.statics._addMultipleCOntractRequests = addMultipleContractRequests
+OrganisationSchema.statics._removeMultipleContractRequests = removeMultipleContractRequests
 
 // Methods
 

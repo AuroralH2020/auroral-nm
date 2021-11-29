@@ -13,6 +13,10 @@ import { UserModel } from '../../../persistance/user/model'
 import { NotificationStatus } from '../../../persistance/notification/types'
 import { AuditModel } from '../../../persistance/audit/model'
 import { xmpp } from '../../../microservices/xmppClient'
+import { ContractModel } from '../../../persistance/contract/model'
+import { rejectContract } from './contracts'
+import { ContractService } from '../../../core'
+import { removeOrgFromContract } from '../../../core/contracts'
 
 // Controllers
 
@@ -253,6 +257,22 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
 	try {
     const myCid = decoded.org
     const myUid = decoded.uid
+    const commonPrivateContracts = await ContractModel._getCommonPrivateContracts(myCid, friendCid)
+    // There is a private contract
+    if (commonPrivateContracts.length > 0)  {
+      for (const common of commonPrivateContracts) {
+        if (common.contracted) {
+          // leave contract
+          logger.debug('Removing org from private contract:' + common.ctid)
+         await ContractService.removeOrgFromContract(common.ctid, myCid, decoded.uid, res.locals.audit)
+        } else {
+          // reject contract request
+          logger.debug('Rejecting private contract request:' + common.ctid)
+          await ContractService.rejectContractRequest(common.ctid, myCid, myUid,res.locals.audit)
+        }
+      }
+    }
+
     await OrganisationModel._delFriendship(myCid, friendCid)
     await OrganisationModel._delFriendship(friendCid, myCid)
     // TBD: Remove all gateways from CS to friendships group

@@ -13,12 +13,24 @@ import * as nodeCtrl from './controllers/node'
 import * as notificationCtrl from './controllers/notification'
 import * as auditCtrl from './controllers/audit'
 import * as itemsCtrl from './controllers/items'
+import * as contractsCtrl from './controllers/contracts'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { SourceType } from '../../types/misc-types'
 import { RolesEnum } from '../../types/roles'
 // Joi schemas
-import { updateItemSchema, updateOrganisationSchema, passwordSchema, registrationSchema, registrationStatusSchema, updateNodeSchema, updatePasswordSchema, updateUserSchema, emptyItemSchema } from '../../core/joi-schemas'
+import {
+    updateItemSchema,
+    updateOrganisationSchema,
+    passwordSchema,
+    registrationSchema,
+    registrationStatusSchema,
+    updateNodeSchema,
+    updatePasswordSchema,
+    updateUserSchema,
+    emptyItemSchema,
+    editContractSchema, editItemContractSchema
+} from '../../core/joi-schemas'
 
 const UiRouter = Router()
 
@@ -53,15 +65,15 @@ UiRouter
 .get('/organisation/:cid/configuration', addOrigin(Interfaces.UI), jwt(), organisationCtrl.getConfiguration)
 .put('/organisation/:cid', addOrigin(Interfaces.UI), jwt(), validateBody(updateOrganisationSchema), createAudit(SourceType.ORGANISATION), organisationCtrl.updateOrganisation)
 .delete('/organisation', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), createAudit(SourceType.ORGANISATION), organisationCtrl.removeOrganisation)
-// Send friendship request to cid by autenticated user
+// Send friendship request to cid by authenticated user
 .post('/organisation/:cid/friendship/request', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.processFriendRequest)
 // Send friendship request approval to cid from authenticated user
 .post('/organisation/:cid/friendship/accept', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.acceptFriendRequest)
 // Send friendship request rejection to cid from authenticated user
 .post('/organisation/:cid/friendship/reject', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.rejectFriendRequest)
-// Send friendship request cancelation to cid from authenticated user
+// Send friendship request cancellation to cid from authenticated user
 .post('/organisation/:cid/friendship/cancelRequest', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendRequest)
-// Send friendship cancelation to cid from authenticated user
+// Send friendship cancellation to cid from authenticated user
 .post('/organisation/:cid/friendship/cancel', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendship)
 
 // USERS
@@ -96,5 +108,21 @@ UiRouter
 
 // AUDITS
 .get('/audits/:id', addOrigin(Interfaces.UI), jwt(), auditCtrl.getAudits)
+
+// CONTRACTS
+.get('/contracts/', addOrigin(Interfaces.UI), jwt(), contractsCtrl.getContracts)
+.get('/contract/:ctid', addOrigin(Interfaces.UI), jwt(), contractsCtrl.getContract)
+.post('/contract/', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.createContract)
+.put('/contract/:ctid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), validateBody(editContractSchema), createAudit(SourceType.CONTRACT), contractsCtrl.editContract)
+.delete('/contract/:ctid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.removeOrgFromContract)
+.post('/contract/:ctid/accept', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.acceptContract)
+.get('/contract/:ctid/items', addOrigin(Interfaces.UI), jwt(), contractsCtrl.getContractItems)
+.get('/contract/:ctid/items/company', addOrigin(Interfaces.UI), jwt(), contractsCtrl.getCompanyItems)
+.post('/contract/:ctid/reject', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.rejectContract)
+.post('/contract/:ctid/invite', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.inviteOrganisations)
+.post('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.CONTRACT), contractsCtrl.addItem)
+.put('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OWNER]), validateBody(editItemContractSchema), createAudit(SourceType.CONTRACT), contractsCtrl.editItem)
+.delete('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeItem)
+.delete('/contract/:ctid/items/:cid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeAllCompanyItems)
 
 export { UiRouter }

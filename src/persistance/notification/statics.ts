@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { INotificationDocument, INotificationModel, INotificationCreate, INotification, NotificationStatus, NotifFinderType } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
-import { logger } from '../../utils/logger'
 
 export async function getNotifications(
   this: INotificationModel, owners: string[], unreadOnly: boolean, limit: number = 0, offset: number = 0
@@ -68,7 +67,7 @@ export async function setStatus(
 export async function findNotifications(
   this: INotificationModel, data: NotifFinderType
 ): Promise<string[]> {
-  const query = { ...data, owner: { $in: data.owners } } 
+  const query = { ...data, owner: { $in: data.owners } }
   delete query.owners // Need to remove to avoid conflicts with MONGO query
   const records = await this.find(query, { notificationId: 1 }).lean().exec()
   if (records) {

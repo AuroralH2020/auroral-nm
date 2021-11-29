@@ -37,7 +37,7 @@ export enum NotificationStatus {
 
 export type NotificationObj = {
     id: string
-    name: string
+    name?: string
 }
 
 export interface INotification {
@@ -70,6 +70,7 @@ export interface NotifFinderType {
     actor?: NotificationObj
     target?: NotificationObj
     object?: NotificationObj // Sender (organisation sending the request)
+    'object.id'?: string // Sender (organisation sending the request)
 }
 
 export interface INotificationDocument extends INotification, Document {

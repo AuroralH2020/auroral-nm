@@ -12,16 +12,19 @@ import { OrganisationModel } from '../../../persistance/organisation/model'
 import { FriendshipsData, IOrganisationUI, IOrganisationUpdate, OrgConfiguration } from '../../../persistance/organisation/types'
 import { UserModel } from '../../../persistance/user/model'
 import { OrganisationService } from '../../../core'
+import { ContractModel } from '../../../persistance/contract/model'
+import { companiesContracted } from '../../../persistance/contract/types'
 
 // Controllers
 
-type getOneController = expressTypes.Controller<{ cid: string }, {}, {}, IOrganisationUI & FriendshipsData, localsTypes.ILocals>
+type getOneController = expressTypes.Controller<{ cid: string }, {}, {}, IOrganisationUI & FriendshipsData & companiesContracted, localsTypes.ILocals>
  
 export const getOne: getOneController = async (req, res) => {
         const { decoded } = res.locals // Requester organisation ID
         const { cid } = req.params // Requested organisation info
         try {
                 const data = await OrganisationModel._getOrganisation(cid)
+                const myOrg = await OrganisationModel._getOrganisation(decoded.org)
                 // Complete organisation data with friendships
                 let isNeighbour = false
                 let canSendNeighbourRequest = true
@@ -48,9 +51,20 @@ export const getOne: getOneController = async (req, res) => {
                         // If any of the previous is true we cannot send friendship requests
                         canSendNeighbourRequest = !canAnswerNeighbourRequest && !canCancelNeighbourRequest && !isNeighbour
                 }
+                // get common private contract
+                const common = await ContractModel._getCommonPrivateContracts(cid, decoded.org)
+                let contract : companiesContracted = {
+                        ctid: '',
+                        contracted: false,
+                        contractRequested: false,
+                }
+                if (common.length > 0) {
+                        contract = common[0]
+                }
                 // Compile final response
                 const dataWithFriendships = {
                         ...data,
+                        ...contract,
                         isNeighbour,
                         canSendNeighbourRequest,
                         canCancelNeighbourRequest,

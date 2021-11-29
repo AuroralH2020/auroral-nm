@@ -11,7 +11,7 @@ export async function getAudits(
   const d = new Date()
   d.setHours(0, 0, 0, 0)
   d.setDate(d.getDate() - days)
-  const query = { cid: cid, 'target.id': id, created: { $gte: d.getTime() } }
+  const query = { 'target.id': id, created: { $gte: d.getTime() } }
   const records = await this.find(
     { ...query },
     { 'label.ip': 0 }
@@ -118,6 +118,24 @@ const generateMessage: (data: IAuditCreate) => string = (
       break
     case EventType.partnershipRejected:
       message += 'Friendship between \'' + data.target.name + '\' and \'' + data.object?.name + ' has been rejected by user ' + data.actor.name
+      break
+    case EventType.contractCreated:
+      message += 'Contract has been created by user ' + data.actor.name + ' (organisation: ' + data.object?.name + ')'
+      break
+    case EventType.contractJoined:
+      message += 'Organisation ' + data.object?.name + ' joined contract (user ' + data.actor.name + ')'
+      break
+    case EventType.contractAbandoned:
+      message += 'Organisation ' + data.object?.name + ' left contract (user ' + data.actor.name + ')'
+      break
+    case EventType.contractDeleted:
+      message += 'Contract has been deleted by user ' + data.actor.name + ' (organisation: ' + data.object?.name + ')'
+      break
+    case EventType.contractUpdated:
+      message += 'Contract has been updated by user ' + data.actor.name + ' (organisation: ' + data.object?.name + ')'
+      break
+    case EventType.contractItemUpdated:
+      message += 'Item in ' + data.target?.name + ' has been updated by user ' + data.actor.name + ' (organisation: ' + data.object?.name + ')'
       break
     default:
       message += 'Something has been updated'

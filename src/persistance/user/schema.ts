@@ -25,9 +25,9 @@ const UserSchema = new Schema<IUserDocument, IUserModel>({
     accessLevel: { type: String, required: true, enum: visibilities },
     roles: [{ type: String, required: true, enum: roles }],
     hasNotifications: [{ type: String, default: [] }], // Contains notifications ids
+    hasContracts: [{ type: String, default: [] }], // Contains contracts ids
     hasAudits: [{ type: String, default: [] }],
     hasItems: [{ type: String, default: [] }],
-    hasContracts: [{ type: String, default: [] }],
     lastUpdated: { type: Number, default: Date.now },
     created: { type: Number, default: Date.now }
 })

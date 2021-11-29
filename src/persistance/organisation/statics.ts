@@ -7,9 +7,9 @@ export async function getOrganisation(
   this: IOrganisationModel, cid: string
 ): Promise<IOrganisationUI> {
   const record = await this.findOne(
-    { cid, status: OrganisationStatus.ACTIVE }, 
+    { cid, status: OrganisationStatus.ACTIVE },
     { hasNotifications: 0, hasAudits: 0 }
-    ).lean().exec()
+  ).lean().exec()
   if (record) {
     return record
   } else {
@@ -27,23 +27,23 @@ export async function getOrganisations(
   let record: IOrganisationUI[] = [] // final result
   // Retrieve all organisations
   if (type === 0) {
-      record = await this.find(
-        query, 
-        { hasNotifications: 0, hasAudits: 0, hasUsers: 0, hasNodes: 0 }
-        ).skip(offset).limit(LIMIT).lean()
+    record = await this.find(
+      query,
+      { hasNotifications: 0, hasAudits: 0, hasUsers: 0, hasNodes: 0 }
+    ).skip(offset).limit(LIMIT).lean()
       .exec()
-  // Retrieve all friends
+    // Retrieve all friends
   } else if (type === 1) {
-      const doc = await this.findOne({ cid }, { knows: 1 }).lean().exec()
-      const friends = doc ? doc.knows : []
-      record = await this.find({ cid: { $in: friends }, status: OrganisationStatus.ACTIVE }, { hasNotifications: 0, hasAudits: 0, hasNodes: 0 }).lean().exec()
+    const doc = await this.findOne({ cid }, { knows: 1 }).lean().exec()
+    const friends = doc ? doc.knows : []
+    record = await this.find({ cid: { $in: friends }, status: OrganisationStatus.ACTIVE }, { hasNotifications: 0, hasAudits: 0, hasNodes: 0 }).lean().exec()
     // Retrieve all NON friends
   } else if (type === 2) {
-      const doc = await this.findOne({ cid }, { knows: 1 }).lean().exec()
-      const friends = doc ? doc.knows : []
-      record = await this.find({ cid: { $nin: [...friends, cid] }, status: OrganisationStatus.ACTIVE }, { hasNotifications: 0, hasAudits: 0, hasNodes: 0 }).lean().exec()
+    const doc = await this.findOne({ cid }, { knows: 1 }).lean().exec()
+    const friends = doc ? doc.knows : []
+    record = await this.find({ cid: { $nin: [...friends, cid] }, status: OrganisationStatus.ACTIVE }, { hasNotifications: 0, hasAudits: 0, hasNodes: 0 }).lean().exec()
   } else {
-      throw new Error('Wrong type number (organisations retrieval): ' + type)
+    throw new Error('Wrong type number (organisations retrieval): ' + type)
   }
   if (record) {
     return record
@@ -56,7 +56,7 @@ export async function getOrganisations(
 export async function getDoc(
   this: IOrganisationModel, cid: string
 ): Promise<IOrganisationDocument> {
-  const record = await this.findOne({ cid,  status: OrganisationStatus.ACTIVE }).exec()
+  const record = await this.findOne({ cid, status: OrganisationStatus.ACTIVE }).exec()
   if (record) {
     return record
   } else {
@@ -66,9 +66,9 @@ export async function getDoc(
 }
 
 export async function createOrganisation(
-    this: IOrganisationModel, data: IOrganisationCreate
-  ): Promise<IOrganisationDocument> {
-    return this.create(data)
+  this: IOrganisationModel, data: IOrganisationCreate
+): Promise<IOrganisationDocument> {
+  return this.create(data)
 }
 
 export async function findDuplicatesCompany(
@@ -87,17 +87,17 @@ export async function findDuplicatesCompany(
 
 export async function getConfiguration(
   this: IOrganisationModel, cid: string
-  ): Promise<OrgConfiguration> {
-    const record = await this.findOne({ cid }, { skinColor: 1 }).exec()
-    if (record) {
-      return {
-        skinColor: record.skinColor
-      }
-    } else {
-      // logger.warn('Organisation not found')
-      throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
+): Promise<OrgConfiguration> {
+  const record = await this.findOne({ cid }, { skinColor: 1 }).exec()
+  if (record) {
+    return {
+      skinColor: record.skinColor
     }
+  } else {
+    // logger.warn('Organisation not found')
+    throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
+}
 
 /**
  * Add and remove 
@@ -109,14 +109,14 @@ export async function getConfiguration(
  * @param cid 
  * @param uid 
  */
-export async function addUserToCompany  (
+export async function addUserToCompany(
   this: IOrganisationModel, cid: string, uid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $push: { hasUsers: uid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error adding user to organisation')
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $push: { hasUsers: uid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding user to organisation')
   }
+}
 
 /**
  * Remove a user from company hasUsers array
@@ -124,14 +124,14 @@ export async function addUserToCompany  (
  * @param cid 
  * @param uid 
  */
-export async function removeUserFromCompany  (
+export async function removeUserFromCompany(
   this: IOrganisationModel, cid: string, uid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $pull: { hasUsers: uid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error removing user from organisation')
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $pull: { hasUsers: uid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error removing user from organisation')
   }
+}
 
 /**
  * Add node to company hasNodes array
@@ -139,14 +139,14 @@ export async function removeUserFromCompany  (
  * @param cid 
  * @param agid 
  */
-export async function addNodeToCompany  (
+export async function addNodeToCompany(
   this: IOrganisationModel, cid: string, agid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $push: { hasNodes: agid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error adding node to organisation')
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $push: { hasNodes: agid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding node to organisation')
   }
+}
 
 /**
  * Remove a node from company hasNodes array
@@ -154,14 +154,14 @@ export async function addNodeToCompany  (
  * @param cid 
  * @param agid 
  */
-export async function removeNodeFromCompany  (
+export async function removeNodeFromCompany(
   this: IOrganisationModel, cid: string, agid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $pull: { hasNodes: agid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error removing node from organisation')
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $pull: { hasNodes: agid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error removing node from organisation')
   }
+}
 
 /**
  * FRIENDSHIPS
@@ -173,29 +173,29 @@ export async function removeNodeFromCompany  (
  * @param cid 
  * @param friendCid 
  */
-export async function addIncomingFriendReq  (
+export async function addIncomingFriendReq(
   this: IOrganisationModel, cid: string, friendCid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $addToSet: { knowsRequestsFrom: friendCid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error adding friend request from ' + friendCid)
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $addToSet: { knowsRequestsFrom: friendCid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding friend request from ' + friendCid)
   }
+}
 
 /**
  * Remove incoming friend request
  * @param this 
  * @param cid 
  * @param friendCid 
- */  
-export async function delIncomingFriendReq  (
+ */
+export async function delIncomingFriendReq(
   this: IOrganisationModel, cid: string, friendCid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $pull: { knowsRequestsFrom: friendCid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error removing friend request from ' + friendCid)
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $pull: { knowsRequestsFrom: friendCid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error removing friend request from ' + friendCid)
   }
+}
 
 /**
  * Add outgoing friend request
@@ -203,14 +203,14 @@ export async function delIncomingFriendReq  (
  * @param cid 
  * @param friendCid 
  */
-export async function addOutgoingFriendReq  (
+export async function addOutgoingFriendReq(
   this: IOrganisationModel, cid: string, friendCid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $addToSet: { knowsRequestsTo: friendCid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error adding friend request to ' + friendCid)
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $addToSet: { knowsRequestsTo: friendCid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding friend request to ' + friendCid)
   }
+}
 
 /**
  * Cancel outgoing friend request
@@ -218,14 +218,14 @@ export async function addOutgoingFriendReq  (
  * @param cid 
  * @param friendCid 
  */
-export async function delOutgoingFriendReq  (
+export async function delOutgoingFriendReq(
   this: IOrganisationModel, cid: string, friendCid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $pull: { knowsRequestsTo: friendCid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error removing friend request to ' + friendCid)
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $pull: { knowsRequestsTo: friendCid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error removing friend request to ' + friendCid)
   }
+}
 
 /**
  * Add a friendship
@@ -233,26 +233,118 @@ export async function delOutgoingFriendReq  (
  * @param cid 
  * @param friendCid 
  */
-export async function addFriendship  (
+export async function addFriendship(
   this: IOrganisationModel, cid: string, friendCid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $addToSet: { knows: friendCid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error adding friend ' + friendCid)
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $addToSet: { knows: friendCid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding friend ' + friendCid)
   }
+}
 
 /**
  * Remove a friendship
- * @param this 
- * @param cid 
- * @param friendCid 
+ * @param this
+ * @param cid
+ * @param friendCid
  */
-export async function delFriendship  (
+export async function delFriendship(
   this: IOrganisationModel, cid: string, friendCid: string
-  ): Promise<void> {
-    const record = await this.updateOne({ cid }, { $pull: { knows: friendCid } }).exec()
-    if (!record.ok) {
-      throw new Error('Error removing friend ' + friendCid)
-    }
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $pull: { knows: friendCid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error removing friend ' + friendCid)
   }
+}
+
+/**
+ * Add Contract to organisation
+ * @param this
+ * @param cid
+ * @param ctid
+ */
+export async function addContract(
+  this: IOrganisationModel, cid: string, ctid: string
+): Promise<void> {
+  const record = await this.updateOne({ cid },
+      { $push: { hasContracts: ctid } ,
+               $pull: { hasContractRequests: ctid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding contract ' + ctid)
+  }
+}
+
+/**
+ * Remove Contract from organisation
+ * @param this
+ * @param cid
+ * @param ctid
+ */
+export async function removeContract(
+  this: IOrganisationModel, cid: string, ctid: string
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $pull: { hasContracts: ctid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding contract ' + ctid)
+  }
+}
+
+/**
+ * Add Contract request to organisation
+ * @param this
+ * @param cid
+ * @param ctid
+ */
+export async function addContractRequest(
+  this: IOrganisationModel, cid: string, ctid: string
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $addToSet: { hasContractRequests: ctid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding contract ' + ctid)
+  }
+}
+
+/**
+ * Remove Contract request from organisation
+ * @param this
+ * @param cid
+ * @param ctid
+ */
+export async function removeContractRequest(
+  this: IOrganisationModel, cid: string, ctid: string
+): Promise<void> {
+  const record = await this.updateOne({ cid }, { $pull: { hasContractRequests: ctid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding contract ' + ctid)
+  }
+}
+
+/**
+ * Add Contract request to multple organisations
+ * @param this
+ * @param cid string array
+ * @param ctid
+ */
+export async function addMultipleContractRequests(
+    this: IOrganisationModel, cid: string[], ctid: string
+): Promise<void> {
+  const record = await this.updateMany({ cid: { $in: cid } }, { $addToSet: { hasContractRequests: ctid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding contract ' + ctid)
+  }
+}
+
+/**
+ * Remove  Contract request from multiple organisation
+ * @param this
+ * @param cid
+ * @param ctid
+ */
+export async function removeMultipleContractRequests(
+    this: IOrganisationModel, cid: string[], ctid: string
+): Promise<void> {
+  const record = await this.updateMany({ cid: { $in: cid } }, { pull: { hasContractRequests: ctid } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding contract ' + ctid)
+  }
+}
