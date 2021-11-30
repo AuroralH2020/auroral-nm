@@ -26,7 +26,8 @@ GtwRouter
 .get('/agent/privacy', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPrivacy) 
 .get('/agent/cid/:reqid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getCid) 
 .get('/agent/partners', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPartners) 
-.get('/agent/partner/:cid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPartner) 
+.get('/agent/partner/:cid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPartner)
+.get('/agent/contract/items/:cid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getContractedItemsByCid)
 
 // .get('/agent/relationship/:reqid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getRelationship) 
 // .post('/items/td', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getTd) // Remove once Gateway is updated, deprecated use
