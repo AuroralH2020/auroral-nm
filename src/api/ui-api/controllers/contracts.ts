@@ -232,8 +232,8 @@ export const addItem: addItemController = async (req, res) => {
             await NotificationModel._createNotification({
                 owner: itemOrg.cid,
                 actor: { id: decoded.org, name: myOrg.name },
-                target: { id: myOrg.cid, name: myOrg.name },
-                object: { id: item.oid, name: item.name },
+                target: { id: item.oid, name: item.name },
+                object: { id: ctid, name: 'Private contract' },
                 type: EventType.contractItemUpdated,
                 status: NotificationStatus.INFO
             })
