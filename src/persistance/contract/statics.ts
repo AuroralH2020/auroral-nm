@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import {
+  agentContractType,
   companiesContracted,
   ContractItemType,
   ContractStatus,
@@ -536,4 +537,80 @@ export async function getNodesInContract(
    return []
   }
 }
+
+export async function getItemsInContractByAgid(
+    this: IContractModel, ctid: string, agid: string
+): Promise<agentContractType[]> {
+  const record = await this.aggregate([
+    {
+      '$match': {
+        'ctid': ctid
+      }
+    }, {
+      '$unwind': {
+        'path': '$items',
+        'preserveNullAndEmptyArrays': false
+      }
+    }, {
+      '$project': {
+        'ctid': 1,
+        'oid': '$items.oid',
+        'rw': '$items.rw',
+        'enabled': '$items.enabled',
+        '_id': 0
+      }
+    }, {
+      '$lookup': {
+        'from': 'items',
+        'localField': 'oid',
+        'foreignField': 'oid',
+        'as': 'item'
+      }
+    }, {
+      '$unwind': {
+        'path': '$item',
+        'preserveNullAndEmptyArrays': false
+      }
+    }, {
+      '$match': {
+        'item.agid': agid,
+        'enabled': true
+      }
+    }, {
+      '$project': {
+        'ctid': 1,
+        'oid': 1,
+        'cid': '$item.cid',
+        'rw': 1,
+        'agid': '$item.agid'
+      }
+    }, {
+      '$group': {
+        '_id': '$ctid',
+        'ctid': {
+          '$first': '$ctid'
+        },
+        'cid': {
+          '$first': '$cid'
+        },
+        'items': {
+          '$push': {
+            'oid': '$oid',
+            'rw': '$rw'
+          }
+        }
+      }
+    }, {
+      '$project': {
+        '_id': 0
+      } }]).exec()
+  if (record && record) {
+    return record
+  } else {
+    return []
+  }
+}
+
+
+
 

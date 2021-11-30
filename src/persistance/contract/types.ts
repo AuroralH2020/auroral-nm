@@ -1,5 +1,6 @@
 import { Document, Model } from 'mongoose'
 import { IItem, ItemLabelsObj, ItemType } from '../item/types'
+import { getItemsInContractByAgid } from './statics'
 
 export enum ContractType {
     PRIVATE = 'Private',
@@ -68,6 +69,16 @@ export type companiesContracted = {
     ctid: string,
     contracted: boolean,
     contractRequested: boolean
+}
+export type agentItemType = {
+    oid: string,
+    rw: boolean
+}
+
+export type agentContractType = {
+    cid: string,
+    ctid?: string,
+    items: agentItemType[]
 }
 
 export type GetAllQuery = {
@@ -182,6 +193,10 @@ export interface IContractModel extends Model<IContractDocument> {
     _getNodesInContract:(
         this: IContractModel,
         ctid: string) => Promise<string[]>
+    _getItemsInContractByAgid:(
+        this: IContractModel,
+        ctid: string,
+        agid: string) => Promise<agentContractType[]>
 
 }
 

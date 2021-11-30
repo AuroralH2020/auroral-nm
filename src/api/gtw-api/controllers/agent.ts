@@ -13,6 +13,8 @@ import { OrgGatewayType } from '../../../persistance/organisation/types'
 import { ItemModel } from '../../../persistance/item/model'
 import { RelationshipType } from '../../../types/misc-types'
 import { NodeService } from '../../../core'
+import { ContractModel } from '../../../persistance/contract/model'
+import { agentContractType } from '../../../persistance/contract/types'
 
 // Controllers
 
@@ -194,4 +196,39 @@ export const getPrivacy: getAgentPrivacy = async (req, res) => {
 		logger.error(error.message)
 		return responseBuilder(error.status, res, error.message)
 	}
+}
+
+type getContractedItemsByCid = expressTypes.Controller<{cid: string }, {}, {}, agentContractType, localsTypes.ILocalsGtw>
+
+export const getContractedItemsByCid: getContractedItemsByCid = async (req, res) => {
+  const { decoded } = res.locals
+  const { cid } = req.params
+  try {
+    if (decoded) {
+      const myAgid = decoded.iss
+      const node = await NodeModel._getNode(decoded.iss)
+      const commonContract = await ContractModel._getCommonPrivateContracts(cid, node.cid)
+      if (commonContract.length === 0) {
+        // any contract between these companies
+        const response : agentContractType = { cid, items: [] }
+        return responseBuilder(HttpStatusCode.OK, res, null, response)
+      }
+      const agentItems = await ContractModel._getItemsInContractByAgid(commonContract[0].ctid, myAgid)
+      if (agentItems.length > 0) {
+        // return found values
+        return responseBuilder(HttpStatusCode.OK, res, null, agentItems[0])
+      } else {
+        // return empty answer - any affected in contract
+        const response : agentContractType = { cid, items: [] }
+        return responseBuilder(HttpStatusCode.OK, res, null, response)
+      }
+    } else {
+      logger.error('Gateway unauthorized access attempt')
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+    }
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
+  }
 }
