@@ -92,6 +92,7 @@ export const createItemSchema = Joi.object({
       name: Joi.string(),
       avatar: Joi.string(),
       type: Joi.valid(...Object.values(ItemType)),
+      domain: Joi.valid(...Object.values(ItemDomainType)),
       adapterId: Joi.string(),
       labels: updateItemLabelsSchema
     }))

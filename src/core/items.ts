@@ -16,6 +16,7 @@ import {
     GetAllQuery,
     IItemCreate,
     IItemDocument,
+    ItemDomainType,
     IItemUI,
     IItemUpdate,
     ItemPrivacy,
@@ -30,7 +31,7 @@ import { ContractModel } from '../persistance/contract/model'
 /**
  * Get Items
  */
- export const getMany = async (cid: string, type: ItemType, offset: number, filter: number): Promise<IItemUI[]> => {
+ export const getMany = async (cid: string, type: ItemType, offset: number, filter: number, domain?: ItemDomainType): Promise<IItemUI[]> => {
     try {
         // Get your organisation data
         const myOrganisation = await OrganisationModel._getOrganisation(cid)
@@ -39,7 +40,7 @@ import { ContractModel } from '../persistance/contract/model'
         // Get my company Name
         const myCompanyName = myOrganisation.name
         // Build query based on filter
-        const query: GetAllQuery = buildGetManyQuery(organisations, type, filter)
+        const query: GetAllQuery = buildGetManyQuery(organisations, type, filter, domain)
         // Get and return items
         const data = await ItemModel._getAllItems(query, Number(offset))
         // Enrich Data and return
@@ -201,7 +202,7 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
 
 // Private functions
 
-const updateStatus = async (item: IItemDocument, status: ItemStatus , owner: string, oid: string) => { 
+const updateStatus = async (item: IItemDocument, status: ItemStatus , owner: string, oid: string) => {
     // Add privacy if disabling
 
     // Check conflicts
@@ -262,70 +263,82 @@ const checkBeforeItemUpdate = async (oid: string, data: IItemUpdate) => {
 
 }
 
-const buildGetManyQuery = (cid: string | { $in: string[] }, type: ItemType, filter: number): GetAllQuery => {
+const buildGetManyQuery = (cid: string | { $in: string[] }, type: ItemType, filter: number, domain?: ItemDomainType): GetAllQuery => {
+    let query: GetAllQuery
     switch (Number(filter)) {
         case 0:
             // My disabled devices
-            return {
+            query = {
                 cid,
                 type,
                 accessLevel: ItemPrivacy.PRIVATE,
                 status: ItemStatus.DISABLED
             }
+            break
         case 1:
             // My private devices
-            return {
+            query = {
                 cid,
                 type,
                 accessLevel: ItemPrivacy.PRIVATE,
                 status: { $ne: ItemStatus.DELETED }
             }
+            break
         case 2:
             // My devices for friends
-            return {
+            query = {
                 cid,
                 type,
                 accessLevel: ItemPrivacy.FOR_FRIENDS,
                 status: { $ne: ItemStatus.DELETED }
             }
+            break
         case 3:
             // My public devices
-            return {
+            query = {
                 cid,
                 type,
                 accessLevel: ItemPrivacy.PUBLIC,
                 status: { $ne: ItemStatus.DELETED }
             }
+            break
         case 4:
             // My devices
-            return {
+            query = {
                 cid,
                 type,
                 status: { $ne: ItemStatus.DELETED }
             }
+            break
         case 5:
             // Friend's devices
-            return {
+            query = {
                 cid,
                 type,
                 $or: [{ accessLevel: ItemPrivacy.FOR_FRIENDS } , { accessLevel: ItemPrivacy.PUBLIC }],
                 status: { $ne: ItemStatus.DELETED }
             }
+            break
         case 6:
             // All public devices
-            return {
+            query = {
                 type,
                 accessLevel: ItemPrivacy.PUBLIC,
                 status: { $ne: ItemStatus.DELETED }
             }
+            break
         default:
             // Defaults to option 4
             logger.warn('Getting items from default option...')
-            return {
+            query = {
                 cid,
                 type,
                 accessLevel: ItemPrivacy.PUBLIC,
                 status: { $ne: ItemStatus.DELETED }
             }
     }
+    if (domain) {
+        query['labels.domain'] = domain
+    }
+    return query
 }

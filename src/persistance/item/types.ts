@@ -137,7 +137,8 @@ export type GetAllQuery = {
     type: ItemType,
     accessLevel?: ItemPrivacy,
     $or?: { accessLevel: ItemPrivacy }[],
-    status?: ItemStatus | { $ne: ItemStatus }
+    'labels.domain'?:  ItemDomainType,
+    status?: ItemStatus |{ $ne: ItemStatus }
 }
 
 export type GetByOwnerQuery = {
