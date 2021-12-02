@@ -23,7 +23,7 @@ export const Config = {
 	},
 	XMPP_CLIENT: {
 		URL: process.env.XMPP_CLIENT_URL!,
-		NAME: process.env.XMPP_CLIENT_NAME!
+		NAME: process.env.XMPP_USERNAME!
 	},
 	MONGO: {
 		USER: process.env.MONGO_USER!, 

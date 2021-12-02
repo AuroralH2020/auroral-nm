@@ -198,9 +198,9 @@ export const getPrivacy: getAgentPrivacy = async (req, res) => {
 	}
 }
 
-type getContractedItemsByCid = expressTypes.Controller<{cid: string }, {}, {}, agentContractType, localsTypes.ILocalsGtw>
+type getContractedItemsByCidCtrl = expressTypes.Controller<{cid: string }, {}, {}, agentContractType, localsTypes.ILocalsGtw>
 
-export const getContractedItemsByCid: getContractedItemsByCid = async (req, res) => {
+export const getContractedItemsByCid: getContractedItemsByCidCtrl = async (req, res) => {
   const { decoded } = res.locals
   const { cid } = req.params
   try {
@@ -210,7 +210,7 @@ export const getContractedItemsByCid: getContractedItemsByCid = async (req, res)
       const commonContract = await ContractModel._getCommonPrivateContracts(cid, node.cid)
       if (commonContract.length === 0) {
         // any contract between these companies
-        const response : agentContractType = { cid, items: [] }
+        const response : agentContractType = { cid, ctid: null, items: [] }
         return responseBuilder(HttpStatusCode.OK, res, null, response)
       }
       const agentItems = await ContractModel._getItemsInContractByAgid(commonContract[0].ctid, myAgid)
@@ -219,7 +219,7 @@ export const getContractedItemsByCid: getContractedItemsByCid = async (req, res)
         return responseBuilder(HttpStatusCode.OK, res, null, agentItems[0])
       } else {
         // return empty answer - any affected in contract
-        const response : agentContractType = { cid, items: [] }
+        const response : agentContractType = { cid, ctid: commonContract[0].ctid, items: [] }
         return responseBuilder(HttpStatusCode.OK, res, null, response)
       }
     } else {

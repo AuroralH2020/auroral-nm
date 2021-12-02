@@ -484,59 +484,59 @@ export async function getCommonPrivateContracts(
     return record
 }
 
-export async function getNodesInContract(
-    this: IContractModel, ctid: string
-): Promise<string[]> {
-  const record = await this.aggregate([
-    {
-      '$match': {
-        'ctid': ctid
-      }
-    }, {
-      '$unwind': {
-        'path': '$items',
-        'preserveNullAndEmptyArrays': false
-      }
-    }, {
-      '$project': {
-        'oid': '$items.oid',
-        '_id': 0
-      }
-    }, {
-      '$lookup': {
-        'from': 'items',
-        'localField': 'oid',
-        'foreignField': 'oid',
-        'as': 'items'
-      }
-    }, {
-      '$unwind': {
-        'path': '$items',
-        'preserveNullAndEmptyArrays': true
-      }
-    }, {
-      '$group': {
-        '_id': '$items.agid'
-      }
-    }, {
-      '$group': {
-        '_id': '',
-        'agids': {
-          '$push': '$_id'
-        }
-      }
-    }, {
-      '$project': {
-        '_id': 0
-      }
-    }
-  ]).exec()
-  if (record && record[0].agids) {
-    return record[0].agids
-  } else {
-   return []
-  }
-}
+// export async function getNodesInContract(
+//     this: IContractModel, ctid: string
+// ): Promise<string[]> {
+//   const record = await this.aggregate([
+//     {
+//       '$match': {
+//         'ctid': ctid
+//       }
+//     }, {
+//       '$unwind': {
+//         'path': '$items',
+//         'preserveNullAndEmptyArrays': false
+//       }
+//     }, {
+//       '$project': {
+//         'oid': '$items.oid',
+//         '_id': 0
+//       }
+//     }, {
+//       '$lookup': {
+//         'from': 'items',
+//         'localField': 'oid',
+//         'foreignField': 'oid',
+//         'as': 'items'
+//       }
+//     }, {
+//       '$unwind': {
+//         'path': '$items',
+//         'preserveNullAndEmptyArrays': true
+//       }
+//     }, {
+//       '$group': {
+//         '_id': '$items.agid'
+//       }
+//     }, {
+//       '$group': {
+//         '_id': '',
+//         'agids': {
+//           '$push': '$_id'
+//         }
+//       }
+//     }, {
+//       '$project': {
+//         '_id': 0
+//       }
+//     }
+//   ]).exec()
+//   if (record && record[0].agids) {
+//     return record[0].agids
+//   } else {
+//    return []
+//   }
+// }
 
 export async function getItemsInContractByAgid(
     this: IContractModel, ctid: string, agid: string
@@ -604,13 +604,10 @@ export async function getItemsInContractByAgid(
       '$project': {
         '_id': 0
       } }]).exec()
-  if (record && record) {
+  if (record) {
     return record
   } else {
     return []
   }
 }
-
-
-
 

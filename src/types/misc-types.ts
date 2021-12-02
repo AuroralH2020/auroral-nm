@@ -30,7 +30,10 @@ export enum ResultStatusType{
 export enum XmppNotificationTypes{
     PRIVACY = 'privacyUpdate',
     PARTNERS = 'partnersUpdate',
-    CONTRACTS = 'contractsUpdate'
+    CONTRACT_CREATE = 'contractsCreate',
+    CONTRACT_REMOVE = 'contractsRemove',
+    CONTRACT_ITEM_UPDATE = 'contractsItemUpdate',
+    CONTRACT_ITEM_REMOVE = 'contractsItemRemove'
 }
 
 export enum EventType {

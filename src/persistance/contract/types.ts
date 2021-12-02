@@ -77,7 +77,7 @@ export type agentItemType = {
 
 export type agentContractType = {
     cid: string,
-    ctid?: string,
+    ctid: string | null,
     items: agentItemType[]
 }
 

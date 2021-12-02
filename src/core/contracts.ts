@@ -14,7 +14,7 @@ import {
     IContractUpdate
 } from '../persistance/contract/types'
 import { logger } from '../utils/logger'
-import { errorHandler, ErrorSource, MyError } from '../utils/error-handler'
+import { errorHandler, MyError } from '../utils/error-handler'
 import { ContractModel } from '../persistance/contract/model'
 import { OrganisationModel } from '../persistance/organisation/model'
 import { UserModel } from '../persistance/user/model'
@@ -26,13 +26,18 @@ import { NotificationStatus } from '../persistance/notification/types'
 import { EventType, ResultStatusType } from '../types/misc-types'
 import { cs } from '../microservices/commServer'
 import { AuditModel } from '../persistance/audit/model'
-import { ContractService } from './index'
 import { IAuditLocals } from '../types/locals-types'
 import { OrganisationStatus } from '../persistance/organisation/types'
 import { xmpp } from '../microservices/xmppClient'
 
 // Functions
 
+/**
+ * Get all my contracts
+ * Allows filtering
+ * @param args 
+ * @returns 
+ */
 export const getMany = async (args: getContractstOptions): Promise<IContractUI[]> => {
     try {
         const query: GetAllQuery = {
@@ -48,58 +53,21 @@ export const getMany = async (args: getContractstOptions): Promise<IContractUI[]
         // TBD enrich data
         return contracts
     } catch (err) {
-        const error = errorHandler(err)
-        throw error
+        throw errorHandler(err)
     }
 }
 
-export const testAfterRemoving = async (ctid: string): Promise<boolean> => {
-    try {
-        let contract = await ContractModel._getContract(ctid)
-        if ((contract.organisations.length === 1 && contract.pendingOrganisations.length === 0)) {
-            // last alone organisation left
-            logger.debug('Removing last organisation')
-            // remove last organisation
-            await ItemModel._removeContractFromCompanyItems(contract.organisations[0], ctid)
-            await ContractModel._removeOrgItemsFromContract(ctid, contract.organisations[0])
-            await ContractModel._removeOrganisationFromContract(ctid, contract.organisations[0])
-            await OrganisationModel._removeContract(contract.organisations[0], ctid)
-        }
-        contract = await ContractModel._getContract(ctid)
-        if (contract.organisations.length === 0) {
-            logger.debug('Last organisation was removed - removing contract')
-            // Last organisation was removed -> remove contract
-            const contractDoc = await ContractModel._getDoc(ctid)
-            // Remove pending invitations
-            const notificationsToUpdate = await NotificationModel._findNotifications({
-                owners: contractDoc.pendingOrganisations,
-                status: NotificationStatus.WAITING,
-                type: EventType.contractRequest,
-                'object.id': ctid
-            })
-            // Update notification of contract request --> reject it
-            for (const notif of notificationsToUpdate) {
-                await NotificationModel._setRead(notif)
-                await NotificationModel._setStatus(notif, NotificationStatus.REJECTED)
-            }
-            // Mark contract as deleted, remove parties
-            await contractDoc._removeContract()
-            // Remove openfire group
-            await cs.deleteGroup(ctid)
-            // Send XMPP notification to agents
-            const agids = await ContractModel._getNodesInContract(ctid)
-            for (const agid of agids) {
-                await xmpp.notifyContractChanged(agid, ctid)
-            }
-            return true
-        }
-        return false
-    } catch (err) {
-        const error = errorHandler(err)
-        logger.debug(error.message)
-        throw error
-    }
-}
+/**
+ * Initialize a contract
+ * Still waiting for organisations invited to join
+ * @param cid 
+ * @param uid 
+ * @param termsAndConditions 
+ * @param organisations 
+ * @param audit 
+ * @param description 
+ * @returns 
+ */
 export const createOne = async (cid: string, uid: string, termsAndConditions: string, organisations: string[], audit: IAuditLocals, description?: string): Promise<string> => {
     try {
         // get my data for notifications and audits
@@ -136,14 +104,14 @@ export const createOne = async (cid: string, uid: string, termsAndConditions: st
 
         // Create Notifications and fill hasContracts for all organisations
         let contractName = 'contract: ' + myOrg.name
-        for (const org of organisations) {
-            await OrganisationModel._addContractRequest(org, contract.ctid)
-            const remoteOrg = await OrganisationModel._getOrganisation(org)
+        for (const x of organisations) {
+            await OrganisationModel._addContractRequest(x, contract.ctid)
+            const remoteOrg = await OrganisationModel._getOrganisation(x)
             contractName += ' ' + remoteOrg.name
             await NotificationModel._createNotification({
-                owner: org,
+                owner: x,
                 actor: { id: cid, name: myOrg.name },
-                target: { id: org, name: remoteOrg.name },
+                target: { id: x, name: remoteOrg.name },
                 object: { id: contract.ctid, name: 'Private contract' },
                 type: EventType.contractRequest,
                 status: NotificationStatus.WAITING
@@ -168,7 +136,37 @@ export const createOne = async (cid: string, uid: string, termsAndConditions: st
     }
 }
 
+/**
+ * Update a contract
+ * So far only description can be updated
+ * @param ctid 
+ * @param data 
+ * @returns 
+ */
+ export const updateOne = async (ctid: string, data: IContractUpdate): Promise<string> => {
+    try {
+        // Create contract
+        const contract = await ContractModel._getDoc(ctid)
+        await contract._updateContract(data)
+        // TBD Notification and Audit?
+        return contract.ctid
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.error(error.message)
+        throw error
+    }
+}
+
+/**
+ * Organisations decides to abandon a contract
+ * @param ctid 
+ * @param cid 
+ * @param uid 
+ * @param audit 
+ */
 export const removeOrgFromContract = async (ctid: string, cid: string, uid: string, audit: IAuditLocals): Promise<void> => {
+    // Get contract organisations
+    const contractCids = (await ContractModel._getContract(ctid)).organisations
     // Remove org items from contract
     // const itemsToRemove = await ContractModel._getOrgItemsInContract(ctid, cid)
     await ItemModel._removeContractFromCompanyItems(cid, ctid)
@@ -188,7 +186,7 @@ export const removeOrgFromContract = async (ctid: string, cid: string, uid: stri
         labels: { ...audit.labels, status: ResultStatusType.SUCCESS }
     })
     // Test if there is only one organisation -> remove contract
-    const removed = await ContractService.testAfterRemoving(ctid)
+    const removed = await testAfterRemoving(ctid)
     if (removed) {
         await AuditModel._createAudit({
             ...audit,
@@ -199,9 +197,27 @@ export const removeOrgFromContract = async (ctid: string, cid: string, uid: stri
             labels: { ...audit.labels, status: ResultStatusType.SUCCESS }
         })
     }
+    // Send XMPP notification to all agents of the organisations involved in the contract
+    const agids_0 = (await OrganisationModel._getOrganisation(contractCids[0])).hasNodes
+    for (const agid of agids_0) {
+        await xmpp.notifyContractCreated(agid, { ctid, cid: contractCids[0] })
+    }
+    const agids_1 = (await OrganisationModel._getOrganisation(contractCids[1])).hasNodes
+    for (const agid of agids_1) {
+        await xmpp.notifyContractCreated(agid, { ctid, cid: contractCids[1] })
+    }
 }
 
+/**
+ * Organisation rejects being included into a contract
+ * @param ctid 
+ * @param cid 
+ * @param uid 
+ * @param audit 
+ */
 export const rejectContractRequest = async (ctid: string, cid: string, uid: string, audit: IAuditLocals): Promise<void> => {
+    // Get contract organisations
+    const contractCids = (await ContractModel._getContract(ctid)).organisations
     // Test if rejecting  is possible
     if (!(await OrganisationModel._getOrganisation(cid)).hasContractRequests.includes(ctid)) {
         throw new MyError('Can not reject this contract')
@@ -226,7 +242,7 @@ export const rejectContractRequest = async (ctid: string, cid: string, uid: stri
         await NotificationModel._setStatus(notif, NotificationStatus.REJECTED)
     }
     // Test if there is only one organisation -> remove contract
-    const removed = await ContractService.testAfterRemoving(ctid)
+    const removed = await testAfterRemoving(ctid)
     if (removed) {
         // get my data
         const myOrg = await OrganisationModel._getOrganisation(cid)
@@ -240,7 +256,21 @@ export const rejectContractRequest = async (ctid: string, cid: string, uid: stri
             labels: { ...audit.labels, status: ResultStatusType.SUCCESS }
         })
     }
+    // Send XMPP notification to agents
+    // Only org inviting could have items at this point
+    const agids = (await OrganisationModel._getOrganisation(contractCids[0])).hasNodes
+    for (const agid of agids) {
+        await xmpp.notifyContractRemoved(agid, { ctid, cid })
+    }
 }
+
+/**
+ * Organisation accepts to be included into a contract
+ * @param ctid 
+ * @param cid 
+ * @param uid 
+ * @param audit 
+ */
 export const acceptContractRequest = async (ctid: string, cid: string, uid: string, audit: IAuditLocals): Promise<void> => {
     // Test if accepting is possible
     if (!(await OrganisationModel._getOrganisation(cid)).hasContractRequests.includes(ctid)) {
@@ -257,7 +287,7 @@ export const acceptContractRequest = async (ctid: string, cid: string, uid: stri
         owners: [cid],
         status: NotificationStatus.WAITING,
         type: EventType.contractRequest,
-        'object.id': ctid ,
+        'object.id': ctid
     })
     // Update notification of contract request --> accept it
     for (const notif of notificationsToUpdate) {
@@ -275,26 +305,22 @@ export const acceptContractRequest = async (ctid: string, cid: string, uid: stri
         type: EventType.contractJoined,
         labels: { ...audit.labels, status: ResultStatusType.SUCCESS }
     })
+    // TBD: NOT NEEDED AT THE MOMENT
+    // Initial contract info is retrieved by agent when needed for the first time
     // Send XMPP notification to agents
-    const agids = await ContractModel._getNodesInContract(ctid)
-    for (const agid of agids) {
-        await xmpp.notifyContractChanged(agid, ctid)
-    }
+    // const agids = await ContractModel._getNodesInContract(ctid)
+    // for (const agid of agids) {
+    //     await xmpp.notifyContractCreated(agid, { ctid, cids: contract.organisations })
+    // }
 }
 
-export const updateOne = async (ctid: string, data: IContractUpdate): Promise<string> => {
-    try {
-        // Create contract
-        const contract = await ContractModel._getDoc(ctid)
-        await contract._updateContract(data)
-        // TBD Notification? and Audit
-        return contract.ctid
-    } catch (err) {
-        const error = errorHandler(err)
-        logger.error(error.message)
-        throw error
-    }
-}
+/**
+ * Add an item to a contract
+ * @param ctid 
+ * @param oid 
+ * @param rw 
+ * @param enabled 
+ */
 export const addItem = async (ctid: string, oid: string, rw: boolean, enabled: boolean): Promise<void> => {
     try {
         // Create contract
@@ -309,8 +335,8 @@ export const addItem = async (ctid: string, oid: string, rw: boolean, enabled: b
             await cs.addUserToGroup(oid, ctid)
         }
         // test if item is already included in contract
-        if ((contract.items).some((item) => {
-            return item.oid === oid
+        if ((contract.items).some((it) => {
+            return it.oid === oid
             })) {
             throw  new MyError('Item is already included in contract', HttpStatusCode.BAD_REQUEST)
         }
@@ -319,12 +345,17 @@ export const addItem = async (ctid: string, oid: string, rw: boolean, enabled: b
         await ContractModel._addItem(ctid, contractItem)
         // Add contract to item
         await ItemModel._addContract(oid, ctid)
-        // Send XMPP notification to agents
-        const agids = await ContractModel._getNodesInContract(ctid)
-        for (const agid of agids) {
-            await xmpp.notifyContractChanged(agid, ctid)
+        if (enabled) {
+        // Send XMPP notification to agents IF item is enabled
+        // Send notifications to nodes of the organisation(s) that do not own the item
+            const foreignOrgs = contract.organisations.filter(it => item.cid !== it)
+            for (const x of foreignOrgs) {
+                const agids = (await OrganisationModel._getOrganisation(x)).hasNodes
+                for (const agid of agids) {
+                    await xmpp.notifyContractItemUpdate(agid, { ctid, cid: item.cid, oid, rw })
+                }
+            }
         }
-        // TODO notifications if sent from gateway
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)
@@ -332,16 +363,24 @@ export const addItem = async (ctid: string, oid: string, rw: boolean, enabled: b
     }
 }
 
+/**
+ * Update an item already included in a contract
+ * Enable/disable or change rw
+ * @param ctid 
+ * @param oid 
+ * @param data 
+ */
 export const editItem = async (ctid: string, oid: string, data: IContractItemUpdate): Promise<void> => {
     try {
+        // Get contract
+        const contract = await ContractModel._getContract(ctid)
+        // Get item
         const item = await ContractModel._getItem(ctid, oid)
         if (!item) {
             throw new MyError('Can not edit item which is not in contract', HttpStatusCode.BAD_REQUEST)
         }
-        // Edit item
-        await ContractModel._editItem(ctid, oid, data)
-        // enabled has changed
-        if (data.enabled !== undefined && data.enabled !== item.enabled) {
+        // Enabled property has changed --> Check if we need to remove from CS
+        if (data.enabled && data.enabled !== item.enabled) {
             if (data.enabled) {
                 // Add to openfire group
                 await cs.addUserToGroup(oid, ctid)
@@ -350,10 +389,28 @@ export const editItem = async (ctid: string, oid: string, data: IContractItemUpd
                 await cs.deleteUserFromGroup(oid, ctid)
             }
         }
-        // Send XMPP notification to agents
-        const agids = await ContractModel._getNodesInContract(ctid)
-        for (const agid of agids) {
-            await xmpp.notifyContractChanged(agid, ctid)
+        // Item after updates
+        const itemNew = await ContractModel._getItem(ctid, oid)
+        // Edit item 
+        await ContractModel._editItem(ctid, oid, data)
+        // Send XMPP notification
+        // IF item is enabled just update, ELSE send remove notification
+        // Send notifications to nodes of the organisation(s) that do not own the item
+        const foreignOrgs = contract.organisations.filter(it => item.cid !== it)
+        if (itemNew.enabled) {
+            for (const x of foreignOrgs) {
+                const agids = (await OrganisationModel._getOrganisation(x)).hasNodes
+                for (const agid of agids) {
+                    await xmpp.notifyContractItemUpdate(agid, { ctid, cid: item.cid, oid, rw: itemNew.rw })
+                }
+            }
+        } else {
+            for (const x of foreignOrgs) {
+                const agids = (await OrganisationModel._getOrganisation(x)).hasNodes
+                for (const agid of agids) {
+                    await xmpp.notifyContractItemRemoved(agid, { ctid, cid: item.cid, oid })
+                }
+            }
         }
     } catch (err) {
         const error = errorHandler(err)
@@ -362,8 +419,17 @@ export const editItem = async (ctid: string, oid: string, data: IContractItemUpd
     }
 }
 
-export const removeItems = async (ctid: string, oids: string[]): Promise<void> => {
+/**
+ * Remove an item from a contract
+ * Accepts multiple items but all from same organisation
+ * @param ctid 
+ * @param oids 
+ * @param cid
+ */
+export const removeItems = async (ctid: string, oids: string[], cid: string): Promise<void> => {
     try {
+        // Get contract
+        const contract = await ContractModel._getContract(ctid)
         // Remove array of items
         const items = await ContractModel._getContractItems(ctid)
         oids.forEach((oid) => {
@@ -381,14 +447,67 @@ export const removeItems = async (ctid: string, oids: string[]): Promise<void> =
             // remove openfire group
             await cs.deleteUserFromGroup(oid, ctid)
         }))
-        // Send XMPP notification to agents
-        const agids = await ContractModel._getNodesInContract(ctid)
-        for (const agid of agids) {
-            await xmpp.notifyContractChanged(agid, ctid)
+        // Send XMPP notification
+        // Send notifications to nodes of the organisation(s) that do not own the item
+        const foreignOrgs = contract.organisations.filter(it => cid !== it)
+        const notifications = []
+        for (const x of foreignOrgs) {
+            const agids = (await OrganisationModel._getOrganisation(x)).hasNodes
+            for (const agid of agids) {
+                for (const oid of oids) {
+                    notifications.push(xmpp.notifyContractItemRemoved(agid, { ctid, cid, oid }))
+                }
+            }
         }
+        await Promise.all(notifications) // Execute async all notifs
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)
+        throw error
+    }
+}
+
+// Private 
+
+const testAfterRemoving = async (ctid: string): Promise<boolean> => {
+    try {
+        // If only one party in contract --> REMOVE ORG FROM CONTRACT
+        const contract = await ContractModel._getContract(ctid)
+        if ((contract.organisations.length === 1 && contract.pendingOrganisations.length === 0)) {
+            // last alone organisation left
+            logger.debug('Removing last organisation')
+            // remove last organisation
+            await ItemModel._removeContractFromCompanyItems(contract.organisations[0], ctid)
+            await ContractModel._removeOrgItemsFromContract(ctid, contract.organisations[0])
+            await ContractModel._removeOrganisationFromContract(ctid, contract.organisations[0])
+            await OrganisationModel._removeContract(contract.organisations[0], ctid)
+        }
+        // If now contract is empty --> REMOVE CONTRACT
+        const contractDoc = await ContractModel._getDoc(ctid)
+        if (contractDoc.organisations.length === 0) {
+            logger.debug('Last organisation was removed - removing contract')
+            // Remove pending invitations
+            const notificationsToUpdate = await NotificationModel._findNotifications({
+                owners: contractDoc.pendingOrganisations,
+                status: NotificationStatus.WAITING,
+                type: EventType.contractRequest,
+                'object.id': ctid
+            })
+            // Update notification of contract request --> reject it
+            for (const notif of notificationsToUpdate) {
+                await NotificationModel._setRead(notif)
+                await NotificationModel._setStatus(notif, NotificationStatus.REJECTED)
+            }
+            // Mark contract as deleted, remove parties
+            await contractDoc._removeContract()
+            // Remove openfire group
+            await cs.deleteGroup(ctid)
+            return true
+        }
+        return false
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.debug(error.message)
         throw error
     }
 }

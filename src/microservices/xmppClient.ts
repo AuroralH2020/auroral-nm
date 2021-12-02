@@ -28,9 +28,8 @@ const ApiHeader = {
 export const xmpp = {
     notifyPrivacy: async (agid?: string): Promise<void> => {
         if (agid) {
-            // send notification to Node
             try {
-                await request(agid + '/' + XmppNotificationTypes.PRIVACY, 'GET', undefined, ApiHeader)
+                await request(agid + '/' + XmppNotificationTypes.PRIVACY, 'POST', undefined, ApiHeader)
                 logger.debug('XMPP notif [' + XmppNotificationTypes.PRIVACY + '] sent to: ' + agid)
             } catch (err) {
                 const error = errorHandler(err)
@@ -40,9 +39,8 @@ export const xmpp = {
     },
     notifyPartnersChanged: async (agid?: string): Promise<void> => {
         if (agid) {
-            // send notification to Node
             try {
-                await request(agid + '/' + XmppNotificationTypes.PARTNERS, 'GET', undefined, ApiHeader)
+                await request(agid + '/' + XmppNotificationTypes.PARTNERS, 'POST', undefined, ApiHeader)
                 logger.debug('XMPP notif [' + XmppNotificationTypes.PARTNERS + '] sent to: ' + agid)
             } catch (err) {
                 const error = errorHandler(err)
@@ -50,18 +48,40 @@ export const xmpp = {
             }
         }
     },
-    notifyContractChanged: async (agid: string, ctid: string): Promise<void> => {
-        // send notification to Node
-        if (true) {
-            logger.warn('PARAMETER SENDING NOT IMPLEMENTED')
-            return
-        }
+    notifyContractCreated: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            await request(agid + '/' + XmppNotificationTypes.CONTRACTS, 'GET', undefined, ApiHeader)
-            logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACTS + '] sent to: ' + agid)
+            await request(agid + '/' + XmppNotificationTypes.CONTRACT_CREATE, 'POST', body, ApiHeader)
+            logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_CREATE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
-            logger.error('XMPP notif [' + XmppNotificationTypes.CONTRACTS + '] not sent: ' + agid + ' [' + error.message + ']')
+            logger.error('XMPP notif [' + XmppNotificationTypes.CONTRACT_CREATE + '] not sent: ' + agid + ' [' + error.message + ']')              
+        }
+    },
+    notifyContractRemoved: async (agid: string, body: JsonType): Promise<void> => {
+        try {
+            await request(agid + '/' + XmppNotificationTypes.CONTRACT_REMOVE, 'POST', body, ApiHeader)
+            logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_REMOVE + '] sent to: ' + agid)
+        } catch (err) {
+            const error = errorHandler(err)
+            logger.error('XMPP notif [' + XmppNotificationTypes.CONTRACT_REMOVE + '] not sent: ' + agid + ' [' + error.message + ']')              
+        }
+    },
+    notifyContractItemUpdate: async (agid: string, body: JsonType): Promise<void> => {
+        try {
+            await request(agid + '/' + XmppNotificationTypes.CONTRACT_ITEM_UPDATE, 'POST', body, ApiHeader)
+            logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_UPDATE + '] sent to: ' + agid)
+        } catch (err) {
+            const error = errorHandler(err)
+            logger.error('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_UPDATE + '] not sent: ' + agid + ' [' + error.message + ']')              
+        }
+    },
+    notifyContractItemRemoved: async (agid: string, body: JsonType): Promise<void> => {
+        try {
+            await request(agid + '/' + XmppNotificationTypes.CONTRACT_ITEM_REMOVE, 'POST', body, ApiHeader)
+            logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_REMOVE + '] sent to: ' + agid)
+        } catch (err) {
+            const error = errorHandler(err)
+            logger.error('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_REMOVE + '] not sent: ' + agid + ' [' + error.message + ']')              
         }
     }
 }

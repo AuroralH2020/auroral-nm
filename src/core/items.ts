@@ -258,9 +258,6 @@ const checkBeforeItemUpdate = async (oid: string, data: IItemUpdate) => {
             }
         }
     }
-
-    // check if update breaks contract
-
 }
 
 const buildGetManyQuery = (cid: string | { $in: string[] }, type: ItemType, filter: number, domain?: ItemDomainType): GetAllQuery => {

@@ -18,7 +18,8 @@ import {
     getCommonPrivateContracts,
     getItem,
     removeItemFromAllContracts,
-    getNodesInContract, getItemsInContractByAgid
+    // getNodesInContract, 
+    getItemsInContractByAgid
 } from './statics'
 import { removeContract, updateContract, updateStatus } from './methods'
 import { ContractItemType, ContractStatus, ContractType, IContractDocument, IContractModel } from './types'
@@ -73,9 +74,8 @@ ContractSchema.statics._removeItemFromAllContracts = removeItemFromAllContracts
 ContractSchema.statics._getContractItemsUI = getContractItemsUI
 ContractSchema.statics._getContractItems = getContractItems
 ContractSchema.statics._getCommonPrivateContracts = getCommonPrivateContracts
-ContractSchema.statics._getNodesInContract = getNodesInContract
+// ContractSchema.statics._getNodesInContract = getNodesInContract
 ContractSchema.statics._getItemsInContractByAgid = getItemsInContractByAgid
-
 
 // Methods
 

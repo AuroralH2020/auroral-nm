@@ -157,7 +157,7 @@ export const getContractItems: getContractItemController = async (req, res) => {
     const { offset } = req.query
     const { ctid } = req.params
     try {
-        let contracts = (await OrganisationModel._getOrganisation(decoded.org)).hasContracts
+        const contracts = (await OrganisationModel._getOrganisation(decoded.org)).hasContracts
         contracts.concat((await OrganisationModel._getOrganisation(decoded.org)).hasContractRequests)
         if (!contracts.includes(ctid)) {
             throw new MyError('You are not allowed to see contract details')
@@ -186,9 +186,9 @@ export const createContract: postContractController = async (req, res) => {
     }
 }
 
-type removeOrgFromContract = expressTypes.Controller<{ctid: string}, {}, {}, null, localsTypes.ILocals>
+type removeOrgFromContractCtrl = expressTypes.Controller<{ctid: string}, {}, {}, null, localsTypes.ILocals>
 
-export const removeOrgFromContract: removeOrgFromContract = async (req, res) => {
+export const removeOrgFromContract: removeOrgFromContractCtrl = async (req, res) => {
     const { ctid } = req.params
     const { decoded } = res.locals
     try {
@@ -272,7 +272,7 @@ export const removeItem: removeItemController = async (req, res) => {
         if (item.cid !== decoded.org) {
             throw new MyError('You are not allowed to remove this item', HttpStatusCode.BAD_REQUEST)
         }
-        await ContractService.removeItems(ctid, [oid])
+        await ContractService.removeItems(ctid, [oid], decoded.org)
         // TODO Notif and audits
         return responseBuilder(HttpStatusCode.OK, res, null, null)
     } catch (err) {
@@ -289,7 +289,7 @@ export const removeAllCompanyItems: removeAllCompanyItemsCtrl = async (req, res)
     const { decoded } = res.locals
     try {
         const items = await ContractModel._getOrgItemsInContract(ctid, cid)
-        await ContractService.removeItems(ctid, items)
+        await ContractService.removeItems(ctid, items, decoded.org)
         // TODO Notif and audits
         return responseBuilder(HttpStatusCode.OK, res, null, null)
     } catch (err) {
