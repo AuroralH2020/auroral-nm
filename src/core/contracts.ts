@@ -198,16 +198,16 @@ export const removeOrgFromContract = async (ctid: string, cid: string, uid: stri
         })
     }
     // Send XMPP notification to all agents of the organisations involved in the contract
-    const agids_0 = (await OrganisationModel._getOrganisation(contractCids[0])).hasNodes
-    for (const agid of agids_0) {
-        await xmpp.notifyContractCreated(agid, { ctid, cid: contractCids[0] })
-    }
-    const agids_1 = (await OrganisationModel._getOrganisation(contractCids[1])).hasNodes
-    for (const agid of agids_1) {
-        await xmpp.notifyContractCreated(agid, { ctid, cid: contractCids[1] })
+    for (const orgCid of contractCids) {
+        const agids_0 = (await OrganisationModel._getOrganisation(orgCid)).hasNodes
+        for (const agid of agids_0) {
+            await xmpp.notifyContractCreated(agid, {
+                ctid,
+                cid: orgCid
+            })
+        }
     }
 }
-
 /**
  * Organisation rejects being included into a contract
  * @param ctid 
@@ -486,6 +486,10 @@ const testAfterRemoving = async (ctid: string): Promise<boolean> => {
         const contractDoc = await ContractModel._getDoc(ctid)
         if (contractDoc.organisations.length === 0) {
             logger.debug('Last organisation was removed - removing contract')
+            // Remove hasContractRequests from pending organisations
+            contractDoc.pendingOrganisations.forEach(async(o) => {
+                await OrganisationModel._removeContractRequest(o,ctid)
+            })
             // Remove pending invitations
             const notificationsToUpdate = await NotificationModel._findNotifications({
                 owners: contractDoc.pendingOrganisations,

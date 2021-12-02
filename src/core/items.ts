@@ -248,7 +248,7 @@ const checkBeforeItemUpdate = async (oid: string, data: IItemUpdate) => {
         // test if item is in contract
         if (item.hasContracts && item.hasContracts.length > 0) {
             if (data.status === ItemStatus.DISABLED) {
-                throw new MyError('Item can not be disabled - it is included in contract')
+                throw new MyError('Item can not be disabled - it is included in contract', HttpStatusCode.BAD_REQUEST)
             }
             if (data.status === ItemStatus.DELETED) {
                 throw new MyError('Item can not be deleted - it is included in contract')
@@ -268,7 +268,6 @@ const buildGetManyQuery = (cid: string | { $in: string[] }, type: ItemType, filt
             query = {
                 cid,
                 type,
-                accessLevel: ItemPrivacy.PRIVATE,
                 status: ItemStatus.DISABLED
             }
             break

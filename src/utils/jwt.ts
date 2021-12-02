@@ -5,6 +5,8 @@ import { Config } from '../config'
 import { logger } from './logger'
 import { RolesEnum } from '../types/roles'
 import { JWTDecodedToken } from '../types/jwt-types'
+import { MyError } from './error-handler'
+import { HttpStatusCode } from './http-status-codes'
 
 // Algorithms
 enum Algorithms {
@@ -54,7 +56,7 @@ export const Auth = {
                                 return decoded.roles.includes(i) 
                             })
         if (matches.length === 0) {
-            throw new Error('Missing proper roles')
+            throw new MyError('Missing proper roles', HttpStatusCode.UNAUTHORIZED)
         }
     }
 }

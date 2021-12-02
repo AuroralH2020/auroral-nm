@@ -85,7 +85,8 @@ export async function getAllCompanyItemsContractView(
   const record = await this.aggregate([
     {
       '$match': {
-        'cid': cid
+        'cid': cid,
+        'status': ItemStatus.ENABLED
       }
     }, {
       '$lookup': {
