@@ -1,8 +1,8 @@
 import { ContractStatus, IContractDocument, IContractItemUpdate, IContractUpdate } from './types'
 
-export async function updateContract(this: IContractDocument, data: IContractUpdate): Promise<IContractDocument> {
-    this.description = data.description ? data.description : this.description
-    return this
+export async function updateContract(this: IContractDocument, data: IContractUpdate): Promise<void> {
+    this.description = data.description !== undefined ? data.description : this.description
+    await this.save()
 }
 
 export async function removeContract(this: IContractDocument): Promise<void> {

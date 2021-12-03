@@ -45,6 +45,7 @@ const ContractItemSchema = new Schema<ContractItemType>({
 const ContractSchema = new Schema<IContractDocument, IContractModel>({
     ctid: { type: String, index: true, unique: true, required: true }, // unique contract id
     termsAndConditions: { type: String, required: true },
+    description: { type: String, default: 'Private contract' },
     type: { type: String, default: ContractType.PRIVATE, enum: contractTypes },
     organisations: [{ type: String, default: [] }],
     pendingOrganisations: [{ type: String, default: [] }],

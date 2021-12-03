@@ -7,6 +7,9 @@
 node_modules/
 dist/
 
+# IDE folders
+.idea
+
 # Scripts
 # *.sh
 
