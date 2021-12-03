@@ -85,6 +85,7 @@ export async function getContractUI(
         'pendingOrganisations': 1,
         'organisationsWithName.cid': 1,
         'organisationsWithName.name': 1,
+        'description': 1,
         'pendingOrganisationsWithName.cid': 1,
         'pendingOrganisationsWithName.name': 1,
         // 'items': 1,
