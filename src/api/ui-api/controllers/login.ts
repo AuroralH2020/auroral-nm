@@ -17,8 +17,8 @@ type authController = expressTypes.Controller<{}, {username: string, password: s
 export const authenticate: authController = async (req, res) => {
     const { username, password } = req.body
     if (!username || !password) {
-                logger.warn('Missing username or password')
-	        return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null, 'Missing username or password')
+            logger.warn('Missing username or password')
+            return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null, 'Missing username or password')
 	}
 	try {
                 await comparePassword(username, password)

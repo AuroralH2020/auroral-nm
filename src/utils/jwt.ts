@@ -56,7 +56,7 @@ export const Auth = {
                                 return decoded.roles.includes(i) 
                             })
         if (matches.length === 0) {
-            throw new MyError('Missing proper roles', HttpStatusCode.UNAUTHORIZED)
+            throw new MyError('Missing proper roles', HttpStatusCode.FORBIDDEN)
         }
     }
 }
