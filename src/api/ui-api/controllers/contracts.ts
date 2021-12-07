@@ -306,7 +306,6 @@ export const getCompanyItems: getCompanyItemsController = async (req, res) => {
     const { decoded } = res.locals
     try {
         const orgItems = await ItemModel._getAllCompanyItemsContractView(decoded.org ,ctid)
-        // TODO Notif and audits
         return responseBuilder(HttpStatusCode.OK, res, null, orgItems)
     } catch (err) {
         const error = errorHandler(err)

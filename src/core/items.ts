@@ -244,17 +244,17 @@ const updateAccessLevel = async (item: IItemDocument, accessLevel: ItemPrivacy ,
 const checkBeforeItemUpdate = async (oid: string, data: IItemUpdate) => {
     const item = await ItemModel._getItem(oid)
     // test if conflicting operations
-    if (data.status || data.accessLevel) {
+    if (data.status || data.accessLevel !== undefined) {
         // test if item is in contract
         if (item.hasContracts && item.hasContracts.length > 0) {
             if (data.status === ItemStatus.DISABLED) {
-                throw new MyError('Item can not be disabled - it is included in contract', HttpStatusCode.BAD_REQUEST)
+                throw new MyError('Unable to disable item - it is included in contract', HttpStatusCode.BAD_REQUEST)
             }
             if (data.status === ItemStatus.DELETED) {
-                throw new MyError('Item can not be deleted - it is included in contract')
+                throw new MyError('Unable to delete item - it is included in contract', HttpStatusCode.BAD_REQUEST)
             }
-            if (data.accessLevel && data.accessLevel < ItemPrivacy.FOR_FRIENDS) {
-                throw new MyError('Item privacy can not be lowered - it is included in contract')
+            if (data.accessLevel !== undefined && data.accessLevel < ItemPrivacy.FOR_FRIENDS) {
+                throw new MyError('Item is included in contract - unable to set private access level', HttpStatusCode.BAD_REQUEST)
             }
         }
     }

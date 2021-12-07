@@ -1,4 +1,6 @@
 import { IAccountDocument, IAccountModel, IAccountRegistrationPost, IAccountUI } from './types'
+import { MyError } from '../../utils/error-handler'
+import { HttpStatusCode } from '../../utils'
 
 export async function getAccount(
   this: IAccountModel, username: string
@@ -19,7 +21,7 @@ export async function getHash(
   if (record) {
     return record.passwordHash
   } else {
-    throw new Error('User not found or not verified')
+    throw new MyError('User not found or not verified', HttpStatusCode.BAD_REQUEST)
   }
 }
 

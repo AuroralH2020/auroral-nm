@@ -7,7 +7,7 @@ import {
   GetAllQuery,
   GetByOwnerQuery,
   IItemPrivacy,
-  ContractItemSelect
+  ContractItemSelect, ItemPrivacy
 } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
@@ -86,7 +86,8 @@ export async function getAllCompanyItemsContractView(
     {
       '$match': {
         'cid': cid,
-        'status': ItemStatus.ENABLED
+        'status': ItemStatus.ENABLED,
+        'accessLevel': { $ne: ItemPrivacy.PRIVATE }
       }
     }, {
       '$lookup': {

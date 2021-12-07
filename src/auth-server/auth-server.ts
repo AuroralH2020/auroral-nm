@@ -6,6 +6,8 @@ import { AccountModel } from '../persistance/account/model'
 import { Config } from '../config'
 import { logger } from '../utils/logger'
 import { jwtTypes } from '../types/index'
+import { MyError } from '../utils/error-handler'
+import { HttpStatusCode } from '../utils'
 
 // Algorithms
 enum Algorithms {
@@ -45,7 +47,7 @@ export const comparePassword = async (username: string, password: string): Promi
     const hash = await AccountModel._getHash(username)
     const isValid = await crypto.compare(password, hash)
     if (!isValid) {
-        throw new Error('Wrong password') 
+        throw new MyError('Wrong password', HttpStatusCode.BAD_REQUEST)
     }
     return true
 }
