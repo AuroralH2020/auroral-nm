@@ -215,7 +215,7 @@ export async function removeContractFromItem(
 export async function removeContractFromCompanyItems(
     this: IItemModel,cid: string,  ctid: string
 ): Promise<void> {
-  const record = await this.updateOne({ cid: cid, hasContracts: ctid }, { $pull: { hasContracts: ctid } }).exec()
+  const record = await this.updateMany({ cid: cid, hasContracts: ctid }, { $pull: { hasContracts: ctid } }).exec()
   if (!record.ok) {
     throw new Error('Error removing item from user')
   }
