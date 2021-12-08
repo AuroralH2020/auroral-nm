@@ -201,9 +201,10 @@ export const removeOrgFromContract = async (ctid: string, cid: string, uid: stri
     for (const orgCid of contractCids) {
         const agids_0 = (await OrganisationModel._getOrganisation(orgCid)).hasNodes
         for (const agid of agids_0) {
-            await xmpp.notifyContractCreated(agid, {
+            const foreignOrg = contractCids.filter(it => it !== orgCid)
+            await xmpp.notifyContractRemoved(agid, {
                 ctid,
-                cid: orgCid
+                cid: foreignOrg[0] // Return the other organisation in the contract
             })
         }
     }
@@ -346,8 +347,10 @@ export const addItem = async (ctid: string, oid: string, rw: boolean, enabled: b
         // Add contract to item
         await ItemModel._addContract(oid, ctid)
         if (enabled) {
+            // Get other organisations in contract
+            const foreignOrg = contract.organisations.filter(it => it !== item.cid)
             // Send XMPP notification to node where the item belongs
-            await xmpp.notifyContractItemUpdate(item.agid, { ctid, cid: item.cid, oid, rw })
+            await xmpp.notifyContractItemUpdate(item.agid, { ctid, cid: foreignOrg[0], oid, rw })
         }
     } catch (err) {
         const error = errorHandler(err)
@@ -372,7 +375,7 @@ export const editItem = async (ctid: string, oid: string, data: IContractItemUpd
             throw new MyError('Can not edit item which is not in contract', HttpStatusCode.BAD_REQUEST)
         }
         // Enabled property has changed --> Check if we need to remove from CS
-        if (data.enabled && data.enabled !== item.enabled) {
+        if (data.enabled !== undefined && data.enabled !== item.enabled) {
             if (data.enabled) {
                 // Add to openfire group
                 await cs.addUserToGroup(oid, ctid)
@@ -381,17 +384,20 @@ export const editItem = async (ctid: string, oid: string, data: IContractItemUpd
                 await cs.deleteUserFromGroup(oid, ctid)
             }
         }
-        // Item after updates
-        const itemNew = await ContractModel._getItem(ctid, oid)
         // Edit item 
         await ContractModel._editItem(ctid, oid, data)
+        // Item after updates
+        const itemNew = await ContractModel._getItem(ctid, oid)
         // Send XMPP notification
         // IF item is enabled just update, ELSE send remove notification
-        // Send notifications to node where the items belong
+        // Send notifications to node where the items belong and with org ID of the contracted org
+        // Get other organisations in contract
+        const organisations = (await ContractModel._getContract(ctid)).organisations
+        const foreignOrg = organisations.filter(it => it !== item.cid)
         if (itemNew.enabled) {
-            await xmpp.notifyContractItemUpdate(itemAgid, { ctid, cid: item.cid, oid, rw: itemNew.rw })
+            await xmpp.notifyContractItemUpdate(itemAgid, { ctid, cid: foreignOrg[0], oid, rw: itemNew.rw })
         } else {
-            await xmpp.notifyContractItemRemoved(itemAgid, { ctid, cid: item.cid, oid })
+            await xmpp.notifyContractItemRemoved(itemAgid, { ctid, cid: foreignOrg[0], oid })
         }
     } catch (err) {
         const error = errorHandler(err)
@@ -427,12 +433,15 @@ export const removeItems = async (ctid: string, oids: string[], cid: string): Pr
             await cs.deleteUserFromGroup(oid, ctid)
         }))
         // Send XMPP notification
-        // Send notifications to nodes of the organisation that own the item
+        // Send notifications to node where the items belong and with org ID of the contracted org
+        // Get other organisations in contract
+        const organisations = (await ContractModel._getContract(ctid)).organisations
+        const foreignOrg = organisations.filter(it => it !== cid)
         const notifications = []
         const agids = (await OrganisationModel._getOrganisation(cid)).hasNodes
         for (const agid of agids) {
             for (const oid of oids) {
-                notifications.push(xmpp.notifyContractItemRemoved(agid, { ctid, cid, oid }))
+                notifications.push(xmpp.notifyContractItemRemoved(agid, { ctid, cid: foreignOrg[0], oid }))
             }
         }
         await Promise.all(notifications) // Execute async all notifs
