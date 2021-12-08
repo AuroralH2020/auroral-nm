@@ -455,49 +455,50 @@ export const removeItems = async (ctid: string, oids: string[], cid: string): Pr
 // Private 
 
 const testAfterRemoving = async (ctid: string): Promise<boolean> => {
-    try {
-        // If only one party in contract --> REMOVE ORG FROM CONTRACT
-        const contract = await ContractModel._getContract(ctid)
-        if ((contract.organisations.length === 1 && contract.pendingOrganisations.length === 0)) {
-            // last alone organisation left
-            logger.debug('Removing last organisation')
-            // remove last organisation
-            await ItemModel._removeContractFromCompanyItems(contract.organisations[0], ctid)
-            await ContractModel._removeOrgItemsFromContract(ctid, contract.organisations[0])
-            await ContractModel._removeOrganisationFromContract(ctid, contract.organisations[0])
-            await OrganisationModel._removeContract(contract.organisations[0], ctid)
-        }
-        // If now contract is empty --> REMOVE CONTRACT
-        const contractDoc = await ContractModel._getDoc(ctid)
-        if (contractDoc.organisations.length === 0) {
-            logger.debug('Last organisation was removed - removing contract')
-            // Remove hasContractRequests from pending organisations
-            contractDoc.pendingOrganisations.forEach(async(o) => {
-                await OrganisationModel._removeContractRequest(o,ctid)
-            })
-            // Remove pending invitations
-            const notificationsToUpdate = await NotificationModel._findNotifications({
-                owners: contractDoc.pendingOrganisations,
-                status: NotificationStatus.WAITING,
-                type: EventType.contractRequest,
-                'object.id': ctid
-            })
-            // Update notification of contract request --> reject it
-            for (const notif of notificationsToUpdate) {
-                await NotificationModel._setRead(notif)
-                await NotificationModel._setStatus(notif, NotificationStatus.REJECTED)
-            }
-            // Mark contract as deleted, remove parties
-            await contractDoc._removeContract()
-            // Remove openfire group
-            await cs.deleteGroup(ctid)
-            return true
-        }
-        return false
-    } catch (err) {
-        const error = errorHandler(err)
-        logger.debug(error.message)
-        throw error
+    // If only one party in contract --> REMOVE ORG FROM CONTRACT
+    const contract = await ContractModel._getContract(ctid)
+    if ((contract.organisations.length === 1 && contract.pendingOrganisations.length === 0)) {
+        // last alone organisation left
+        logger.debug('Removing last organisation')
+        // remove last organisation
+        await ItemModel._removeContractFromCompanyItems(contract.organisations[0], ctid)
+        await ContractModel._removeOrgItemsFromContract(ctid, contract.organisations[0])
+        await ContractModel._removeOrganisationFromContract(ctid, contract.organisations[0])
+        await OrganisationModel._removeContract(contract.organisations[0], ctid)
     }
+    // If now contract is empty --> REMOVE CONTRACT
+    const contractDoc = await ContractModel._getDoc(ctid)
+    if (contractDoc.organisations.length === 0) {
+        logger.debug('Last organisation was removed - removing contract')
+        // Remove hasContractRequests from pending organisations
+        contractDoc.pendingOrganisations.forEach(async(o) => {
+            await OrganisationModel._removeContractRequest(o,ctid)
+        })
+        // Remove pending invitations
+        const notificationsToUpdate = await NotificationModel._findNotifications({
+            owners: contractDoc.pendingOrganisations,
+            status: NotificationStatus.WAITING,
+            type: EventType.contractRequest,
+            'object.id': ctid
+        })
+        // Update notification of contract request --> reject it
+        for (const notif of notificationsToUpdate) {
+            await NotificationModel._setRead(notif)
+            await NotificationModel._setStatus(notif, NotificationStatus.REJECTED)
+        }
+        // Mark contract as deleted, remove parties
+        await contractDoc._removeContract()
+        // Remove all items from group
+        const cs_users = await cs.getGroup(ctid)
+        for (const user of cs_users.members) {
+            // Members contain domain, exclude it before calling cs
+            const jid = user.indexOf('@') !== -1 ? user.substr(0, user.indexOf('@')) : user
+            await cs.deleteUserFromGroup(jid, ctid)
+        }
+        // Remove openfire group
+        await cs.deleteGroup(ctid)
+        return true
+    }
+    return false
 }
 
