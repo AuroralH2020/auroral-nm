@@ -3,11 +3,11 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler } from '../../../utils/error-handler'
+import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { cs } from '../../../microservices/commServer'
-import { IItemCreate, IItemUpdate, ItemStatus } from '../../../persistance/item/types'
+import { IGatewayItemUpdate, IItemCreate, IItemUpdate, ItemStatus } from '../../../persistance/item/types'
 import { NodeModel } from '../../../persistance/node/model'
 import { ItemModel } from '../../../persistance/item/model'
 import { ItemService } from '../../../core'
@@ -25,6 +25,11 @@ type registrationResponse = {
   name: string
   oid: string
   password: string | null
+  error?: boolean
+}
+
+type registrationUpdateResponse = {
+  oid: string
   error?: boolean
 }
 
@@ -164,65 +169,68 @@ export const deleteItems: deleteItemsController = async (req, res) => {
   }
 }
 
-type updateItemController = expressTypes.Controller<{}, { agid: string, thingDescriptions: IItemUpdate[] }, {}, null, localsTypes.ILocalsGtw>
+type updateItemController = expressTypes.Controller<{}, { agid: string, items: IGatewayItemUpdate[] }, {}, registrationUpdateResponse[], localsTypes.ILocalsGtw>
 
 export const updateItem: updateItemController = async (req, res) => {
-  const { thingDescriptions } = req.body
+  const { items } = req.body
   const { decoded } = res.locals
   try {
+    logger.debug('Registering items in node: ' + req.body.agid)
+    const response: registrationUpdateResponse[] = []
+
     if (!decoded && Config.NODE_ENV === 'production') {
       logger.error('Gateway unauthorized access attempt')
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, response)
     } else {
       if (!decoded) {
-        logger.warn({ msg: 'Gateway anonymous access, it will be forbidden in production...', id: res.locals.reqId })
+        logger.warn('Gateway anonymous access, it will be forbidden in production...')
       }
       const agid = decoded ? decoded.iss : req.body.agid
-      thingDescriptions.forEach(async (it) => {
+      const node = await NodeModel._getNode(agid)
+      // Async updating of items
+      await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
         try {
-          if (it.oid) {
-            const item = await ItemModel._getDoc(it.oid)
-            let eventType = EventType.itemUpdatedByUser
-            if (it.status) {
-              if (it.status === ItemStatus.DISABLED) {
-                eventType = EventType.itemDisabled
-              }
-              if (it.status === ItemStatus.ENABLED) {
-                eventType = EventType.itemEnabled
-              }
-            }
-            if (agid !== item.agid) {
-              throw new Error('Cannot update ' + it + ' because it does not belong to ' + agid)
-            }
-            await item._updateItem(it)
-            // Create Notification
-            const myOrg = (await OrganisationModel._getOrganisation(item.cid))
-            const myNode = (await NodeModel._getNode(agid))
-            const myItem = (await ItemModel._getItem(it.oid))
-            await NotificationModel._createNotification({
-              owner: myOrg.cid,
-              actor: { id: myOrg.cid, name: myOrg.name },
-              target: { id: item.oid, name: item.name },
-              type: eventType,
-              status: NotificationStatus.INFO
-            })
-            // Audit
-            await AuditModel._createAudit({
-              ...res.locals.audit,
-              actor: { id: agid, name: myNode.name },
-              target: { id: myItem.oid, name: myItem.name },
-              type: eventType,
-              labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
-            })
+          // Test if AP contains this item
+          if (!node.hasItems.includes(it.oid)) {
+            throw new MyError('Trying to modify item that do not belong to this node (' + it.oid + ')')
           }
-          // TBD: Update contracts if needed
-          logger.info({ msg: it.oid + ' was updated', id: res.locals.reqId })
-        } catch (error) {
-          const e = errorHandler(error)
-          logger.error({ msg: e.message, id: res.locals.reqId })
+          // UpdateItem
+          const item = await ItemModel._getDoc(it.oid)
+          await item._updateItem(it)
+          // Create response
+          response.push({ oid: it.oid,error: false })
+
+          // get updated item for notifications
+          const updatedItem = await ItemModel._getItem(it.oid)
+
+          // Create Notification
+          const myOrgName = (await OrganisationModel._getOrganisation(node.cid)).name
+          await NotificationModel._createNotification({
+            owner: node.cid,
+            actor: { id: node.cid, name: myOrgName },
+            target: { id: updatedItem.oid, name: updatedItem.name },
+            type: EventType.itemUpdatedByNode,
+            status: NotificationStatus.INFO
+          })
+          // Audit
+          await AuditModel._createAudit({
+            ...res.locals.audit,
+            cid: node.cid,
+            actor: { id: agid, name: node.name },
+            target: { id: updatedItem.oid, name: updatedItem.name },
+            type: EventType.itemUpdatedByNode,
+            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+          })
+          return true
+        } catch (err) {
+          // Create response
+          const error = errorHandler(err)
+          logger.error({ msg: error.message,id: res.locals.reqId })
+          response.push({ oid: it.oid, error: true })
+          return false
         }
-      })
-      return responseBuilder(HttpStatusCode.OK, res, null, null)
+      }))
+      return responseBuilder(HttpStatusCode.OK, res, null, response)
     }
   } catch (err) {
     const error = errorHandler(err)

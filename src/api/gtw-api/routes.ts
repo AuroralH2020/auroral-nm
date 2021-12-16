@@ -9,7 +9,7 @@ import * as itemsCtrl from './controllers/items'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { SourceType } from '../../types/misc-types'
-import { createItemSchema } from '../../core/joi-schemas'
+import { createItemSchema, updateItemGtwSchema } from '../../core/joi-schemas'
 
 const GtwRouter = Router()
 
@@ -20,7 +20,7 @@ GtwRouter
 .get('/items/:oid', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.neighbourhood)
 .post('/items/register', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), validateBody(createItemSchema), itemsCtrl.registration)
 .post('/items/remove', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), itemsCtrl.deleteItems)
-.put('/items/modify', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), itemsCtrl.updateItem) // Update item
+.put('/items/modify', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), validateBody(updateItemGtwSchema), itemsCtrl.updateItem) // Update item
 .delete('/agent/:agid', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.NODE), agentCtrl.deleteAgent)
 .get('/agent/:agid/items', addOrigin(Interfaces.GATEWAY), guard(),createAudit(SourceType.NODE), agentCtrl.getAgentItems) // change to post if depends on update or use query
 .get('/agent/privacy', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPrivacy) 
