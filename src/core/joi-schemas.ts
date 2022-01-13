@@ -84,6 +84,21 @@ export const updateItemSchema = Joi.object({
   labels: updateItemLabelsSchema
 })
 
+export const updateItemGtwSchema = Joi.object({
+    agid: Joi.string(),
+    items: Joi.array().items(Joi.object(
+        {
+            oid: Joi.string().required(),
+            name: Joi.string(),
+            adapterId: Joi.string(),
+            avatar: Joi.string(),
+            groups: Joi.array(),
+            version: Joi.string(),
+            description: Joi.string(),
+            labels: updateItemLabelsSchema
+        }))
+})
+
 export const createItemSchema = Joi.object({
   agid: Joi.string(),
   items: Joi.array().items(Joi.object(

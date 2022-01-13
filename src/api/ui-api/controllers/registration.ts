@@ -8,14 +8,20 @@ import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { RegistrationModel } from '../../../persistance/registration/model'
-import { IRegistration, IRegistrationPost, RegistrationStatus, RegistrationType, IRegisType } from '../../../persistance/registration/types'
+import {
+  IRegistration,
+  IRegistrationPost,
+  IRegisType,
+  RegistrationStatus,
+  RegistrationType
+} from '../../../persistance/registration/types'
 import { checkTempSecret, hashPassword, signMailToken, verifyToken } from '../../../auth-server/auth-server'
-import { notifyDevOpsOfNewRegistration, verificationMail, rejectRegistration } from '../../../auth-server/mailer'
+import { notifyDevOpsOfNewRegistration, rejectRegistration, verificationMail } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
 import { UserModel } from '../../../persistance/user/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { AuditModel } from '../../../persistance/audit/model'
-import { RolesEnum } from '../../../types/roles' 
+import { RolesEnum } from '../../../types/roles'
 import { NotificationModel } from '../../../persistance/notification/model'
 import { EventType, ResultStatusType, SourceType } from '../../../types/misc-types'
 import { NotificationStatus } from '../../../persistance/notification/types'
@@ -82,7 +88,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
         username: data.email,
         passwordHash: hash,
         cid,
-        roles: [RolesEnum.USER, RolesEnum.ADMIN] // IF status open is organisation administrator
+        roles: [RolesEnum.USER, RolesEnum.ADMIN, RolesEnum.INFRAS_OPERATOR, RolesEnum.SYS_INTEGRATOR] // IF status open is organisation administrator
       })
       // Create registration obj
       const registration = await RegistrationModel._createRegistration({
@@ -115,7 +121,7 @@ export const postRegistration: postRegistrationController = async (req, res) => 
         username: data.email,
         passwordHash: hash,
         cid,
-        roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN] : data.roles
+        roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN, RolesEnum.INFRAS_OPERATOR, RolesEnum.SYS_INTEGRATOR] : data.roles
       })
       // Create registration obj      
       const pendingDoc = await RegistrationModel._createRegistration({

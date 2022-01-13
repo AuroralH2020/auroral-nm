@@ -119,7 +119,7 @@ export interface IItemCreatePost {
     // interactionPatterns: ??[]
 }
 
-// Input to create a new Item
+// Input to update Item
 export interface IItemUpdate {
     oid?: string,
     name?: string, // fullName
@@ -130,6 +130,15 @@ export interface IItemUpdate {
     description?: string,
     labels?: ItemLabelsObj
     // interactionPatterns: ??[]
+}
+
+// Input update Item from gateway
+export interface IGatewayItemUpdate {
+    oid: string,
+    name?: string, // fullName
+    avatar?: string,
+    description?: string,
+    labels?: ItemLabelsObj
 }
 
 export type GetAllQuery = {
