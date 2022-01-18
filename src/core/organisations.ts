@@ -9,24 +9,32 @@ import { UserModel } from '../persistance/user/model'
 import { AccountModel } from '../persistance/account/model'
 import { removeOne } from './nodes'
 import { IOrganisationDocument } from '../persistance/organisation/types'
+import { ContractService } from '../core'
+import { IAuditLocals } from '../types/locals-types'
 
 // Functions
 
 /**
  * Get Items
  */
- export const remove = async (organisation: IOrganisationDocument): Promise<void> => {
+ export const remove = async (organisation: IOrganisationDocument, uid: string, audit: IAuditLocals): Promise<void> => {
     try {
         const cid = organisation.cid
 
-        // 1 - Remove contracts
-        // TBD
+        // 1a - Remove contracts
+        await Promise.all(organisation.hasContracts.map(async it => {
+            await ContractService.removeOrgFromContract(it, cid, uid, audit)
+        }))
+        // 1b - Remove contract requests
+        await Promise.all(organisation.hasContractRequests.map(async it => {
+            await ContractService.rejectContractRequest(it, cid, uid, audit)
+        }))
 
         // 2 - Remove nodes and items
         await Promise.all(organisation.hasNodes.map(async it => {
                 await removeOne(it, cid)
             })
-        ).catch(captureError)
+        )
 
         // 3 - Remove users & accounts
         await Promise.all(organisation.hasUsers.map(async it => {
@@ -34,7 +42,7 @@ import { IOrganisationDocument } from '../persistance/organisation/types'
                 await AccountModel._deleteAccount(userDoc.email) // remove first account to user proper mail
                 await userDoc._removeUser()
             })
-        ).catch(captureError)
+        )
 
         // 4 - Remove organisation
         await organisation._removeOrganisation()
