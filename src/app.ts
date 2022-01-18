@@ -1,3 +1,11 @@
+/* eslint-disable import/order */
+/* eslint-disable import/first */
+import apm_service from './utils/apm-service'
+
+apm_service().then(() => {
+  console.log('Apm has been run')
+}).catch((error) => {})
+
 import cors from 'cors'
 import express from 'express'
 import { responseBuilder, HttpStatusCode } from './utils'
