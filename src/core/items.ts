@@ -134,6 +134,8 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
             logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
             throw new MyError('Item does not belong to requester', HttpStatusCode.UNAUTHORIZED)
         }
+        // Remove item in CS
+        await cs.deleteUser(oid)
         // Remove item from user
         if (item.uid) {
             await UserModel._removeItemFromUser(item.uid, oid)
@@ -146,8 +148,6 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         if (item.hasContracts.length > 0) {
             await ContractModel._removeItemFromAllContracts(oid)
         }
-        // Remove item in CS
-        await cs.deleteUser(oid)
         // Remove item in Mongo
         await item._removeItem()
         // Send notification to NODE

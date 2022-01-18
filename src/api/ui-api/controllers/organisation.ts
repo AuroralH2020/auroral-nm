@@ -144,7 +144,7 @@ export const removeOrganisation: removeOrganisationController = async (req, res)
                 const userName = (await UserModel._getUser(decoded.uid)).name
 
                 // Remove organisation
-                await OrganisationService.remove(orgDoc)
+                await OrganisationService.remove(orgDoc, decoded.uid, res.locals.audit)
                  
                 // Audit
                 await AuditModel._createAudit({
