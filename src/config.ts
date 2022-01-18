@@ -40,5 +40,10 @@ export const Config = {
 		MAIL_SERVER: process.env.SMTP_MAIL_SERVER!,
 		APPROVER_MAIL: process.env.SMTP_APPROVER_MAIL!,
 		SALES_MAIL: process.env.SMTP_SALES_MAIL!
+	},
+	APM: {
+		SERVER_URL: process.env.APM_SERVER_URL!,
+		TOKEN: process.env.APM_TOKEN!,
+		NAME: process.env.APM_NAME!
 	}
 }

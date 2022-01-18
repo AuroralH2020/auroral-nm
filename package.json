@@ -39,6 +39,7 @@
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
+    "elastic-apm-node": "^3.26.0",
     "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "got": "^11.8.1",
