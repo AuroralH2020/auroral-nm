@@ -171,7 +171,7 @@ export const verifyToken = async (token: string): Promise<jwtTypes.JWTDecodedTok
 export const checkTempSecret = async (username: string, secret: string): Promise<boolean> => {
     const record = await AccountModel._getDoc(username)
     if (record.tempSecret !== secret) {
-        throw new Error('Token has expired')
+        throw new MyError('Token has expired', HttpStatusCode.UNAUTHORIZED)
     }
     await record._updateTempSecret()
     return true

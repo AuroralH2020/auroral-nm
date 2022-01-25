@@ -3,11 +3,11 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler } from '../../../utils/error-handler'
+import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { comparePassword, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword } from '../../../auth-server/auth-server'
-import { recoverPassword } from '../../../auth-server/mailer'
+import { passwordlessLogin, recoverPassword } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
 
 // Controllers
@@ -98,6 +98,49 @@ export const refreshToken: refreshTokenController = async (req, res) => {
         try {
                 const token = await signAppToken(decoded.iss)
                 return responseBuilder(HttpStatusCode.OK, res, null, token)
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
+        }
+}
+
+type requestPasswordlessController = expressTypes.Controller<{}, { username: string }, {}, null, localsTypes.ILocals>
+ 
+export const requestPasswordless: requestPasswordlessController = async (req, res) => {
+        const { username } = req.body
+        if (!username) {
+                logger.warn('Missing username')
+                return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null)
+	}
+        try {
+                // Check if account exists and verified
+                await AccountModel._isVerified(username)
+                // Sign the token
+                const token = await signMailToken(username, 'passwordless')
+                // Send mail with token and URI for UI
+                passwordlessLogin(username, token, res.locals.origin?.realm)
+                return responseBuilder(HttpStatusCode.OK, res, null, null)
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
+        }
+}
+
+type processPasswordlessController =  expressTypes.Controller<{ token: string }, {}, {}, string, localsTypes.ILocals>
+ 
+export const processPasswordless: processPasswordlessController = async (req, res) => {
+        const { token } = req.params
+        try {
+                // get token object from JWT
+                const tokenObject = await verifyToken(token)
+                // Check if secret is valid (throws error if not )
+                await checkTempSecret(tokenObject.iss, tokenObject.sub)
+                logger.debug('Passwordless login validated')
+                // generate app token
+                const appToken = await signAppToken(tokenObject.iss)
+                return responseBuilder(HttpStatusCode.OK, res, null, appToken)
         } catch (err) {
                 const error = errorHandler(err)
                 logger.error(error.message)

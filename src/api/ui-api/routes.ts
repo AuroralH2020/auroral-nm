@@ -40,6 +40,9 @@ UiRouter
 .post('/login/refresh', addOrigin(Interfaces.UI), jwt(), loginCtrl.refreshToken)
 .post('/login/recovery', addOrigin(Interfaces.UI), loginCtrl.sendRecoverPwdMail)
 .put('/login/recovery/:token', addOrigin(Interfaces.UI), validateBody(passwordSchema), loginCtrl.processRecoverPwd)
+.post('/login/passwordless', addOrigin(Interfaces.UI), loginCtrl.requestPasswordless)
+.post('/login/passwordless/:token', addOrigin(Interfaces.UI), loginCtrl.processPasswordless)
+
 // .post('/remember', loginCtrl.rememberCookie)
 // .put('/remember/:id', loginCtrl.updateCookie)
 

@@ -9,6 +9,7 @@ import { InvitationType } from '../persistance/invitation/types'
 import { errorHandler } from '../utils/error-handler'
 
 const TEMP_RECOVER_PWD = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/recoverPwd.html', 'utf-8')
+const TEMP_PASSWORDLESS_LOGIN = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/passwordlessLogin.html', 'utf-8')
 const TEMP_ACTIVATE_COMPANY = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/activateCompany.html', 'utf-8')
 const TEMP_ACTIVATE_USER = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/activateUser.html', 'utf-8')
 const TEMP_NOTIFY_APPROVER = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/notifyApprover.html', 'utf-8')
@@ -48,7 +49,7 @@ const sendMail = async (mails: string | string[], cc: string | string[] | undefi
 
 export const recoverPassword = async (username: string, token: string, realm?: string) => {
     const dns = realm === 'localhost' || !realm ? 'http://localhost:8000/app/#' : 'https://' + realm + '/nm/#'
-    const subject = 'Password recovery email VICINITY'
+    const subject = 'Password recovery email AURORAL'
     const link = `${dns}/authentication/recoverPassword/${token}`
     // TBD: remove after testing
     // logger.debug(link)
@@ -62,7 +63,7 @@ export const recoverPassword = async (username: string, token: string, realm?: s
 
 export const verificationMail = async (username: string, token: string, type: RegistrationType, realm?: string) => {
     const dns = realm === 'localhost' || !realm ? 'http://localhost:8000/app/#' : 'https://' + realm + '/nm/#'
-    const subject = 'Verification email to join VICINITY'
+    const subject = 'Verification email to join AURORAL'
     const templateName = type === RegistrationType.COMPANY ? TEMP_ACTIVATE_COMPANY : TEMP_ACTIVATE_USER
     const link = `${dns}/registration/${type}/${token}`
     // TBD: remove after testing
@@ -87,7 +88,7 @@ export const notifyDevOpsOfNewRegistration = async (name: string, company: strin
 }
 
 export const rejectRegistration = async (username: string, company: string) => {
-    const subject = 'Issue validating your VICINITY account'
+    const subject = 'Issue validating your AURORAL account'
     // Replace info
     const view = {
         COMPANY: company
@@ -98,7 +99,7 @@ export const rejectRegistration = async (username: string, company: string) => {
 
 export const invitationMail = async (username: string, id: string, type: InvitationType, realm?: string) => {
     const dns = realm === 'localhost' || !realm ? 'http://localhost:8000/app/#' : 'https://' + realm + '/nm/#'
-    const subject = 'Invitation email to join VICINITY'
+    const subject = 'Invitation email to join AURORAL'
     const templateName = type === InvitationType.COMPANY ? TEMP_INVITE_COMPANY : TEMP_INVITE_USER
     const link = `${dns}/invitation/${type}/${id}`
     // Replace info
@@ -106,5 +107,19 @@ export const invitationMail = async (username: string, id: string, type: Invitat
         LINK: link
     }
     const temp = Mustache.render(templateName, view)
+    sendMail(username, undefined, undefined, temp, subject)
+}
+
+export const passwordlessLogin = async (username: string, token: string, realm?: string) => {
+    const dns = realm === 'localhost' || !realm ? 'http://localhost:8000/app/#' : 'https://' + realm + '/nm/#'
+    const subject = 'Magic link for AURORAL'
+    const link = `${dns}/authentication/passwordlessLogin/${token}`
+    // TBD: remove after testing
+    logger.debug(link)
+    // Replace info
+    const view = {
+        LINK: link
+    }
+    const temp = Mustache.render(TEMP_PASSWORDLESS_LOGIN, view)
     sendMail(username, undefined, undefined, temp, subject)
 }
