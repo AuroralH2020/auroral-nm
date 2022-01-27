@@ -43,8 +43,8 @@ UiRouter
 .post('/login/passwordless', addOrigin(Interfaces.UI), loginCtrl.requestPasswordless)
 .post('/login/passwordless/:token', addOrigin(Interfaces.UI), loginCtrl.processPasswordless)
 
-// .post('/remember', loginCtrl.rememberCookie)
-// .put('/remember/:id', loginCtrl.updateCookie)
+.get('/login/remember', addOrigin(Interfaces.UI), jwt(), loginCtrl.rememberCookie)
+.post('/login/remember/', addOrigin(Interfaces.UI), loginCtrl.rememberGetToken)
 
 // REGISTRATION
 .get('/registration', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getAllRegistrations)

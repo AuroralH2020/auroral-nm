@@ -1,4 +1,5 @@
 import crypto from 'bcrypt'
+import nodejsCrypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
 import jwt from 'jsonwebtoken'
@@ -174,5 +175,26 @@ export const checkTempSecret = async (username: string, secret: string): Promise
         throw new MyError('Token has expired', HttpStatusCode.UNAUTHORIZED)
     }
     await record._updateTempSecret()
+    return true
+}
+
+/**
+ * Generate secret 
+ */
+ export const generateSecret =  (): string => {
+    return nodejsCrypto.randomBytes(16).toString('base64')
+}
+
+/**
+ * Validate the secret with hashed secret
+ * Purpose of the secret is to keep valid only last mailToken sent
+ * @param {string} secret 
+ * @param {string} secretHash
+ */
+export const verifyHash = async (secret: string, secretHash: string): Promise<boolean> => {
+    const isValid = await crypto.compare(secret, secretHash)
+    if (!isValid) {
+       return false
+    }
     return true
 }

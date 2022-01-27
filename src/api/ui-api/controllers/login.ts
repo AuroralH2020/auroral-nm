@@ -6,9 +6,11 @@ import { responseBuilder } from '../../../utils/response-builder'
 import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
-import { comparePassword, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword } from '../../../auth-server/auth-server'
+import { comparePassword, generateSecret, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword, verifyHash } from '../../../auth-server/auth-server'
 import { passwordlessLogin, recoverPassword } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
+import { SessionModel } from '../../../persistance/sessions/model'
+import { UserModel } from '../../../persistance/user/model'
 
 // Controllers
 
@@ -145,5 +147,47 @@ export const processPasswordless: processPasswordlessController = async (req, re
                 const error = errorHandler(err)
                 logger.error(error.message)
                 return responseBuilder(error.status, res, error.message)
+        }
+}
+
+type rememberCookieController =  expressTypes.Controller<{}, {}, {}, string, localsTypes.ILocals>
+ 
+export const rememberCookie: rememberCookieController = async (req, res) => {
+        const { decoded } = res.locals // Requester organisation ID
+        try {
+                const secret = generateSecret()
+                const secretHash = await hashPassword(secret)
+                const sessionId = (await SessionModel._createSession({ uid: decoded.uid, secretHash, originIp: res.locals.origin.originIp })).sessionId
+               return responseBuilder(HttpStatusCode.OK, res, null, sessionId + ':' + secret)
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
+        }
+}
+
+type rememberGetTokenController =  expressTypes.Controller<{ }, { cookie: string }, {}, string, localsTypes.ILocals>
+ 
+export const rememberGetToken: rememberGetTokenController = async (req, res) => {
+        const { cookie } = req.body
+        try {
+                // split to get sessionId and secret
+                const values = cookie.split(':')
+                // find session by ID
+                const session = await SessionModel._getSession(values[0])
+                // compare secret from cookie to stored hash in db
+                if (!await verifyHash(values[1], session.secretHash)) {
+                        SessionModel._deleteSession(session.sessionId)
+                        throw new MyError('session secret invalid -> deleting session')
+                }
+                // look for username and get token
+                const username = (await UserModel._getUser(session.uid)).email
+                const token = await signAppToken(username)
+
+                return responseBuilder(HttpStatusCode.OK, res, null, token)
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, error.message)
         }
 }

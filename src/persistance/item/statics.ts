@@ -236,5 +236,3 @@ export async function getItemsPrivacy(
     throw new MyError('Items not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }
-
-
