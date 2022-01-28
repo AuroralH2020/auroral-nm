@@ -99,7 +99,8 @@ export const removeUser: removeUserController = async (req, res) => {
                 })
 
                 // remove user in MONGO
-                userDoc._removeUser()
+                await userDoc._removeUser()
+                await OrganisationModel._removeUserFromCompany(company.cid, uid)
                 logger.debug('User:' + userDoc.name + ' was deleted')
 
                 return responseBuilder(HttpStatusCode.OK, res, null, null)

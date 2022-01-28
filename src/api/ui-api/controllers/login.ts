@@ -191,3 +191,20 @@ export const rememberGetToken: rememberGetTokenController = async (req, res) => 
                 return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, error.message)
         }
 }
+
+type rememberDeleteTokenController =  expressTypes.Controller<{ sessionId: string}, { }, {}, null, localsTypes.ILocals>
+ 
+export const rememberDeleteToken: rememberDeleteTokenController = async (req, res) => {
+        const { sessionId } = req.params
+        try {
+                // split to get sessionId and secret
+                // remove session by ID
+                SessionModel._deleteSession(sessionId)
+                return responseBuilder(HttpStatusCode.OK, res, null, null)
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, error.message)
+        }
+}
+

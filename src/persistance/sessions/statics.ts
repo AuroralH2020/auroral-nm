@@ -36,5 +36,5 @@ export async function createSession(
 export async function deleteSession(
   this: ISessionModel, sessionId: string
 ): Promise<void> {
-    this.findOne({ sessionId }, {}).remove().exec()
+    this.deleteOne({ sessionId }, {}).exec()
 }

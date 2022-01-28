@@ -45,6 +45,7 @@ UiRouter
 
 .get('/login/remember', addOrigin(Interfaces.UI), jwt(), loginCtrl.rememberCookie)
 .post('/login/remember/', addOrigin(Interfaces.UI), loginCtrl.rememberGetToken)
+.delete('/login/remember/:sessionId', addOrigin(Interfaces.UI), loginCtrl.rememberDeleteToken)
 
 // REGISTRATION
 .get('/registration', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getAllRegistrations)
