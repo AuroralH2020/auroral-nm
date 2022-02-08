@@ -137,4 +137,7 @@ export interface IUserModel extends Model<IUserDocument> {
         uid: string,
         ctid: string
     ) => Promise<void>
+    _count: (
+        this: IUserModel,
+    ) => Promise<number>
 }

@@ -197,6 +197,9 @@ export interface IContractModel extends Model<IContractDocument> {
         this: IContractModel,
         ctid: string,
         agid: string) => Promise<agentContractType[]>
+    _count:(
+        this: IContractModel
+        ) => Promise<number>
 
 }
 

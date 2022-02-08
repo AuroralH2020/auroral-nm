@@ -81,7 +81,6 @@ export const getByCompany: getByCompanyController = async (req, res) => {
     if (foreignOrg.knows.includes(decoded.org)) {
       // We are friends
       reqParam.$or = [{ accessLevel: ItemPrivacy.FOR_FRIENDS }, { accessLevel: ItemPrivacy.PUBLIC }]
-
     } else if (cid === decoded.org) {
       // My org
       reqParam.status = { $ne: ItemStatus.DELETED }

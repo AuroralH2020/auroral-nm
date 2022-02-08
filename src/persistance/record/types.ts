@@ -63,7 +63,7 @@ export interface IRecordAgg {
     agid: string,
     oid: string,
     cid: string,
-    date: number,
+    date: string,
     totalSize: number,
     action: number,
     event: number,
@@ -82,6 +82,10 @@ export interface IRecordModel extends Model<IRecordDocument> {
     ) => Promise<IRecordDocument>
     _getAggregated: (
         this: IRecordModel,
-        Records: string[]
-    ) => Promise<IRecordAgg>
+        timestamp: number
+    ) => Promise<IRecordAgg[]>
+    _aggregationCompleted: (
+        this: IRecordModel,
+        timestamp: number
+    ) => Promise<void>
 }

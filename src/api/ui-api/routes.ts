@@ -5,6 +5,7 @@ import { jwt, addOrigin, validateBody, createAudit } from '../middlewares/index'
 // Controllers
 import * as loginCtrl from './controllers/login'
 import * as registrationCtrl from './controllers/registration'
+import * as statisticsCtrl from './controllers/statistics'
 import * as invitationCtrl from './controllers/invitation'
 import * as organisationCtrl from './controllers/organisation'
 import * as friendingCtrl from './controllers/friending'
@@ -128,5 +129,10 @@ UiRouter
 .put('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OWNER]), validateBody(editItemContractSchema), createAudit(SourceType.CONTRACT), contractsCtrl.editItem)
 .delete('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeItem)
 .delete('/contract/:ctid/items/:cid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeAllCompanyItems)
+
+// STATISTICS
+.get('/statistics/', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.getStatistics)
+.get('/statistics/:date', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.getStatistics)
+.post('/statistics/', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.storeStatistics)
 
 export { UiRouter }

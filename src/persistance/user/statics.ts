@@ -110,3 +110,13 @@ export async function removeItemFromUser(
       throw new Error('Error removing item from user')
     }
   }
+
+export async function count(
+  this: IUserModel): Promise<Number> {
+    const record = await this.countDocuments({ status: { $ne: UserStatus.DELETED } }).exec()
+    if (record) {
+      return record
+    } else {
+      throw new MyError('User count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+    }
+  }

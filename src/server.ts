@@ -5,6 +5,7 @@ import { Config } from './config'
 import { logger } from './utils/logger'
 import { mongo } from './persistance/mongo'
 import { cs } from './microservices/commServer'
+import { scheduledJobs } from './core/scheduler'
 
 /**
  * Error Handler. Provides full stack - only in dev
@@ -20,6 +21,15 @@ async function bootstrap() {
     mongo.connect() // Mongo connection
     const sessions = (await cs.getSessions()).sessions.length
     logger.info(`Communication server connected, there are ${sessions} sessions active`)
+    // Scheduled tasks
+    if (Config.SCHEDULER_ENABLED) {
+      logger.info('Scheduler enabled')
+      scheduledJobs.start()
+    } else {
+      logger.info('Scheduler NOT enabled')
+      scheduledJobs.stop()
+    }
+
     logger.info('All services initialized')
   } catch (error: unknown) {
     const err = error as Error

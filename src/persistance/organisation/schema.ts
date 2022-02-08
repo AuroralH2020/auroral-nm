@@ -21,7 +21,8 @@ import {
     removeContractRequest,
     addContractRequest,
     addMultipleContractRequests,
-    removeMultipleContractRequests
+    removeMultipleContractRequests,
+    count
 } from './statics'
 import { updateOrganisation, removeOrganisation } from './methods'
 import { IOrganisationDocument, IOrganisationModel, OrganisationStatus, UISkins } from './types'
@@ -80,6 +81,7 @@ OrganisationSchema.statics._addContractRequest = addContractRequest
 OrganisationSchema.statics._removeContractRequest = removeContractRequest
 OrganisationSchema.statics._addMultipleCOntractRequests = addMultipleContractRequests
 OrganisationSchema.statics._removeMultipleContractRequests = removeMultipleContractRequests
+OrganisationSchema.statics._count = count
 
 // Methods
 

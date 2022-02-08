@@ -19,7 +19,8 @@ import {
     getItem,
     removeItemFromAllContracts,
     // getNodesInContract, 
-    getItemsInContractByAgid
+    getItemsInContractByAgid,
+    count
 } from './statics'
 import { removeContract, updateContract, updateStatus } from './methods'
 import { ContractItemType, ContractStatus, ContractType, IContractDocument, IContractModel } from './types'
@@ -77,6 +78,7 @@ ContractSchema.statics._getContractItems = getContractItems
 ContractSchema.statics._getCommonPrivateContracts = getCommonPrivateContracts
 // ContractSchema.statics._getNodesInContract = getNodesInContract
 ContractSchema.statics._getItemsInContractByAgid = getItemsInContractByAgid
+ContractSchema.statics._count = count
 
 // Methods
 

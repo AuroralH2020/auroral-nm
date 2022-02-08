@@ -8,7 +8,7 @@ import {
     removeUserFromItem,
     getByOwner,
     getItemsPrivacy,
-    addContractToItem, removeContractFromItem, removeContractFromCompanyItems, getAllCompanyItemsContractView
+    addContractToItem, removeContractFromItem, removeContractFromCompanyItems, getAllCompanyItemsContractView, count
 } from './statics'
 import { updateItem, removeItem } from './methods'
 import { IItemDocument, IItemModel, ItemType, ItemStatus, ItemPrivacy, ItemLabelsObj, ItemDomainType } from './types'
@@ -49,6 +49,7 @@ const ItemSchema = new Schema<IItemDocument, IItemModel>({
 // Statics
 
 ItemSchema.statics._getItem = getItem
+ItemSchema.statics._count = count
 ItemSchema.statics._getDoc = getDoc
 ItemSchema.statics._createItem = createItem
 ItemSchema.statics._getAllItems = getAllItems

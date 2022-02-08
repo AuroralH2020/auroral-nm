@@ -221,4 +221,7 @@ export interface IItemModel extends Model<IItemDocument> {
         cid: string,
         ctid: string
     ) => Promise<ContractItemSelect[]>
+    _count: (
+        this: IItemModel,
+    ) => Promise<number>
 }

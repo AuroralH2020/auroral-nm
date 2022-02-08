@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { createRecord, getAggregated } from './statics'
+import { aggregationCompleted, createRecord, getAggregated } from './statics'
 import { IRecordDocument, IRecordModel, MessageType } from './types'
 
 const Schema = mongoose.Schema
@@ -25,6 +25,7 @@ const RecordSchema = new Schema<IRecordDocument, IRecordModel>({
 
 RecordSchema.statics._getAggregated = getAggregated
 RecordSchema.statics._createRecord = createRecord
+RecordSchema.statics._aggregationCompleted = aggregationCompleted
 
 // Methods
 

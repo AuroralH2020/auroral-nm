@@ -3,7 +3,7 @@
 import apm_service from './utils/apm-service'
 
 apm_service().then(() => {
-  console.log('Apm has been run')
+  logger.info('APM started')
 }).catch((error) => {})
 
 import cors from 'cors'

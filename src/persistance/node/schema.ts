@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey } from './statics'
+import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count } from './statics'
 import { updateNode, removeNode } from './methods'
 import { INodeDocument, INodeModel, NodeType, NodeStatus } from './types'
 
@@ -34,6 +34,7 @@ NodeSchema.statics._addItemToNode = addItemToNode
 NodeSchema.statics._removeItemFromNode = removeItemFromNode
 NodeSchema.statics._getKey = getKey
 NodeSchema.statics._removeKey = removeKey
+NodeSchema.statics._count = count
 
 // Methods
 

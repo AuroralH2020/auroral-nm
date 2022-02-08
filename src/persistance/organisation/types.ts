@@ -216,4 +216,7 @@ export interface IOrganisationModel extends Model<IOrganisationDocument> {
         cid: string,
         ctid: string
     ) => Promise<void>
+    _count: (
+        this: IOrganisationModel,
+    ) => Promise<number>
 }

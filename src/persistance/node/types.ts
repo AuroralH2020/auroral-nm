@@ -110,4 +110,7 @@ export interface INodeModel extends Model<INodeDocument> {
         this: INodeModel,
         agid: string
     ) => Promise<void>
+    _count: (
+        this: INodeModel,
+    ) => Promise<number>
 }

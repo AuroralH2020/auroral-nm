@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { RolesEnum } from '../../types/roles'
-import { getUser, getDoc, createUser, findDuplicatesUser, getAllUsers, getUserByRole, addItemToUser, removeItemFromUser } from './statics'
+import { getUser, getDoc, createUser, findDuplicatesUser, getAllUsers, getUserByRole, addItemToUser, removeItemFromUser, count } from './statics'
 import { updateUser, updateUserRoles, removeUser } from './methods'
 import { IUserDocument, IUserModel, UserVisibility, UserStatus } from './types'
 
@@ -42,6 +42,7 @@ UserSchema.statics._findDuplicatesUser = findDuplicatesUser
 UserSchema.statics._getAllUsers = getAllUsers
 UserSchema.statics._addItemToUser = addItemToUser
 UserSchema.statics._removeItemFromUser = removeItemFromUser
+UserSchema.statics._count = count
 
 // Methods
 

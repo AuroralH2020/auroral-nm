@@ -94,3 +94,13 @@ export async function removeKey(
     throw new Error('Error removing key from node')
   }
 }
+
+export async function count(
+  this: INodeModel): Promise<Number> {
+    const record = await this.countDocuments({ status: { $ne: NodeStatus.DELETED } }).exec()
+    if (record) {
+      return record
+    } else {
+      throw new MyError('Nodes count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+    }
+  }

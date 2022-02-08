@@ -17,6 +17,7 @@ export const Config = {
 	IP: process.env.IP!,
 	PORT: process.env.PORT!,
 	SECRET_TOKEN: process.env.SECRET_TOKEN!,
+	SCHEDULER_ENABLED: process.env.SCHEDULER_ENABLED,
 	CS: {
 		URL: process.env.CS_URL!, 
 		SECRET_KEY: process.env.CS_SECRET_KEY!
@@ -45,5 +46,9 @@ export const Config = {
 		SERVER_URL: process.env.APM_SERVER_URL!,
 		TOKEN: process.env.APM_TOKEN!,
 		NAME: process.env.APM_NAME!
+	},
+	ELK: {
+		URL: process.env.ELK_URL!,
+		TOKEN: process.env.ELK_TOKEN!
 	}
 }
