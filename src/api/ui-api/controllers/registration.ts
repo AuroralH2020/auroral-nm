@@ -185,7 +185,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
             email: registrationObj.email,
             occupation: registrationObj.occupation,
             cid: registrationObj.cid,
-            roles: [RolesEnum.USER, RolesEnum.ADMIN]
+            roles: [RolesEnum.USER, RolesEnum.ADMIN, RolesEnum.INFRAS_OPERATOR, RolesEnum.SYS_INTEGRATOR]
           })
            // Audits
           await AuditModel._createAudit({
