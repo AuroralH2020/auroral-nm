@@ -5,7 +5,7 @@ import { HttpStatusCode } from '../../utils'
 export async function getAccount(
   this: IAccountModel, username: string
 ): Promise<IAccountUI> {
-  const record = await this.findOne({ username }, { passwordHash: 0, tempSecret: 0 }).lean().exec()
+  const record = await this.findOne({ username: username.toLowerCase() }, { passwordHash: 0, tempSecret: 0 }).lean().exec()
   if (record) {
     return record
   } else {
@@ -17,7 +17,7 @@ export async function getAccount(
 export async function getHash(
   this: IAccountModel, username: string
 ): Promise<string> {
-  const record = await this.findOne({ username, verified: true }, { passwordHash: 1 }).lean().exec()
+  const record = await this.findOne({ username: username.toLowerCase(), verified: true }, { passwordHash: 1 }).lean().exec()
   if (record) {
     return record.passwordHash
   } else {
@@ -28,7 +28,7 @@ export async function getHash(
 export async function getDoc(
   this: IAccountModel, username: string
 ): Promise<IAccountDocument> {
-  const record = await this.findOne({ username }).exec()
+  const record = await this.findOne({ username: username.toLowerCase() }).exec()
   if (record) {
     return record
   } else {
@@ -50,19 +50,22 @@ export async function getDocByUid(
 export async function createAccount(
     this: IAccountModel, data: IAccountRegistrationPost
   ): Promise<IAccountDocument> {
-    return this.create(data)
+    return this.create({
+      ...data,
+      username: data.username.toLowerCase()
+    })
   }
 
 export async function verifyAccount(
   this: IAccountModel, username: string, uid: string
 ): Promise<void> {
-  await this.updateOne({ username }, { $set: { verified: true, uid } }).lean().exec()
+  await this.updateOne({ username: username.toLowerCase() }, { $set: { verified: true, uid } }).lean().exec()
 }
 
 export async function isVerified(
   this: IAccountModel, username: string
 ): Promise<boolean> {
-  const doc = await this.findOne({ username }, { verified: 1 }).lean().exec()
+  const doc = await this.findOne({ username: username.toLowerCase() }, { verified: 1 }).lean().exec()
   if (doc && doc.verified) {
     return true
   } else {
@@ -73,5 +76,5 @@ export async function isVerified(
 export async function deleteAccount(
   this: IAccountModel, username: string
 ): Promise<void> {
-  await this.deleteOne({ username }).lean().exec()
+  await this.deleteOne({ username: username.toLowerCase() }).lean().exec()
 }

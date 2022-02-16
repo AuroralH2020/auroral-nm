@@ -6,7 +6,7 @@ export async function updateUser(this: IUserDocument, data: IUserUpdate): Promis
     this.firstName = data.firstName ? data.firstName : this.firstName
     this.lastName = data.lastName ? data.lastName : this.lastName
     this.name = this.firstName + ' ' + this.lastName
-    this.contactMail = data.contactMail ? data.contactMail : this.contactMail
+    this.contactMail = data.contactMail ? data.contactMail.toLowerCase() : this.contactMail
     this.occupation = data.occupation ? data.occupation : this.occupation
     this.location = data.location ? data.location : this.location
     this.avatar = data.avatar ? data.avatar : this.avatar

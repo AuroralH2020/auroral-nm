@@ -1,7 +1,6 @@
 import { RolesEnum } from '../../types/roles'
 import { IUserDocument, IUserModel, IUserCreate, IUserUI, UserVisibility, UserStatus, IUserUIProfile } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
-import { logger } from '../../utils/logger'
 import { HttpStatusCode } from '../../utils/http-status-codes'
 
 export async function getUser(
@@ -73,6 +72,7 @@ export async function createUser(
   ): Promise<IUserDocument> {
     const newUser = {
       ...data,
+      email: data.email.toLowerCase(),
       accessLevel: UserVisibility.PRIVATE,
       name: data.firstName + ' ' + data.lastName
     }
@@ -83,7 +83,7 @@ export async function findDuplicatesUser(
   this: IUserModel, email: string
 ): Promise<boolean> {
   // Look in ACTIVE users
-  const record = await this.findOne({ email, status: { $ne: UserStatus.DELETED } }).exec()
+  const record = await this.findOne({ email: email.toLowerCase(), status: { $ne: UserStatus.DELETED } }).exec()
   if (record) {
     // Duplicates found
     return true
@@ -112,7 +112,7 @@ export async function removeItemFromUser(
   }
 
 export async function count(
-  this: IUserModel): Promise<Number> {
+  this: IUserModel): Promise<number> {
     const record = await this.countDocuments({ status: { $ne: UserStatus.DELETED } }).exec()
     if (record) {
       return record
