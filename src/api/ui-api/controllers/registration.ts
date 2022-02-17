@@ -151,6 +151,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
   const { token } = req.params
   const locals = res.locals
 	try {
+    // Organisation verified, registering it...
     if (status === RegistrationStatus.VERIFIED) {
       const decoded = await verifyToken(token)
       const registrationId = decoded.iss
@@ -264,6 +265,7 @@ export const putRegistration: putRegistrationController = async (req, res) => {
           throw new Error('Wrong registration type')
         }
       }
+    // Sending verificaiton mail to pending account
     } else if (status === RegistrationStatus.PENDING) {
       // For status pending token === registrationId
       const registrationId = token
@@ -291,6 +293,18 @@ export const putRegistration: putRegistrationController = async (req, res) => {
           await NotificationModel._setStatus(elem, NotificationStatus.RESPONDED)
         })
       })
+    // Re-Sending verificaiton mail to pending account
+    } else if (status === RegistrationStatus.RESENDING) {
+      // For status pending token === registrationId
+      const registrationId = token
+      // Retrieve the registration object
+      const registrationObj = await RegistrationModel._getDoc(registrationId)
+      // Generate account validation token
+      const newToken = await signMailToken(registrationObj.email, 'validate', registrationId)
+      logger.info('Resending verification mail to organisation ' + registrationObj.companyName)
+      // Notify user by mail
+      verificationMail(registrationObj.email, newToken, registrationObj.type, locals.origin?.realm)
+    // Declining registration
     } else if (status === RegistrationStatus.DECLINED) {
       // For status pending token === registrationId
       const registrationId = token

@@ -5,7 +5,8 @@ export enum RegistrationStatus {
     OPEN = 'open', // Waiting for devOps to validate mail/organisation
     VERIFIED = 'verified', // Approved
     DECLINED = 'declined', // Rejected
-    PENDING = 'pending' // Verification mail sent to user
+    PENDING = 'pending', // Verification mail sent to user
+    RESENDING = 'resending' // Same as pending, mail is sent again and registration status remains pending
 }
 
 export enum RegistrationType {
