@@ -52,7 +52,7 @@ interface IRegis {
     created: number
 }
 
-interface IRegistrationUser extends IRegis {
+export interface IRegistrationUser extends IRegis {
     roles: RolesEnum[]
 }
 

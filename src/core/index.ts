@@ -8,5 +8,6 @@ import * as StatisticsService from './statistics'
 import * as ContractService from './contracts'
 import * as OrganisationService from './organisations'
 import * as UserService from './users'
+import * as RegistrationService from './registrations'
 
-export { ItemService, NodeService, UserService, OrganisationService, ContractService, StatisticsService }
+export { ItemService, NodeService, UserService, OrganisationService, ContractService, StatisticsService, RegistrationService }
