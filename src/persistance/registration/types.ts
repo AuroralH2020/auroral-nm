@@ -6,7 +6,8 @@ export enum RegistrationStatus {
     VERIFIED = 'verified', // Approved
     DECLINED = 'declined', // Rejected
     PENDING = 'pending', // Verification mail sent to user
-    RESENDING = 'resending' // Same as pending, mail is sent again and registration status remains pending
+    RESENDING = 'resending', // Same as pending, mail is sent again and registration status remains pending
+    MASTER_VERIFICATION = 'masterVerification' // Platform admin validates an account
 }
 
 export enum RegistrationType {

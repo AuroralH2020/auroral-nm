@@ -94,15 +94,39 @@ export const putRegistration: putRegistrationController = async (req, res) => {
     // Organisation verified, registering it...
     if (status === RegistrationStatus.VERIFIED) {
       await RegistrationService.registerAfterVerification(status, token, locals)
+    // Invalid status received
+    } else {
+      throw new Error('Wrong registration update request with status: ' + status)
+    }  
+    return responseBuilder(HttpStatusCode.OK, res, null, null)
+	} catch (err) {
+    // Update invitation status to FAILED
+    // await InvitationModel._setInvitationStatus(registrationObj.invitationId, InvitationStatus.FAILED)
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
+	}
+}
+
+type putAdminRegistrationController = expressTypes.Controller<{ registrationId: string }, { status: RegistrationStatus }, {}, null, localsTypes.ILocals>
+ 
+export const putAdminRegistration: putAdminRegistrationController = async (req, res) => {
+  const { status } = req.body
+  const { registrationId } = req.params
+  const locals = res.locals
+	try {
     // Sending verificaiton mail to pending account
-    } else if (status === RegistrationStatus.PENDING) {
-      await RegistrationService.sendVerificationMail(status, token, locals)
+    if (status === RegistrationStatus.PENDING) {
+      await RegistrationService.sendVerificationMail(status, registrationId, locals)
     // Re-Sending verificaiton mail to pending account
     } else if (status === RegistrationStatus.RESENDING) {
-      await RegistrationService.resendVerificationMail(status, token, locals)
+      await RegistrationService.resendVerificationMail(status, registrationId, locals)
     // Declining registration
     } else if (status === RegistrationStatus.DECLINED) {
-      await RegistrationService.declineRegistration(status, token, locals)
+      await RegistrationService.declineRegistration(status, registrationId, locals)
+    // Company verified by platform admin
+    } else if (status === RegistrationStatus.MASTER_VERIFICATION) {
+      await RegistrationService.registerAfterMasterVerification(RegistrationStatus.VERIFIED, registrationId, locals)
     // Invalid status received
     } else {
       throw new Error('Wrong registration update request with status: ' + status)

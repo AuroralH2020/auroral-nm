@@ -55,6 +55,7 @@ UiRouter
 // .post('/registration', addOrigin(Interfaces.UI), registrationCtrl.postRegistration)
 .get('/registration/:registrationId', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getRegistration)
 .put('/registration/:token', addOrigin(Interfaces.UI), validateBody(registrationStatusSchema), createAudit(SourceType.ORGANISATION), registrationCtrl.putRegistration)
+.put('/admin-registration/:registrationId', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), validateBody(registrationStatusSchema), createAudit(SourceType.ORGANISATION), registrationCtrl.putAdminRegistration)
 .post('/registration/duplicatesUser', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesUser)
 .post('/registration/duplicatesCompany', addOrigin(Interfaces.UI), registrationCtrl.findDuplicatesCompany)
 
