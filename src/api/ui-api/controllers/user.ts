@@ -119,9 +119,10 @@ export const updateUser: updateUserController = async (req, res) => {
         const my_uid = res.locals.decoded.uid
         try {
                 const userDoc = await UserModel._getDoc(uid)
+                const myUserDoc = await UserModel._getDoc(my_uid)
                 // If updating roles verify there are no conflicts
                 if (payload.roles) {
-                        UserService.checkRoles(my_uid, userDoc, payload.roles)
+                        UserService.checkRoles(myUserDoc, userDoc, payload.roles)
                         // If updating roles add also to account
                         const account = await AccountModel._getDocByUid(uid)
                         account._updateRoles(payload.roles)
