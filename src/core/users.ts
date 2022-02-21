@@ -14,18 +14,23 @@ import { HttpStatusCode } from '../utils'
 /**
  * Validate roles
  */
- export const checkRoles = (my_uid: string, user: IUserDocument, roles: RolesEnum[]): void => {
+ export const checkRoles =  (myUser: IUserDocument, user: IUserDocument, roles: RolesEnum[]): void => {
     // Validate that the user is an admin
-    if (!user.roles.includes(RolesEnum.ADMIN)) {
+    if (!myUser.roles.includes(RolesEnum.ADMIN)) {
         logger.warn('User has to be an admin to update roles')
         throw new MyError('User has to be an admin to update roles', HttpStatusCode.FORBIDDEN)
+    }
+    // Test if updating user from own company
+    if (myUser.cid !== user.cid) {
+        logger.warn('You are not allowed to update this users roles')
+        throw new MyError('You are not allowed to update this users roles', HttpStatusCode.FORBIDDEN)
     }
 
     // Check which roles are added/removed
     const diff = findDifferentRoles(user.roles, roles)
 
     // Validate at least one user with role admin remains
-    if (my_uid === user.uid && diff.removed.includes(RolesEnum.ADMIN)) {
+    if (myUser.uid === user.uid && diff.removed.includes(RolesEnum.ADMIN)) {
         logger.warn('User cannot remove admin from from itself')
         throw new MyError('User cannot remove admin from from itself', HttpStatusCode.FORBIDDEN)
     }
