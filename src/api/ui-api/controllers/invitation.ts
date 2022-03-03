@@ -88,8 +88,8 @@ export const resendInvitation: resendInvitationController = async (req, res) => 
                 if (inv.status === InvitationStatus.DONE || inv.sentBy.cid !== decoded.org) {
                         throw new MyError('Not aproved to resend invitation')
                 }
-                // test if lastly updated is more thand before 1 minute
-                if ((new Date().getTime() - inv.updated) < 360000) {
+                // test if lastly updated is more thand before 5 minute
+                if ((new Date().getTime() - inv.updated) < 300000) {
                         throw new MyError('Too early to resend', HttpStatusCode.TOO_MANY_REQUESTS)
                 }
                 // Set status to pending and set updatedTime

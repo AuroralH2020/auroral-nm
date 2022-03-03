@@ -9,8 +9,9 @@ import { UserModel } from '../persistance/user/model'
 import { AccountModel } from '../persistance/account/model'
 import { removeOne } from './nodes'
 import { IOrganisationDocument } from '../persistance/organisation/types'
-import { ContractService } from '../core'
+import { ContractService, OrganisationService } from '../core'
 import { IAuditLocals } from '../types/locals-types'
+import { OrganisationModel } from '../persistance/organisation/model'
 
 // Functions
 
@@ -29,14 +30,29 @@ import { IAuditLocals } from '../types/locals-types'
         await Promise.all(organisation.hasContractRequests.map(async it => {
             await ContractService.rejectContractRequest(it, cid, uid, audit)
         }))
+        // 2a - Remove partnerships
+        await Promise.all(organisation.knows.map(async it => {
+            OrganisationModel._delFriendship(it, cid)
+            OrganisationModel._delFriendship(cid, it)
+        }))
+        // 2a - Remove partnerships from requests
+         await Promise.all(organisation.knowsRequestsFrom.map(async it => {
+            OrganisationModel._delFriendship(it, cid)
+            OrganisationModel._delIncomingFriendReq(cid, it)
+        }))
+        // 2c - Remove partnerships to requests
+         await Promise.all(organisation.knowsRequestsTo.map(async it => {
+            OrganisationModel._delIncomingFriendReq(it, cid)
+            OrganisationModel._delOutgoingFriendReq(cid, it)
+        }))
 
-        // 2 - Remove nodes and items
+        // 3 - Remove nodes and items
         await Promise.all(organisation.hasNodes.map(async it => {
                 await removeOne(it, cid)
             })
         )
 
-        // 3 - Remove users & accounts
+        // 4 - Remove users & accounts
         await Promise.all(organisation.hasUsers.map(async it => {
                 const userDoc = await UserModel._getDoc(it)
                 await AccountModel._deleteAccount(userDoc.email) // remove first account to user proper mail
@@ -44,7 +60,7 @@ import { IAuditLocals } from '../types/locals-types'
             })
         )
 
-        // 4 - Remove organisation
+        // 5 - Remove organisation
         await organisation._removeOrganisation()
     } catch (err) {
         const error = errorHandler(err)
