@@ -21,7 +21,9 @@ let secret_key: string | null = null
 let priv_cert: Buffer | null = null
 let pub_cert: Buffer | null = null
 
-if (Config.NODE_ENV === 'development') {
+if (Config.NODE_ENV === 'test') {
+    secret_key = 'mytestssecret'
+} else if (Config.NODE_ENV === 'development') {
     logger.debug('Using development authorization server')
     secret_key = Config.SECRET_TOKEN
 } else {

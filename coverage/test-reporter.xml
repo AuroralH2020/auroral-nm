@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testExecutions version="1">
+    <file path="/Users/jorgealmela/Projects/bavenir/Auroral/Projects/auroral_nm/__tests__/auth-server/auth-server.ts">
+        <testCase name="Authentication server Hash password and verify hash" duration="177"/>
+    </file>
+</testExecutions>
