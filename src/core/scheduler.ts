@@ -1,7 +1,6 @@
 import { CronJob } from 'cron'
 import { logger } from '../utils'
 import { errorHandler } from '../utils/error-handler'
-import { Config } from '../config'
 import { elastic } from '../microservices/elasticConnector'
 import { RecordModel } from '../persistance/record/model'
 import { StatisticsService } from '../core'

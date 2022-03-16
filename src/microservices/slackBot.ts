@@ -35,6 +35,5 @@ export const slack = {
 // PRIVATE FUNCTIONS
 
 const request = async (endpoint: string, method: Method, json: JsonType, headers?: Headers) => {
-    const response = await callApi(endpoint, { method, json, headers })
-    return response
+    return callApi(endpoint, { method, json, headers })
 }
