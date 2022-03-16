@@ -36,6 +36,7 @@ import {
 const UiRouter = Router()
 
 UiRouter
+.post('/test', loginCtrl.test)
 // AUTH
 .post('/login/authenticate', addOrigin(Interfaces.UI), loginCtrl.authenticate)
 .post('/login/refresh', addOrigin(Interfaces.UI), jwt(), loginCtrl.refreshToken)
