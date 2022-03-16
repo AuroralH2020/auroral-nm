@@ -11,8 +11,23 @@ import { passwordlessLogin, recoverPassword } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
 import { SessionModel } from '../../../persistance/sessions/model'
 import { UserModel } from '../../../persistance/user/model'
+import { slack } from '../../../microservices/slackBot'
 
 // Controllers
+
+type testController = expressTypes.Controller<{}, { text: string }, {}, null, localsTypes.ILocals>
+ 
+export const test: testController = async (req, res) => {
+    const { text } = req.body
+	try {
+                await slack.pushMessage(text)
+                return responseBuilder(HttpStatusCode.OK, res, null, null)
+	} catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
+	}
+}
 
 type authController = expressTypes.Controller<{}, {username: string, password: string}, {}, string, localsTypes.ILocals>
  

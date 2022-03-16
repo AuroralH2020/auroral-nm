@@ -50,5 +50,9 @@ export const Config = {
 	ELK: {
 		URL: process.env.ELK_URL!,
 		TOKEN: process.env.ELK_TOKEN!
+	},
+	SLACK: {
+		HOST: process.env.SLACK_HOST!,
+		HOOK: process.env.SLACK_HOOK!
 	}
 }
