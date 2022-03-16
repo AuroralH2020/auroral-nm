@@ -64,26 +64,6 @@
     "uuid": "^8.3.2",
     "winston": "^3.3.3"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "preset": "ts-jest",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/__mocks__/",
-      "/__tests__/",
-      "/scripts/",
-      "/coverage/"
-    ],
-    "testResultsProcessor": "jest-sonar-reporter",
-    "setupFiles": [
-      "dotenv/config"
-    ]
-  },
   "jestSonar": {
     "reportPath": "coverage",
     "reportFile": "test-reporter.xml",

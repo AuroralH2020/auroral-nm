@@ -67,8 +67,3 @@ import { OrganisationModel } from '../persistance/organisation/model'
         throw new Error(error.message)
     }
 }
-
-const captureError = (err: unknown): void => {
-    const error = errorHandler(err)
-    logger.error(error.message)
-}
