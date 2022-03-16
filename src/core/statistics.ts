@@ -7,6 +7,7 @@ import { NodeModel } from '../persistance/node/model'
 import { UserModel } from '../persistance/user/model'
 import { IStatistics } from '../persistance/statistics/types'
 import { ContractModel } from '../persistance/contract/model'
+import { slack } from '../microservices/slackBot'
 
 export const storeStatistics = async (): Promise<void> => {
         logger.info('Creating statistics')
@@ -22,6 +23,9 @@ export const storeStatistics = async (): Promise<void> => {
             organisations,
             contracts
         }
+        const slackMessage = 'Items ' + String(items) + ' Nodes: ' + String(nodes) + ' Users: ' + String(users) + ' Organisations: ' + String(organisations) + ' Contracts: ' + String(contracts) 
+        await slack.pushMessage(' This is your daily update for ' + new Date().toISOString())
+        await slack.pushMessage(slackMessage)
         StatisticsModel._createStatistics(data)
 }
 export const getLastStatistics = async (): Promise<IStatistics> => {

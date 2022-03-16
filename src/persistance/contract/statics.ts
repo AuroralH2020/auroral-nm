@@ -614,10 +614,5 @@ export async function getItemsInContractByAgid(
 
 export async function count(
 this: IContractModel): Promise<Number> {
-  const record = await this.countDocuments({ status: { $ne: ContractStatus.DELETED } }).exec()
-  if (record) {
-    return record
-  } else {
-    throw new MyError('Contract count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
-  }
+  return this.countDocuments({ status: { $ne: ContractStatus.DELETED } }).exec()
 }

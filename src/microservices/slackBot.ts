@@ -36,6 +36,5 @@ export const slack = {
 
 const request = async (endpoint: string, method: Method, json: JsonType, headers?: Headers) => {
     const response = await callApi(endpoint, { method, json, headers })
-    console.log(response)
     return response
 }
