@@ -1,6 +1,6 @@
 {
   "name": "nodejs-ts-starter",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "Base for future ts projects",
   "main": "server.js",
   "scripts": {
