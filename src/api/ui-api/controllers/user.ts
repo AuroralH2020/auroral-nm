@@ -73,8 +73,13 @@ export const removeUser: removeUserController = async (req, res) => {
 
                 // Ger user
                 const userDoc = await UserModel._getDoc(uid)
+                // Test if user has some items
                 if ((userDoc.hasItems.length) !== 0) {
                         throw new MyError('User has some enabled items', HttpStatusCode.FORBIDDEN)
+                }
+                // Test if user has some nodes
+                if ((userDoc.hasNodes.length) !== 0) {
+                        throw new MyError('User is setted up as default owner in some node', HttpStatusCode.FORBIDDEN)
                 }
    
                 const adminUser = await UserModel._getUser(decoded.uid)

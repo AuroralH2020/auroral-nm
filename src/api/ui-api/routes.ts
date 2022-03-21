@@ -30,7 +30,7 @@ import {
     updatePasswordSchema,
     updateUserSchema,
     emptyItemSchema,
-    editContractSchema, editItemContractSchema
+    editContractSchema, editItemContractSchema, updateDefaultOwnersSchema
 } from '../../core/joi-schemas'
 
 const UiRouter = Router()
@@ -98,6 +98,7 @@ UiRouter
 .get('/node/:agid/key', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]),createAudit(SourceType.NODE), nodeCtrl.getKey)
 .delete('/node/:agid/key', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), createAudit(SourceType.NODE), nodeCtrl.removeKey)
 .delete('/node/:agid', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), createAudit(SourceType.NODE), nodeCtrl.removeNode)
+.put('/node/:agid/defaultOwner', addOrigin(Interfaces.UI), jwt([RolesEnum.SYS_INTEGRATOR]), validateBody(updateDefaultOwnersSchema), createAudit(SourceType.NODE), nodeCtrl.updateDefaultOwner)
 
 // ITEMS
 .get('/items',  addOrigin(Interfaces.UI), jwt(), itemsCtrl.getMany)

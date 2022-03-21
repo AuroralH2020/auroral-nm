@@ -6,7 +6,7 @@ import { responseBuilder } from '../../../utils/response-builder'
 import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
-import { INodeCreate, INodeUI, INodeUpdate } from '../../../persistance/node/types'
+import { DefaultOwnerTypeUpdate, INodeCreate, INodeUI, INodeUpdate } from '../../../persistance/node/types'
 import { NodeModel } from '../../../persistance/node/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { NodeService } from '../../../core'
@@ -15,6 +15,8 @@ import { NotificationStatus } from '../../../persistance/notification/types'
 import { AuditModel } from '../../../persistance/audit/model'
 import { UserModel } from '../../../persistance/user/model'
 import { ResultStatusType, EventType } from '../../../types/misc-types'
+import { ItemType } from '../../../persistance/item/types'
+import { RolesEnum } from '../../../types/roles'
 
 // Controllers
 
@@ -175,6 +177,67 @@ export const removeKey: removeKeyController = async (req, res) => {
       actor: { id: decoded.uid, name: myUser.name },
       target: { id: agid, name: myNode.name },
       type: EventType.nodeUpdatedKey,
+      labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+    })
+    return responseBuilder(HttpStatusCode.OK, res, null, null)
+	} catch (err) {
+    const error = errorHandler(err)
+    logger.error({ msg: error.message, id: res.locals.reqId })
+    return responseBuilder(error.status, res, error.message)
+	}
+}
+
+type updateDefaultItemOwnerController = expressTypes.Controller<{ agid: string }, DefaultOwnerTypeUpdate, {}, null, localsTypes.ILocals>
+ 
+export const updateDefaultOwner: updateDefaultItemOwnerController = async (req, res) => {
+  const { agid } = req.params
+  const update = req.body
+  const { decoded } = res.locals
+	try {
+    const myNode = await NodeModel._getNode(agid)
+    // role check
+    if (update.Device !== undefined && update.Device !== null) {
+      const user = await UserModel._getUser(update.Device)
+      if (!user.roles.includes(RolesEnum.DEV_OWNER)) {
+        throw new Error('User needs to has DEV_OWNER role ')
+      }
+    }
+    if (update.Service !== undefined && update.Service !== null) {
+      const user = await UserModel._getUser(update.Service)
+      if (!user.roles.includes(RolesEnum.SERV_PROVIDER)) {
+        throw new Error('User needs to has SERV_PROVIDER role ')
+      }
+    }
+    
+    // remove
+    if (update.Device === null && myNode.defaultOwner && myNode.defaultOwner.Device) {
+      await NodeModel._removeDefaultOwner(agid, ItemType.DEVICE)
+      await UserModel._removeNodeFromUser(myNode.defaultOwner.Device, agid, ItemType.DEVICE)
+    }
+    if (update.Service === null && myNode.defaultOwner && myNode.defaultOwner.Service) {
+      await NodeModel._removeDefaultOwner(agid, ItemType.SERVICE)
+      await UserModel._removeNodeFromUser(myNode.defaultOwner.Service, agid, ItemType.SERVICE)
+    }
+
+    // update
+    if (update.Device) {
+      // update Node and user
+      await NodeModel._addDefaultOwner(agid,update.Device, ItemType.DEVICE)
+      await UserModel._addNodeToUser(update.Device, agid, ItemType.DEVICE)
+    }
+    if (update.Service) {
+      // update Node and user
+      await NodeModel._addDefaultOwner(agid,update.Service, ItemType.SERVICE)
+      await UserModel._addNodeToUser(update.Service, agid, ItemType.SERVICE)
+    }
+    
+    // Audit
+    const myUser = await UserModel._getUser(decoded.uid)
+    await AuditModel._createAudit({
+      ...res.locals.audit,
+      actor: { id: decoded.uid, name: myUser.name },
+      target: { id: agid, name: myNode.name },
+      type: EventType.nodeUpdated,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })
     return responseBuilder(HttpStatusCode.OK, res, null, null)

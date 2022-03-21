@@ -51,11 +51,17 @@ export const registration: registrationController = async (req, res) => {
       }
       const agid = decoded ? decoded.iss : req.body.agid
       const node = await NodeModel._getNode(agid)
+
+      const itemsToActivate: { oid:string, data:  IItemUpdate, uid: string }[] = []
       // Async registration of items
       await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
         try {
           // Create item
           const password = await ItemService.createOne(it, agid, node.cid)
+          // Autoenable item if setted up
+          if (node.defaultOwner[it.type]) { // TODO wait few seconds because xmpp notify?
+            itemsToActivate.push({ oid: it.oid, data: { status: ItemStatus.ENABLED }, uid: node.defaultOwner[it.type] })
+          }
           // Create response
           response.push({ name: it.name, oid: it.oid, password })
           // Create Notification
@@ -86,6 +92,12 @@ export const registration: registrationController = async (req, res) => {
         }
       }))
       logger.info('Gateway with id ' + agid + ' registered items')
+      for (const item of itemsToActivate) {
+        setTimeout(() => { // enable item in 30seconds
+          logger.info('Autoenabling item registered under: ' + agid)
+          ItemService.updateOne(item.oid, item.data, item.uid)
+        }, 30000)
+      }
       return responseBuilder(HttpStatusCode.OK, res, null, response)
     }
   } catch (err) {

@@ -10,6 +10,8 @@ import { INodeCreatePost, INodeUpdate, NodeType } from '../persistance/node/type
 import { NodeModel } from '../persistance/node/model'
 import { ItemService } from '../core'
 import { errorHandler } from '../utils/error-handler'
+import { UserModel } from '../persistance/user/model'
+import { ItemType } from '../persistance/item/types'
 
 // Constants
 const PUBLIC_NODES = 'PUBLIC_NODES' // CS group for nodes
@@ -69,6 +71,18 @@ export const removeOne = async (agid: string, cid?: string): Promise<void> => {
         node.hasItems.forEach(async it => {
             await ItemService.removeOne(it)
         })
+        // remove node from users
+        if (node.defaultOwner) {
+            if (node.defaultOwner.Device) {
+                await UserModel._removeNodeFromUser(node.defaultOwner.Device, agid, ItemType.DEVICE)
+            }
+            if (node.defaultOwner.Service) {
+                await UserModel._removeNodeFromUser(node.defaultOwner.Service, agid, ItemType.SERVICE)
+            }
+            if (node.defaultOwner.Marketplace) {
+                await UserModel._removeNodeFromUser(node.defaultOwner.Marketplace, agid, ItemType.MARKETPLACE)
+            }
+        }
         // Remove node from organisation
         await OrganisationModel._removeNodeFromCompany(node.cid, agid)
         // Remove node

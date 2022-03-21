@@ -1,12 +1,19 @@
 import mongoose from 'mongoose'
-import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count } from './statics'
+import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count, removeDefaultItemOwner, addDefaultItemOwner } from './statics'
 import { updateNode, removeNode } from './methods'
-import { INodeDocument, INodeModel, NodeType, NodeStatus } from './types'
+import { INodeDocument, INodeModel, NodeType, NodeStatus, DefaultOwnerType } from './types'
 
 const Schema = mongoose.Schema
 
 const nodeTypes = Object.values(NodeType)
 const statuses = Object.values(NodeStatus)
+
+const DefaultOwnerSchema = new Schema<DefaultOwnerType>({
+    Device: { type: String, required: false },
+    Service: { type: String, required: false },
+    Marketplace: { type: String, required: false },
+    _id: false
+})
 
 const NodeSchema = new Schema<INodeDocument, INodeModel>({
     agid: { type: String, index: true, required: true }, // unique Node id
@@ -17,6 +24,7 @@ const NodeSchema = new Schema<INodeDocument, INodeModel>({
     type: { type: String, required: true, enum: nodeTypes },
     // location: String,
     hasItems: [{ type: String, default: [] }],
+    defaultOwner: { type: DefaultOwnerSchema, required: false },
     itemsCount: { type: Number, default: 0 },
     hasKey: { type: Boolean, default: false },
     key: String,
@@ -35,7 +43,8 @@ NodeSchema.statics._removeItemFromNode = removeItemFromNode
 NodeSchema.statics._getKey = getKey
 NodeSchema.statics._removeKey = removeKey
 NodeSchema.statics._count = count
-
+NodeSchema.statics._addDefaultOwner = addDefaultItemOwner
+NodeSchema.statics._removeDefaultOwner = removeDefaultItemOwner
 // Methods
 
 NodeSchema.methods._updateNode = updateNode

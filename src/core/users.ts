@@ -40,6 +40,14 @@ import { HttpStatusCode } from '../utils'
         logger.warn('User that has items cannot remove an itemOwner roles')
         throw new MyError('User that has items cannot remove an itemOwner roles', HttpStatusCode.FORBIDDEN)
     }
+    if (user.hasNodes.length >= 1 && diff.removed.includes(RolesEnum.DEV_OWNER)) {
+        logger.warn('User that is default Device owner in some node needs to have device owner role')
+        throw new MyError('User that is default Device owner in some node needs to have device owner role', HttpStatusCode.FORBIDDEN)
+    }
+    if (user.hasNodes.length >= 1 && diff.removed.includes(RolesEnum.SERV_PROVIDER)) {
+        logger.warn('User that is default Service owner in some node needs to have Service provider role')
+        throw new MyError('User that is default Service owner in some node needs to have Service provider role', HttpStatusCode.FORBIDDEN)
+    }
 
     // Validate at least one IoTOperator if company hasContracts
     // TBD

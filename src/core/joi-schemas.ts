@@ -69,6 +69,12 @@ export const updateNodeSchema = Joi.object({
   // location: Joi.string()
 })
 
+export const updateDefaultOwnersSchema = Joi.object({
+  Device: Joi.string().allow(null, ''),
+  Service: Joi.string().allow(null, ''),
+  Marketplace: Joi.string().allow(null, '')
+})
+
 export const updateItemLabelsSchema = Joi.object({
   domain: Joi.valid(...Object.values(ItemDomainType))
 })

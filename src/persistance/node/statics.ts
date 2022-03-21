@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { INodeDocument, INodeModel, INodeCreatePost, INodeUI, NodeStatus } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
+import { ItemType } from '../../persistance/item/types'
 
 export async function getNode(
   this: INodeModel, agid: string, cid?: string
@@ -104,3 +105,41 @@ export async function count(
       throw new MyError('Nodes count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
     }
   }
+
+export async function addDefaultItemOwner(
+  this: INodeModel, agid: string, uid: string,  type?: ItemType
+  ): Promise<void> {
+    let record
+    if (type === ItemType.DEVICE) {
+      console.log('updating device')
+      record = await this.updateOne({ agid }, { '$set': { 'defaultOwner.Device': uid } }).exec()
+    } else if (type === ItemType.SERVICE) {
+      record = await this.updateOne({ agid }, { '$set': { 'defaultOwner.Service': uid } }).exec()
+    } else if (type === ItemType.MARKETPLACE) {
+      record = await this.updateOne({ agid }, { '$set': { 'defaultOwner.Marketplace': uid } }).exec()
+    } else {
+      throw new Error('Error addDefaultitemOwner: type not supported')
+    }
+    if (!record.ok) {
+      throw new Error('Error adding defaultOwner to node')
+    }
+}
+
+export async function removeDefaultItemOwner(
+  this: INodeModel, agid: string, type?: ItemType
+  ): Promise<void> {
+    let record
+    if (type === ItemType.DEVICE) {
+      console.log('removing default')
+      record = await this.updateOne({ agid }, { '$unset': { 'defaultOwner.Device': '' } }).exec()
+    } else if (type === ItemType.SERVICE) {
+      record = await this.updateOne({ agid }, { '$unset': { 'defaultOwner.Service': '' } }).exec()
+    } else if (type === ItemType.MARKETPLACE) {
+      record = await this.updateOne({ agid }, { '$unset': { 'defaultOwner.Marketplace': '' } }).exec()
+    } else {
+      throw new Error('Error addDefaultitemOwner: type not supported')
+    }
+    if (!record.ok) {
+      throw new Error('Error removing defaultOwner from node')
+    }
+}

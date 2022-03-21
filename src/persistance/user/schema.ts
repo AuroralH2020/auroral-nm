@@ -1,14 +1,22 @@
 import mongoose from 'mongoose'
 import { RolesEnum } from '../../types/roles'
-import { getUser, getDoc, createUser, findDuplicatesUser, getAllUsers, getUserByRole, addItemToUser, removeItemFromUser, count } from './statics'
+import { getUser, getDoc, createUser, findDuplicatesUser, getAllUsers, getUserByRole, addItemToUser, removeItemFromUser, count, addNodeToUser, removeNodeFromUser } from './statics'
 import { updateUser, updateUserRoles, removeUser } from './methods'
-import { IUserDocument, IUserModel, UserVisibility, UserStatus } from './types'
+import { IUserDocument, IUserModel, UserVisibility, UserStatus, HasNodeType } from './types'
+import { ItemType } from '../../persistance/item/types'
 
 const Schema = mongoose.Schema
 
 const roles = Object.values(RolesEnum)
 const visibilities = Object.values(UserVisibility)
 const statuses = Object.values(UserStatus)
+const itemTypes = Object.values(ItemType)
+
+const HasNodeSchema = new Schema<HasNodeType>({
+    agid: { type: String, required: true },
+    type: { type: String, required: true, enum: itemTypes },
+    _id: false
+})
 
 const UserSchema = new Schema<IUserDocument, IUserModel>({
     uid: { type: String, index: true, required: true },
@@ -28,6 +36,7 @@ const UserSchema = new Schema<IUserDocument, IUserModel>({
     hasContracts: [{ type: String, default: [] }], // Contains contracts ids
     hasAudits: [{ type: String, default: [] }],
     hasItems: [{ type: String, default: [] }],
+    hasNodes: [{ type: HasNodeSchema, default: [] }],
     lastUpdated: { type: Number, default: Date.now },
     created: { type: Number, default: Date.now }
 })
@@ -42,6 +51,8 @@ UserSchema.statics._findDuplicatesUser = findDuplicatesUser
 UserSchema.statics._getAllUsers = getAllUsers
 UserSchema.statics._addItemToUser = addItemToUser
 UserSchema.statics._removeItemFromUser = removeItemFromUser
+UserSchema.statics._addNodeToUser = addNodeToUser
+UserSchema.statics._removeNodeFromUser = removeNodeFromUser
 UserSchema.statics._count = count
 
 // Methods

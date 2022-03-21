@@ -2,6 +2,7 @@ import { RolesEnum } from '../../types/roles'
 import { IUserDocument, IUserModel, IUserCreate, IUserUI, UserVisibility, UserStatus, IUserUIProfile } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
+import { ItemType } from '../../persistance/item/types'
 
 export async function getUser(
   this: IUserModel, uid: string
@@ -109,7 +110,25 @@ export async function removeItemFromUser(
     if (!record.ok) {
       throw new Error('Error removing item from user')
     }
+}
+
+export async function addNodeToUser(
+  this: IUserModel, uid: string, agid: string, type: ItemType
+): Promise<void> {
+  const record = await this.updateOne({ uid }, { $addToSet: { hasNodes: { agid, type } } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding node to user')
   }
+}
+
+export async function removeNodeFromUser(
+  this: IUserModel, uid: string, agid: string, type: ItemType
+  ): Promise<void> {
+    const record = await this.updateOne({ uid }, { $pull: { hasNodes: { agid, type } } }).exec()
+    if (!record.ok) {
+      throw new Error('Error removing node from user')
+    }
+}
 
 export async function count(
   this: IUserModel): Promise<number> {
@@ -119,4 +138,5 @@ export async function count(
     } else {
       throw new MyError('User count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
     }
-  }
+}
+

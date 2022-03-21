@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { ItemType } from '../../persistance/item/types'
 
 export enum NodeType {
     VICINITY = 'Vicinity',
@@ -11,6 +12,18 @@ export enum NodeStatus {
     DELETED = 'deleted'
 }
 
+export type DefaultOwnerType = {
+    Device: string,
+    Service: string,
+    Marketplace: string,
+}
+
+export type DefaultOwnerTypeUpdate = {
+    Device?: string,
+    Service?: string,
+    Marketplace?: string,
+}
+
 export interface INode {
     // context: string
     agid: string, // ID in Auroral
@@ -19,6 +32,7 @@ export interface INode {
     type: NodeType, // Project the node belongs to
     // location: string,
     status: NodeStatus,
+    defaultOwner: DefaultOwnerType,
     visible: boolean, // True if is it discoverable in the P2P network
     hasItems: string[], // Ids of items under the node
     itemsCount: number, // Count of items (hasItems.length())
@@ -37,6 +51,7 @@ export interface INodeUI {
     // location: string,
     status: NodeStatus,
     hasItems: string[],
+    defaultOwner: DefaultOwnerType,
     itemsCount: number,
     hasKey: boolean,
     visible: boolean,
@@ -109,6 +124,17 @@ export interface INodeModel extends Model<INodeDocument> {
     _removeKey: (
         this: INodeModel,
         agid: string
+    ) => Promise<void>
+    _addDefaultOwner: (
+        this: INodeModel,
+        agid: string,
+        uid: string,
+        type?: ItemType 
+    ) => Promise<string | null>
+    _removeDefaultOwner: (
+        this: INodeModel,
+        agid: string,
+        type: ItemType 
     ) => Promise<void>
     _count: (
         this: INodeModel,

@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { ItemType } from '../../persistance/item/types'
 import { RolesEnum } from '../../types/roles' 
 
 export enum UserVisibility {
@@ -10,6 +11,11 @@ export enum UserVisibility {
 export enum UserStatus {
     ACTIVE = 'active',
     DELETED = 'deleted'
+}
+
+export interface HasNodeType {
+    agid: string,
+    type: ItemType
 }
 
 export interface IUser {
@@ -32,6 +38,7 @@ export interface IUser {
     hasNotifications: string[], // Contains notifications ids
     hasAudits: string[], // Contains audits ids
     hasItems: string[], // Contains items ids
+    hasNodes: string[], // Contains nodes in which is user default item owner 
     // hasContracts: string[], // Contains contracts ids
     // Timestamps
     lastUpdated: number,
@@ -126,6 +133,18 @@ export interface IUserModel extends Model<IUserDocument> {
         this: IUserModel,
         uid: string,
         oid: string
+    ) => Promise<void>
+    _addNodeToUser: (
+        this: IUserModel,
+        uid: string,
+        agid: string,
+        type: ItemType
+    ) => Promise<void>
+    _removeNodeFromUser: (
+        this: IUserModel,
+        uid: string,
+        agid: string,
+        type: ItemType
     ) => Promise<void>
     _addContract: (
         this: IUserModel,
