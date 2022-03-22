@@ -22,6 +22,7 @@ export function responseBuilder<T>(statusCode: HttpStatusCode, res: ApiResponse<
     const err = errorBuilder(statusCode, error)
     if (err) {
         return res.status(statusCode).json({
+            message,
             error: err
         })
     } else {

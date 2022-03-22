@@ -24,7 +24,7 @@ const NodeSchema = new Schema<INodeDocument, INodeModel>({
     type: { type: String, required: true, enum: nodeTypes },
     // location: String,
     hasItems: [{ type: String, default: [] }],
-    defaultOwner: { type: DefaultOwnerSchema, required: false },
+    defaultOwner: { type: DefaultOwnerSchema, default: {} },
     itemsCount: { type: Number, default: 0 },
     hasKey: { type: Boolean, default: false },
     key: String,

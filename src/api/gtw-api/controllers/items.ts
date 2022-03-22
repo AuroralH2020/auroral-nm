@@ -33,6 +33,13 @@ type registrationUpdateResponse = {
   error?: boolean
 }
 
+type registrationRemoveResponse = {
+  oid: string,
+  statusCode: number,
+  error?: string,
+  success?: boolean,
+}
+
 // Controllers
 type registrationController = expressTypes.Controller<{}, { agid: string, items: IItemCreate[] }, {}, registrationResponse[], localsTypes.ILocalsGtw>
 
@@ -59,7 +66,7 @@ export const registration: registrationController = async (req, res) => {
           // Create item
           const password = await ItemService.createOne(it, agid, node.cid)
           // Autoenable item if setted up
-          if (node.defaultOwner[it.type]) { // TODO wait few seconds because xmpp notify?
+          if (node.defaultOwner && node.defaultOwner[it.type]) { 
             itemsToActivate.push({ oid: it.oid, data: { status: ItemStatus.ENABLED }, uid: node.defaultOwner[it.type] })
           }
           // Create response
@@ -130,7 +137,7 @@ export const neighbourhood: neighbourhoodController = async (req, res) => {
   }
 }
 
-type deleteItemsController = expressTypes.Controller<{}, { agid: string, oids: string[] }, {}, null, localsTypes.ILocalsGtw>
+type deleteItemsController = expressTypes.Controller<{}, { agid: string, oids: string[] }, {}, registrationRemoveResponse[], localsTypes.ILocalsGtw>
 
 export const deleteItems: deleteItemsController = async (req, res) => {
   const { oids } = req.body
@@ -144,7 +151,8 @@ export const deleteItems: deleteItemsController = async (req, res) => {
         logger.warn({ msg: 'Gateway anonymous access, it will be forbidden in production...', id: res.locals.reqId })
       }
       const agid = decoded ? decoded.iss : req.body.agid
-      oids.forEach(async (it) => {
+
+      const items : registrationRemoveResponse[] =  await Promise.all(oids.map(async (it) => {      
         try {
           const myItem = (await ItemModel._getItem(it))
           const myNode = (await NodeModel._getNode(agid))
@@ -167,12 +175,14 @@ export const deleteItems: deleteItemsController = async (req, res) => {
             labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
           })
           logger.info({ msg: it + 'was removed from ' + agid, id: res.locals.reqId })
+          return { oid: it, statusCode: 200 } as registrationRemoveResponse
         } catch (error) {
           const e = errorHandler(error)
           logger.error({ msg: e.message, id: res.locals.reqId })
+          return { oid: it, error: e.message, statusCode: e.status }
         }
-      })
-      return responseBuilder(HttpStatusCode.OK, res, null, null)
+      }))
+      return responseBuilder(HttpStatusCode.OK, res, null, items)
     }
   } catch (err) {
     const error = errorHandler(err)
