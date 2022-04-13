@@ -3,8 +3,9 @@
 import apm_service from './utils/apm-service'
 
 apm_service().then(() => {
-  logger.info('APM started')
-}).catch((error) => {})
+}).catch((error) => {
+  logger.error(error.message)
+})
 
 import cors from 'cors'
 import express from 'express'

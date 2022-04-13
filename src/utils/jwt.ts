@@ -19,7 +19,7 @@ let secret: string | Buffer | null = null
 let algorithm: Algorithms
 
 if (Config.NODE_ENV === 'development') {
-    logger.debug('Using development jwt verifier')
+    logger.debug('Using development jwt verifier, remember to add SECRET_TOKEN to env variables!')
     secret = Config.SECRET_TOKEN
     algorithm = Algorithms.SYNC
 } else {

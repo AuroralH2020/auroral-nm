@@ -33,6 +33,13 @@ export const Config = {
 		PORT: process.env.MONGO_PORT!,
 		DB: process.env.MONGO_DB!
 	},
+	REDIS: {
+		PASSWORD: process.env.REDIS_PASSWORD,
+		HOST: process.env.REDIS_HOST || 'localhost', 
+		PORT: process.env.REDIS_PORT || 6379,
+		CACHE: process.env.REDIS_CACHE === 'true' ? true : false,
+		CACHE_TTL: process.env.REDIS_CACHE_TTL || 60000,
+	},
 	SMTP: {
 		HOST: process.env.SMTP_HOST!,
 		PORT: process.env.SMTP_PORT!,
@@ -43,16 +50,17 @@ export const Config = {
 		SALES_MAIL: process.env.SMTP_SALES_MAIL!
 	},
 	APM: {
-		SERVER_URL: process.env.APM_SERVER_URL!,
-		TOKEN: process.env.APM_TOKEN!,
-		NAME: process.env.APM_NAME!
+		ACTIVE: process.env.APM_DISABLED === 'true' ? false : true,
+		SERVER_URL: process.env.APM_SERVER_URL || 'https://elastic.url',
+		TOKEN: process.env.APM_TOKEN || 'secret_token',
+		NAME: process.env.APM_NAME || 'test'
 	},
 	ELK: {
-		URL: process.env.ELK_URL!,
-		TOKEN: process.env.ELK_TOKEN!
+		URL: process.env.ELK_URL || 'https://elastic.url',
+		TOKEN: process.env.ELK_TOKEN || 'secret_token'
 	},
 	SLACK: {
-		HOST: process.env.SLACK_HOST!,
-		HOOK: process.env.SLACK_HOOK!
+		HOST: process.env.SLACK_HOST || 'https://hooks.slack.com/',
+		HOOK: process.env.SLACK_HOOK || 'myhook'
 	}
 }
