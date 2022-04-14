@@ -3,19 +3,21 @@
  * Interface to REDIS DB
  * @interface
  */
- import redis, { createClient, RedisClientOptions } from 'redis'
+ import { createClient, RedisClientOptions } from 'redis'
  import { Request, Response, NextFunction } from 'express'
  import { Config } from '../config'
  import { logger } from '../utils/logger'
  import { JsonType } from '../types/misc-types'
- 
- const redisOptions = {
-     port: Number(Config.REDIS.PORT), 
-     host: Config.REDIS.HOST,
-     auth_pass: Config.REDIS.PASSWORD
-  } as RedisClientOptions
 
-  const client = createClient(redisOptions)
+// Create Redis Client for sessions
+const redisSessionsOptions = {
+    port: Number(Config.REDIS.PORT), 
+    host: Config.REDIS.HOST,
+    auth_pass: Config.REDIS.PASSWORD,
+    database: 0 // DB for sessions
+ } as RedisClientOptions
+
+const client = createClient(redisSessionsOptions)
 
 // Exposes functions for working with the cache db REDIS
 export const redisDb = {
@@ -24,15 +26,13 @@ export const redisDb = {
     * @returns {void}
     */
     start: async () => {
-        client.on('error', (err) => {
-            logger.error(err.message)
-            process.exit(1)
-        })
-        client.on('connect', () => {
+        try {
+            await client.connect()
             logger.info('Connected successfully to Redis!!')
-        })
-        await client.connect()
-        },
+        } catch (err) {
+            logger.error('Could not connect to Redis...')
+        }
+    },
     /**
      * Checks REDIS connection status;
      * Rejects if REDIS not ready;
@@ -42,5 +42,60 @@ export const redisDb = {
     health: async (): Promise<void> => {
         const reply = await client.ping()
         logger.debug('Redis is ready: ' + reply)
+    },
+    // PERSIST
+    /**
+     * Force saving changes to dump.rdb;
+     * Use to ensure critical changes will not be lost;
+     * Does not reject on error, resolves false;
+     * @async
+     * @returns {string}
+     */
+    save: async (): Promise<void> => {
+        await client.save()
+    },
+    // BASIC STRING STORAGE & REMOVAL
+    /**
+     * Save a string;
+     * Custom defined ttl => 0 = no TTL;
+     * rejects on error;
+     * @async
+     * @param {string} key
+     * @param {*} item
+     * @param {integer} ttl
+     * @returns {void}
+     */
+    set: async (key: string, item: string, ttl: number): Promise<void> => {
+        await client.set(key, item, { 'EX': ttl }) // Other options NX, GET (Check redis for more)...
+    },
+    /**
+     * Remove manually one key or list stored;
+     * rejects on error a boolean;
+     * @async
+     * @param {string} key
+     * @returns {void}
+     */
+    remove: async (key: string): Promise<void> => {
+        await client.del(key)
+    },
+    /**
+     * Get manually one key or list stored;
+     * rejects on error a boolean;
+     * @async
+     * @param {string} key
+     * @returns {string | null}
+     */
+    get: (key: string): Promise<string | null> => {
+        return client.get(key)
+    },
+    /**
+     * Get manually one key or list stored;
+     * rejects on error a boolean;
+     * @async
+     * @param {string} key
+     * @returns {string | null}
+     */
+    scan: (cursor: number): Promise<{ cursor: number, keys: string[]}> => {
+        return client.scan(cursor)
     }
 }

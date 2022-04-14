@@ -24,9 +24,8 @@ export const authenticate: authController = async (req, res) => {
 	}
 	try {
                 await comparePassword(username, password)
-                const token = await signAppToken(username)
+                const token = await signAppToken(username, res.locals.origin.originIp)
                 // TBD: Consider adding LOGIN audit
-                // TBD: Add passwordless LOGIN
                 return responseBuilder(HttpStatusCode.OK, res, null, token)
 	} catch (err) {
                 const error = errorHandler(err)
@@ -98,7 +97,7 @@ export const refreshToken: refreshTokenController = async (req, res) => {
                 return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null, 'Missing token')
 	}
         try {
-                const token = await signAppToken(decoded.iss)
+                const token = await signAppToken(decoded.iss, res.locals.origin.originIp)
                 return responseBuilder(HttpStatusCode.OK, res, null, token)
         } catch (err) {
                 const error = errorHandler(err)
@@ -141,7 +140,7 @@ export const processPasswordless: processPasswordlessController = async (req, re
                 await checkTempSecret(tokenObject.iss, tokenObject.sub)
                 logger.debug('Passwordless login validated')
                 // generate app token
-                const appToken = await signAppToken(tokenObject.iss)
+                const appToken = await signAppToken(tokenObject.iss, res.locals.origin.originIp)
                 return responseBuilder(HttpStatusCode.OK, res, null, appToken)
         } catch (err) {
                 const error = errorHandler(err)
@@ -182,7 +181,7 @@ export const rememberGetToken: rememberGetTokenController = async (req, res) => 
                 }
                 // look for username and get token
                 const username = (await UserModel._getUser(session.uid)).email
-                const token = await signAppToken(username)
+                const token = await signAppToken(username, res.locals.origin.originIp)
 
                 return responseBuilder(HttpStatusCode.OK, res, null, token)
         } catch (err) {

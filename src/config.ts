@@ -18,6 +18,10 @@ export const Config = {
 	PORT: process.env.PORT!,
 	SECRET_TOKEN: process.env.SECRET_TOKEN!,
 	SCHEDULER_ENABLED: process.env.SCHEDULER_ENABLED,
+	SESSIONS: {
+		ENABLED: process.env.SESSIONS_ENABLED === 'true' ? true : false,
+		DURATION: process.env.SESSIONS_DURATION ? Number(process.env.SESSION_DURATION) : 3600 // Defaults to 1 hour
+	},
 	CS: {
 		URL: process.env.CS_URL!, 
 		SECRET_KEY: process.env.CS_SECRET_KEY!
@@ -38,7 +42,7 @@ export const Config = {
 		HOST: process.env.REDIS_HOST || 'localhost', 
 		PORT: process.env.REDIS_PORT || 6379,
 		CACHE: process.env.REDIS_CACHE === 'true' ? true : false,
-		CACHE_TTL: process.env.REDIS_CACHE_TTL || 60000,
+		CACHE_TTL: process.env.REDIS_CACHE_TTL || 60, // default 60s
 	},
 	SMTP: {
 		HOST: process.env.SMTP_HOST!,

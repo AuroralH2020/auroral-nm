@@ -30,7 +30,7 @@ async function bootstrap() {
       logger.info('Scheduler NOT enabled')
       scheduledJobs.stop()
     }
-    redisDb.start()
+    await redisDb.start()
     logger.info('All services initialized')
   } catch (error: unknown) {
     const err = error as Error

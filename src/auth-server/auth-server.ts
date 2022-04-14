@@ -9,6 +9,7 @@ import { logger } from '../utils/logger'
 import { jwtTypes } from '../types/index'
 import { MyError } from '../utils/error-handler'
 import { HttpStatusCode } from '../utils'
+import { setSession } from '../core/sessions'
 
 // Algorithms
 enum Algorithms {
@@ -92,7 +93,7 @@ export const signMailToken = async (username: string, purpose: string, idInLink?
     })
 }
 
-export const signAppToken = async (username: string): Promise<string> => {
+export const signAppToken = async (username: string, ip: string): Promise<string> => {
     const user = await AccountModel._getAccount(username)
     let secret: string | Buffer
     let algorithm: jwt.Algorithm
@@ -103,6 +104,8 @@ export const signAppToken = async (username: string): Promise<string> => {
         secret = priv_cert!
         algorithm = Algorithms.ASYNC
     }
+    const sessionValue = new Date().getTime() + ':' + ip
+    await setSession(user.uid, sessionValue)
     return new Promise((resolve, reject) => {
         jwt.sign(
             {
@@ -110,14 +113,7 @@ export const signAppToken = async (username: string): Promise<string> => {
                 org: user.cid,
                 uid: user.uid,
                 roles: user.roles.toString(),
-                exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
-                // iss: 'vicinityManager',
-                // sub: username,
-                // exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
-                // roles: user.roles.toString(),
-                // uid: userAccountId,
-                // orgid: companyAccountId,
-                // cid: user.cid
+                exp: Math.floor(Date.now() / 1000) + Config.SESSIONS.DURATION,
             },
             secret,
             { algorithm },
@@ -146,23 +142,24 @@ export const verifyToken = async (token: string): Promise<jwtTypes.JWTDecodedTok
     return new Promise((resolve, reject) => {
         jwt.verify(token, secret, { algorithms: [algorithm] }, (err, decoded) => {
             if (err) {
-                // let myError
-                // if (err.name === 'TokenExpiredError') {
-                //     logger.error('Token expired at: ' + err.expiredAt)
-                //     myError = new customError.UnauthorizedError(err.message, customError.types.INVALID_TOKEN_EXPIRED)
-                // } else if (err.name === 'JsonWebTokenError') {
-                //     myError = new customError.UnauthorizedError(err.message, customError.types.INVALID_TOKEN_MALFORMED) 
-                // } else {
-                //     logger.error(err.message)
-                //     myError = new customError.ServerError(err.message, customError.types.GENERIC_ERROR)
-                // }
-                logger.error(err)
-                reject(err)
-            } else {
+                if (err.name === 'TokenExpiredError') {
+                    throw new MyError(err.message, HttpStatusCode.FORBIDDEN)
+                } else if (err.name === 'JsonWebTokenError') {
+                    throw new MyError(err.message, HttpStatusCode.FORBIDDEN)
+                } else {
+                    logger.error(err.message)
+                    throw new MyError(err.message, HttpStatusCode.INTERNAL_SERVER_ERROR)
+                }
+            } else {                
                 resolve(decoded as jwtTypes.JWTDecodedToken)
             }
         })
     })
+}
+
+// Just decode, no key or expiration checks
+export const decodeToken = (token: string) => {
+    return jwt.decode(token)
 }
 
 /**
