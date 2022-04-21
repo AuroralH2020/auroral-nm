@@ -104,7 +104,9 @@ export const signAppToken = async (username: string, ip: string): Promise<string
         secret = priv_cert!
         algorithm = Algorithms.ASYNC
     }
-    const sessionValue = new Date().getTime() + ':' + ip
+    const exp = Math.floor(Date.now() / 1000) + Config.SESSIONS.DURATION
+    const session_start = Math.floor(Date.now() / 1000)
+    const sessionValue = username + ':' + session_start + ':' + ip
     await setSession(user.uid, sessionValue)
     return new Promise((resolve, reject) => {
         jwt.sign(
@@ -113,7 +115,7 @@ export const signAppToken = async (username: string, ip: string): Promise<string
                 org: user.cid,
                 uid: user.uid,
                 roles: user.roles.toString(),
-                exp: Math.floor(Date.now() / 1000) + Config.SESSIONS.DURATION,
+                exp
             },
             secret,
             { algorithm },

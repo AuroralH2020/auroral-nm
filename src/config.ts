@@ -20,7 +20,7 @@ export const Config = {
 	SCHEDULER_ENABLED: process.env.SCHEDULER_ENABLED,
 	SESSIONS: {
 		ENABLED: process.env.SESSIONS_ENABLED === 'true' ? true : false,
-		DURATION: process.env.SESSIONS_DURATION ? Number(process.env.SESSION_DURATION) : 3600 // Defaults to 1 hour
+		DURATION: process.env.SESSIONS_DURATION ? Number(process.env.SESSION_DURATION) : 600 // Defaults to 1 hour
 	},
 	CS: {
 		URL: process.env.CS_URL!, 

@@ -22,9 +22,9 @@ export const jwt = (roles?: RolesEnum[]) => {
     return function(req, res, next) {
         try {
             // const authHeader = req.headers.authorization
-            const authHeader = req.headers['x-access-token']
+            const authHeader = req.headers.authorization as string
             // const token = authHeader && authHeader.split(' ')[1]
-            const token = authHeader as string
+            const token = authHeader ? authHeader.split(' ')[1] : null
             if (!token) {
                 throw new Error('Unauthorized, missing token')
             }

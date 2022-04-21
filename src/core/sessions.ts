@@ -5,11 +5,19 @@ import { logger } from '../utils/logger'
 // Functions
 
 export const getSession = async (key: string): Promise<string | null> => {
-    return redisDb.get(key)
+    if (Config.SESSIONS.ENABLED) {
+        return redisDb.get(key)
+    } else {
+        return ''
+    }
 }
 
 export const getAllSessions = async (cursor: number) => {
-    await redisDb.scan(cursor)
+    if (Config.SESSIONS.ENABLED) {
+        return redisDb.scan(cursor)
+    } else {
+        return { cursor: 0, keys: [] }
+    }
 }
 
 export const setSession = async (key: string, value: string): Promise<void> => {
