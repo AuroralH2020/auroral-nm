@@ -111,7 +111,6 @@ export async function addDefaultItemOwner(
   ): Promise<void> {
     let record
     if (type === ItemType.DEVICE) {
-      console.log('updating device')
       record = await this.updateOne({ agid }, { '$set': { 'defaultOwner.Device': uid } }).exec()
     } else if (type === ItemType.SERVICE) {
       record = await this.updateOne({ agid }, { '$set': { 'defaultOwner.Service': uid } }).exec()
@@ -130,7 +129,6 @@ export async function removeDefaultItemOwner(
   ): Promise<void> {
     let record
     if (type === ItemType.DEVICE) {
-      console.log('removing default')
       record = await this.updateOne({ agid }, { '$unset': { 'defaultOwner.Device': '' } }).exec()
     } else if (type === ItemType.SERVICE) {
       record = await this.updateOne({ agid }, { '$unset': { 'defaultOwner.Service': '' } }).exec()
@@ -142,4 +140,22 @@ export async function removeDefaultItemOwner(
     if (!record.ok) {
       throw new Error('Error removing defaultOwner from node')
     }
+}
+
+export async function addToCommunity(
+  this: INodeModel, agid: string, commId: string
+): Promise<void> {
+  const record = await this.updateOne({ agid }, { $addToSet: { hasCommunities: commId } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding community to node')
+  }
+}
+
+export async function removeFromCommunity(
+  this: INodeModel, agid: string, commId: string
+): Promise<void> {
+  const record = await this.updateOne({ agid }, { $pull: { hasCommunities: commId } }).exec()
+  if (!record.ok) {
+    throw new Error('Error adding community to node')
+  }
 }

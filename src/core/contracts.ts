@@ -1,5 +1,5 @@
 /**
- * Core functionality of NODES
+ * Core functionality of CONTRACTS
  */
 
 // Imports

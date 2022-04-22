@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count, removeDefaultItemOwner, addDefaultItemOwner } from './statics'
+import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count, removeDefaultItemOwner, addDefaultItemOwner, addToCommunity, removeFromCommunity } from './statics'
 import { updateNode, removeNode } from './methods'
 import { INodeDocument, INodeModel, NodeType, NodeStatus, DefaultOwnerType } from './types'
 
@@ -24,6 +24,7 @@ const NodeSchema = new Schema<INodeDocument, INodeModel>({
     type: { type: String, required: true, enum: nodeTypes },
     // location: String,
     hasItems: [{ type: String, default: [] }],
+    hasCommunities: [{ type: String, default: [] }],
     defaultOwner: { type: DefaultOwnerSchema, default: {} },
     itemsCount: { type: Number, default: 0 },
     hasKey: { type: Boolean, default: false },
@@ -45,8 +46,10 @@ NodeSchema.statics._removeKey = removeKey
 NodeSchema.statics._count = count
 NodeSchema.statics._addDefaultOwner = addDefaultItemOwner
 NodeSchema.statics._removeDefaultOwner = removeDefaultItemOwner
-// Methods
+NodeSchema.statics._addToCommunity = addToCommunity
+NodeSchema.statics._removeFromCommunity = removeFromCommunity
 
+// Methods
 NodeSchema.methods._updateNode = updateNode
 NodeSchema.methods._removeNode = removeNode // Not delete record, keep some info for future inspection if needed
 

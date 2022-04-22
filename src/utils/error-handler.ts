@@ -12,6 +12,7 @@ export enum ErrorSource {
     NODE = 'node',
     CONTRACT = 'contract',
     ORGANISATION = 'organisation',
+    COMMUNITY= 'community'
 }
 
 type ErrorOptions = {

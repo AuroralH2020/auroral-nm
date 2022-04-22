@@ -8,7 +8,7 @@ import { cs } from '../microservices/commServer'
 import { OrganisationModel } from '../persistance/organisation/model'
 import { INodeCreatePost, INodeUpdate, NodeType } from '../persistance/node/types'
 import { NodeModel } from '../persistance/node/model'
-import { ItemService } from '../core'
+import { CommunityService, ItemService } from '../core'
 import { errorHandler } from '../utils/error-handler'
 import { UserModel } from '../persistance/user/model'
 import { ItemType } from '../persistance/item/types'
@@ -71,6 +71,12 @@ export const removeOne = async (agid: string, cid?: string): Promise<void> => {
         node.hasItems.forEach(async it => {
             await ItemService.removeOne(it)
         })
+        // Remove node from communities where is included
+        if (node.hasCommunities) {
+            node.hasCommunities.forEach(async commId => {
+                await CommunityService.removeNode(commId, node.cid,agid)
+            })
+        }
         // remove node from users
         if (node.defaultOwner) {
             if (node.defaultOwner.Device) {
