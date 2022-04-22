@@ -65,13 +65,13 @@ export const jwt = (roles?: RolesEnum[]) => {
                             // if (session.split(':')[1] === res.locals.origin.originIp) {
                             //     return next()
                             // } else {
-                            //     return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'Strange activity detected, IP changed during session life, possible use of VPN or tampering attempt')
+                            //     return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Strange activity detected, IP changed during session life, possible use of VPN or tampering attempt')
                             // }
                             // TBD Create and check token revocation list (Redis list for each user with its revoked tokens)
                             return next()
                         } else {
                             logger.error('Session expired')
-                            return responseBuilder(HttpStatusCode.FORBIDDEN, res, decoded.uid + ': Session expired')
+                            return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, decoded.uid + ': Session expired')
                         }
                     }
                 ).catch((err) => {

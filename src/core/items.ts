@@ -132,7 +132,7 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         // Validate agid provided by agent or uid by UI
         if (owner != null && owner !== item.agid && owner !== item.uid) {
             logger.error('Cannot remove ' + oid + ' because it does not belong to user or agent requester: ' + owner)
-            throw new MyError('Item does not belong to requester', HttpStatusCode.UNAUTHORIZED)
+            throw new MyError('Item does not belong to requester', HttpStatusCode.FORBIDDEN)
         }
         // Remove item in CS
         await cs.deleteUser(oid)
@@ -171,7 +171,7 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
     // Validate agid provided by agent or uid by UI
         if (owner != null && owner !== item.agid && owner !== item.uid && item.status !== ItemStatus.DISABLED) {
             // logger.error('Cannot update ' + oid + ' because it does not belong to user or agent requester: ' + owner)
-            throw new MyError('Item does not belong to requester', HttpStatusCode.UNAUTHORIZED)
+            throw new MyError('Item does not belong to requester', HttpStatusCode.FORBIDDEN)
         }
         // TBD: Do checks before updating
         // Check conflicts

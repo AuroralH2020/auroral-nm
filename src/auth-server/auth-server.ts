@@ -106,7 +106,7 @@ export const signAppToken = async (username: string, ip: string): Promise<string
     }
     const exp = Math.floor(Date.now() / 1000) + Config.SESSIONS.DURATION
     const session_start = Math.floor(Date.now() / 1000)
-    const sessionValue = username + ':' + session_start + ':' + ip
+    const sessionValue = user.uid + ':' + username + ':' + session_start + ':' + ip
     await setSession(user.uid, sessionValue)
     return new Promise((resolve, reject) => {
         jwt.sign(
@@ -145,9 +145,9 @@ export const verifyToken = async (token: string): Promise<jwtTypes.JWTDecodedTok
         jwt.verify(token, secret, { algorithms: [algorithm] }, (err, decoded) => {
             if (err) {
                 if (err.name === 'TokenExpiredError') {
-                    throw new MyError(err.message, HttpStatusCode.FORBIDDEN)
+                    throw new MyError(err.message, HttpStatusCode.UNAUTHORIZED)
                 } else if (err.name === 'JsonWebTokenError') {
-                    throw new MyError(err.message, HttpStatusCode.FORBIDDEN)
+                    throw new MyError(err.message, HttpStatusCode.UNAUTHORIZED)
                 } else {
                     logger.error(err.message)
                     throw new MyError(err.message, HttpStatusCode.INTERNAL_SERVER_ERROR)

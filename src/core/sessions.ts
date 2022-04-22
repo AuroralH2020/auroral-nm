@@ -14,9 +14,14 @@ export const getSession = async (key: string): Promise<string | null> => {
 
 export const getAllSessions = async (cursor: number) => {
     if (Config.SESSIONS.ENABLED) {
-        return redisDb.scan(cursor)
+        const data = await redisDb.scan(cursor)
+        const sessions = await Promise.all(data.keys.map(async (it) => {
+                return getSession(it) 
+            })
+        ) as unknown as string[]
+        return { cursor: data.cursor, sessions }
     } else {
-        return { cursor: 0, keys: [] }
+        return { cursor: 0, sessions: [] }
     }
 }
 

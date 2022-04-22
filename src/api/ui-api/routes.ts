@@ -4,6 +4,7 @@ import { Router } from 'express'
 import { jwt, addOrigin, validateBody, createAudit } from '../middlewares/index'
 // Controllers
 import * as loginCtrl from './controllers/login'
+import * as sessionsCtrl from './controllers/sessions'
 import * as registrationCtrl from './controllers/registration'
 import * as statisticsCtrl from './controllers/statistics'
 import * as invitationCtrl from './controllers/invitation'
@@ -43,10 +44,14 @@ UiRouter
 .put('/login/recovery/:token', addOrigin(Interfaces.UI), validateBody(passwordSchema), loginCtrl.processRecoverPwd)
 .post('/login/passwordless', addOrigin(Interfaces.UI), loginCtrl.requestPasswordless)
 .post('/login/passwordless/:token', addOrigin(Interfaces.UI), loginCtrl.processPasswordless)
-
 .get('/login/remember', addOrigin(Interfaces.UI), jwt(), loginCtrl.rememberCookie)
 .post('/login/remember/', addOrigin(Interfaces.UI), loginCtrl.rememberGetToken)
 .delete('/login/remember/:sessionId', addOrigin(Interfaces.UI), loginCtrl.rememberDeleteToken)
+
+// SESSIONS
+.get('/sessions/all/:cursor', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getAll)
+.get('/sessions/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getOne)
+.delete('/sessions/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.delOne)
 
 // REGISTRATION
 .get('/registration', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getAllRegistrations)
