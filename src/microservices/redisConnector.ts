@@ -4,10 +4,8 @@
  * @interface
  */
  import { createClient, RedisClientOptions } from 'redis'
- import { Request, Response, NextFunction } from 'express'
  import { Config } from '../config'
  import { logger } from '../utils/logger'
- import { JsonType } from '../types/misc-types'
 
 // Create Redis Client for sessions
 const redisSessionsOptions = {

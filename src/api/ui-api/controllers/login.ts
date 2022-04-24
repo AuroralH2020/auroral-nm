@@ -14,19 +14,19 @@ import { UserModel } from '../../../persistance/user/model'
 
 // Controllers
 
-type authController = expressTypes.Controller<{}, {username: string, password: string}, {}, string, localsTypes.ILocals>
+type authController = expressTypes.Controller<{}, {username: string, password: string}, {}, any, localsTypes.ILocals>
  
 export const authenticate: authController = async (req, res) => {
     const { username, password } = req.body
     if (!username || !password) {
             logger.warn('Missing username or password')
-            return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null, 'Missing username or password')
+            return responseBuilder(HttpStatusCode.BAD_REQUEST, res, 'Missing username or password')
 	}
 	try {
                 await comparePassword(username, password)
-                const token = await signAppToken(username, res.locals.origin.originIp)
+                const tokens = await signAppToken(username, res.locals.origin.originIp)
                 // TBD: Consider adding LOGIN audit
-                return responseBuilder(HttpStatusCode.OK, res, null, token)
+                return responseBuilder(HttpStatusCode.OK, res, null, tokens)
 	} catch (err) {
                 const error = errorHandler(err)
                 logger.error(error.message)
@@ -87,18 +87,24 @@ export const processRecoverPwd: processRecoverPwdController = async (req, res) =
         }
 }
 
-type refreshTokenController = expressTypes.Controller<{}, { roles: string }, {}, string, localsTypes.ILocals>
+type refreshTokenController = expressTypes.Controller<{}, { refreshToken: string }, {}, any, localsTypes.ILocals>
  
 export const refreshToken: refreshTokenController = async (req, res) => {
-        // const { roles } = req.body
         const { decoded } = res.locals
+        const { refreshToken } = req.body
         if (!decoded) {
                 logger.warn('Missing token')
-                return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null, 'Missing token')
+                return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Missing token')
 	}
         try {
-                const token = await signAppToken(decoded.iss, res.locals.origin.originIp)
-                return responseBuilder(HttpStatusCode.OK, res, null, token)
+                const original = await verifyToken(refreshToken)
+                if (original.aud === 'refresh' && original.uid === decoded.uid) {
+                        const tokens = await signAppToken(decoded.iss, res.locals.origin.originIp, decoded.iat)
+                        return responseBuilder(HttpStatusCode.OK, res, null, tokens)
+                } else {
+                        logger.warn('Refresh token not valid')
+                        return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'Refresh token not valid') 
+                }
         } catch (err) {
                 const error = errorHandler(err)
                 logger.error(error.message)
@@ -129,7 +135,7 @@ export const requestPasswordless: requestPasswordlessController = async (req, re
         }
 }
 
-type processPasswordlessController =  expressTypes.Controller<{ token: string }, {}, {}, string, localsTypes.ILocals>
+type processPasswordlessController =  expressTypes.Controller<{ token: string }, {}, {}, { token: string, refreshToken: string }, localsTypes.ILocals>
  
 export const processPasswordless: processPasswordlessController = async (req, res) => {
         const { token } = req.params
@@ -140,8 +146,8 @@ export const processPasswordless: processPasswordlessController = async (req, re
                 await checkTempSecret(tokenObject.iss, tokenObject.sub)
                 logger.debug('Passwordless login validated')
                 // generate app token
-                const appToken = await signAppToken(tokenObject.iss, res.locals.origin.originIp)
-                return responseBuilder(HttpStatusCode.OK, res, null, appToken)
+                const tokens = await signAppToken(tokenObject.iss, res.locals.origin.originIp)
+                return responseBuilder(HttpStatusCode.OK, res, null, tokens)
         } catch (err) {
                 const error = errorHandler(err)
                 logger.error(error.message)
@@ -165,7 +171,7 @@ export const rememberCookie: rememberCookieController = async (req, res) => {
         }
 }
 
-type rememberGetTokenController =  expressTypes.Controller<{ }, { cookie: string }, {}, string, localsTypes.ILocals>
+type rememberGetTokenController =  expressTypes.Controller<{ }, { cookie: string }, {}, any, localsTypes.ILocals>
  
 export const rememberGetToken: rememberGetTokenController = async (req, res) => {
         const { cookie } = req.body

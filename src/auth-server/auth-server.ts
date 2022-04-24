@@ -10,6 +10,7 @@ import { jwtTypes } from '../types/index'
 import { MyError } from '../utils/error-handler'
 import { HttpStatusCode } from '../utils'
 import { setSession } from '../core/sessions'
+import { JsonType } from '../types/misc-types'
 
 // Algorithms
 enum Algorithms {
@@ -39,7 +40,7 @@ if (Config.NODE_ENV === 'test') {
 }
 
 // Token types
-const validTokenTypes = ['validate', 'validatepwd', 'pwdrecovery', 'passwordless']
+const validTokenTypes = ['authentication', 'refresh', 'validate', 'validatepwd', 'pwdrecovery', 'passwordless']
 
 export const hashPassword = async (password: string) => {
     const saltRounds = 10
@@ -60,87 +61,58 @@ export const signMailToken = async (username: string, purpose: string, idInLink?
     if (validTokenTypes.lastIndexOf(purpose) === -1) {
         throw new Error('Invalid token type')
     }
-    let secret: string | Buffer
-    let algorithm: jwt.Algorithm
-    if (secret_key) {
-        secret = secret_key
-        algorithm = Algorithms.SYNC
-    } else {
-        secret = priv_cert!
-        algorithm = Algorithms.ASYNC
-    }
+    const { secret, algorithm } = getSecretAndAlg()
     const secretDoc = await AccountModel._getDoc(username)
     const accountSecret = await secretDoc._updateTempSecret()
-    return new Promise((resolve, reject) => {
-        jwt.sign(
+    return signToken(
         {
             exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
             iss: idInLink ? idInLink : username,
             aud: purpose,
             sub: accountSecret
-        }, 
+        },
         secret,
-        { algorithm },
-        (err: Error | null, token?: string) => {
-            if (err) {
-                reject(err) 
-            } else if (token) {
-                resolve(token)
-            } else {
-                reject(new Error('Token was not created'))
-            }
-        })
-    })
+        algorithm  
+    )
 }
 
-export const signAppToken = async (username: string, ip: string): Promise<string> => {
+export const signAppToken = async (username: string, ip: string, started_at?: number): Promise<{ token: string, refreshToken: string}> => {
     const user = await AccountModel._getAccount(username)
-    let secret: string | Buffer
-    let algorithm: jwt.Algorithm
-    if (secret_key) {
-        secret = secret_key
-        algorithm = Algorithms.SYNC
-    } else {
-        secret = priv_cert!
-        algorithm = Algorithms.ASYNC
-    }
+    const { secret, algorithm } = getSecretAndAlg()
     const exp = Math.floor(Date.now() / 1000) + Config.SESSIONS.DURATION
-    const session_start = Math.floor(Date.now() / 1000)
-    const sessionValue = user.uid + ':' + username + ':' + session_start + ':' + ip
+    const iat = started_at ? started_at : Math.floor(Date.now() / 1000) // Session initiated at
+    const sessionValue = user.uid + ':' + username + ':' + iat + ':' + ip
     await setSession(user.uid, sessionValue)
-    return new Promise((resolve, reject) => {
-        jwt.sign(
-            {
-                iss: username,
-                org: user.cid,
-                uid: user.uid,
-                roles: user.roles.toString(),
-                exp
-            },
-            secret,
-            { algorithm },
-            (err: Error | null, token?: string) => {
-                if (err) {
-                    reject(err)
-                } else if (token) {
-                    resolve(token)
-                } else {
-                    reject(new Error('Token was not created'))
-                }
-            })
-    })
+    const token = await signToken(
+        {
+            iss: username,
+            org: user.cid,
+            uid: user.uid,
+            aud: validTokenTypes[0],
+            roles: user.roles.toString(),
+            iat,
+            exp
+        },
+        secret,
+        algorithm  
+    )
+    const refreshToken = await signToken(
+        {
+            iss: username,
+            org: user.cid,
+            uid: user.uid,
+            aud: validTokenTypes[1],
+            roles: user.roles.toString(),
+            exp
+        },
+        secret,
+        algorithm  
+    )
+    return { token, refreshToken }
 }
 
 export const verifyToken = async (token: string): Promise<jwtTypes.JWTDecodedToken> => {
-    let secret: string | Buffer
-    let algorithm: jwt.Algorithm
-    if (secret_key) {
-        secret = secret_key
-        algorithm = Algorithms.SYNC
-    } else {
-        secret = pub_cert!
-        algorithm = Algorithms.ASYNC
-    }
+    const { secret, algorithm } = getSecretAndAlg()
     return new Promise((resolve, reject) => {
         jwt.verify(token, secret, { algorithms: [algorithm] }, (err, decoded) => {
             if (err) {
@@ -198,4 +170,37 @@ export const verifyHash = async (secret: string, secretHash: string): Promise<bo
        return false
     }
     return true
+}
+
+// Private
+
+const getSecretAndAlg = (): { secret: string | Buffer, algorithm: jwt.Algorithm} => {
+    let secret: string | Buffer
+    let algorithm: jwt.Algorithm
+    if (secret_key) {
+        secret = secret_key
+        algorithm = Algorithms.SYNC
+    } else {
+        secret = priv_cert!
+        algorithm = Algorithms.ASYNC
+    }
+    return { secret, algorithm }
+}
+
+const signToken = async (payload: JsonType, secret: string | Buffer, algorithm: jwt.Algorithm): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        jwt.sign(
+            payload,
+            secret,
+            { algorithm },
+            (err: Error | null, token?: string) => {
+                if (err) {
+                    reject(err)
+                } else if (token) {
+                    resolve(token)
+                } else {
+                    reject(new Error('Token was not created'))
+                }
+            })
+    })
 }

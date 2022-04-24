@@ -45,7 +45,7 @@ UiRouter
 .post('/login/passwordless', addOrigin(Interfaces.UI), loginCtrl.requestPasswordless)
 .post('/login/passwordless/:token', addOrigin(Interfaces.UI), loginCtrl.processPasswordless)
 .get('/login/remember', addOrigin(Interfaces.UI), jwt(), loginCtrl.rememberCookie)
-.post('/login/remember/', addOrigin(Interfaces.UI), loginCtrl.rememberGetToken)
+.post('/login/remember', addOrigin(Interfaces.UI), loginCtrl.rememberGetToken)
 .delete('/login/remember/:sessionId', addOrigin(Interfaces.UI), loginCtrl.rememberDeleteToken)
 
 // SESSIONS
