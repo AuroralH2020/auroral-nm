@@ -65,6 +65,7 @@ export interface INodeCreate {
     name: string,
     type: NodeType,
     password: string,
+    communities?: string[]
     // location: string
 }
 

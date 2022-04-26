@@ -9,7 +9,7 @@ import { errorHandler } from '../../../utils/error-handler'
 import { DefaultOwnerTypeUpdate, INodeCreate, INodeUI, INodeUpdate } from '../../../persistance/node/types'
 import { NodeModel } from '../../../persistance/node/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
-import { NodeService } from '../../../core'
+import { CommunityService, NodeService } from '../../../core'
 import { NotificationModel } from '../../../persistance/notification/model'
 import { NotificationStatus } from '../../../persistance/notification/types'
 import { AuditModel } from '../../../persistance/audit/model'
@@ -55,12 +55,22 @@ export const getNodes: getNodesController = async (req, res) => {
 type postNodeController = expressTypes.Controller<{}, INodeCreate, {}, null, localsTypes.ILocals>
  
 export const createNode: postNodeController = async (req, res) => {
-  const { name, type, password } = req.body
+  const { name, type, password, communities } = req.body
   const { decoded } = res.locals
 	try {
     // Create node
     const agid = await NodeService.createOne(decoded.org, name, type, password)
 
+    // process adding to communities 
+    try {
+      if (communities) {
+        for (const community of communities) {
+          await CommunityService.addNode(community, decoded.org, agid)
+        }
+      }
+    } catch (error) {
+      logger.warn('Node ' + agid + ' can not be added to community')
+    }
     const myUser = await UserModel._getUser(decoded.uid)
     // Audit
     await AuditModel._createAudit({
