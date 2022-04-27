@@ -31,13 +31,13 @@ docker login ${REGISTRY}
 # Compile dist
 tsc
 
-
 # Multiarch builder
 docker buildx use multiplatform
 
 # Build images & push to private registry
 docker buildx build --platform linux/amd64 \
                     --tag ${REGISTRY}/${IMAGE_NAME}:${ENV} \
+                    --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
                     -f Dockerfile . --push
 # Pull local arch version
 # docker pull ${REGISTRY}/${IMAGE_NAME}:${ENV}

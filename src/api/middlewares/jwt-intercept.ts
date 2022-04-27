@@ -81,9 +81,14 @@ export const jwt = (roles?: RolesEnum[]) => {
             }).catch((err) => {
                 // Verify token error block
                 const error = errorHandler(err)
-                const tokenData = Auth.decode(token) as JsonType
-                logger.error('uid - ' + tokenData.uid + ' : ' + error.message)
-                return responseBuilder(error.status, res, error.message)
+                try {
+                    const tokenData = Auth.decode(token) as JsonType
+                    logger.error('uid - ' + tokenData.uid + ' : ' + error.message)
+                    return responseBuilder(error.status, res, error.message)
+                } catch (err) {
+                    const finalerror = errorHandler(err)
+                    return responseBuilder(finalerror.status, res, finalerror.message)
+                }
             })     
         } catch (err) {
             const error = errorHandler(err)
