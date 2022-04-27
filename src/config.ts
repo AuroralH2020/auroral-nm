@@ -28,7 +28,9 @@ export const Config = {
 	},
 	XMPP_CLIENT: {
 		URL: process.env.XMPP_CLIENT_URL!,
-		NAME: process.env.XMPP_USERNAME!
+		PASSWORD: process.env.XMPP_PASSWORD || 'changeme',
+		DOMAIN: process.env.XMPP_DOMAIN || 'localhost',
+		NAME: process.env.XMPP_USERNAME || 'auroral-dev-user'
 	},
 	MONGO: {
 		USER: process.env.MONGO_USER!, 

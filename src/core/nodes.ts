@@ -14,7 +14,7 @@ import { UserModel } from '../persistance/user/model'
 import { ItemType } from '../persistance/item/types'
 
 // Constants
-const PUBLIC_NODES = 'PUBLIC_NODES' // CS group for nodes
+// const PUBLIC_NODES = 'PUBLIC_NODES' // CS group for nodes
 
 // Functions
 export const createOne = async (cid: string, name: string, type: NodeType, password: string): Promise<string> => {
@@ -28,8 +28,8 @@ export const createOne = async (cid: string, name: string, type: NodeType, passw
         await cs.postUser(node.agid, password)
         // Add to organisation group in commServer
         await cs.addUserToGroup(node.agid, cid)
-        // Add to nodes group in commServer (Initially public)
-        await cs.addUserToGroup(node.agid, PUBLIC_NODES)
+        // Add to nodes group in commServer (Initially public) DEPRECATED
+        // await cs.addUserToGroup(node.agid, PUBLIC_NODES)
         return node.agid
     } catch (err) {
         const error = errorHandler(err)
@@ -44,13 +44,11 @@ export const updateOne = async (agid: string, data: INodeUpdate): Promise<void> 
         // Update node in commServer
         const node = await NodeModel._getDoc(agid)
         await node._updateNode(data)
-        if (data.visible !== undefined) {
-            if (data.visible) {
-                await cs.addUserToGroup(node.agid, PUBLIC_NODES)
-            } else {
-                await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
-            }
-        }
+        // if (data.visible !== undefined) {
+        //     if (data.visible) {
+        // TBD Think what to do here, do we set up master button to remove node from all groups?? Does it make sense??
+        //     }
+        // }
     } catch (err) {
         const error = errorHandler(err)
         logger.error(error.message)
@@ -93,8 +91,8 @@ export const removeOne = async (agid: string, cid?: string): Promise<void> => {
         await OrganisationModel._removeNodeFromCompany(node.cid, agid)
         // Remove node
         await node._removeNode()
-        // Remove from nodes group in commServer (Initially public)
-        await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
+        // // Remove from nodes group in commServer (Initially public) DEPRECATED
+        // await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
         // Delete node user from CS
         await cs.deleteUser(node.agid)
     } catch (err) {

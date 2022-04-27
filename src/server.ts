@@ -20,8 +20,7 @@ async function bootstrap() {
   try {
     // Run other services here
     mongo.connect() // Mongo connection
-    const sessions = (await cs.getSessions()).sessions.length
-    logger.info(`Communication server connected, there are ${sessions} sessions active`)
+    await cs.initialize()
     // Scheduled tasks
     if (Config.SCHEDULER_ENABLED) {
       logger.info('Scheduler enabled')

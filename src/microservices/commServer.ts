@@ -2,6 +2,7 @@ import got, { Method, Headers } from 'got'
 import { JsonType } from '../types/misc-types'
 import { Config } from '../config'
 import { csGroup, csSession, csSessionCount, csUser, csUserGroups, csUserRoster } from '../types/cs-types'
+import { logger } from '../utils/logger'
 
 // CONSTANTS 
 
@@ -26,6 +27,24 @@ const ApiHeader = {
 // FUNCTIONS
 
 export const cs = {
+    initialize: async (username?: string) => {
+        if (!Config.XMPP_CLIENT.URL) {
+            logger.warn('XMPP client configuration missing...Please check...')
+        }
+        // Create XMPP client user if missing
+        try {
+            const xmpp_user = await cs.getUsers(Config.XMPP_CLIENT.NAME) as unknown as csUser
+            logger.info(`Global xmpp user ${xmpp_user.username}`)
+        } catch (err) {
+            logger.warn('XMPP User missing... Creating...')
+            await cs.postUser(Config.XMPP_CLIENT.NAME, Config.XMPP_CLIENT.PASSWORD)
+            const xmpp_user = await cs.getUsers(Config.XMPP_CLIENT.NAME) as unknown as csUser
+            logger.info(`Global xmpp user ${xmpp_user.name}`)
+        }
+        // Get sessions
+        const sessions = (await cs.getSessions()).sessions.length
+        logger.info(`Communication server connected, there are ${sessions} sessions active`)
+    },
     getSessions: async (username?: string) => {
         const uri = username ? 'sessions/' + username : 'sessions'
         return request(uri, 'GET', undefined, ApiHeader) as Promise<{ sessions: csSession[]}>
