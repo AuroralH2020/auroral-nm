@@ -16,6 +16,7 @@ import * as notificationCtrl from './controllers/notification'
 import * as auditCtrl from './controllers/audit'
 import * as itemsCtrl from './controllers/items'
 import * as contractsCtrl from './controllers/contracts'
+import * as communitiesCtrl from './controllers/communities'
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { SourceType } from '../../types/misc-types'
@@ -136,6 +137,13 @@ UiRouter
 .put('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OWNER]), validateBody(editItemContractSchema), createAudit(SourceType.CONTRACT), contractsCtrl.editItem)
 .delete('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeItem)
 .delete('/contract/:ctid/items/:cid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeAllCompanyItems)
+
+// COMMUNITIES
+.get('/communities/', addOrigin(Interfaces.UI), jwt(), communitiesCtrl.getCommunities)
+.get('/community/:commId', addOrigin(Interfaces.UI), jwt(), communitiesCtrl.getCommunity)
+.post('/community/', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), communitiesCtrl.createCommunity)
+.post('/community/:commId/node/:agid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), communitiesCtrl.addNodeToCommunity)
+.delete('/community/:commId/node/:agid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), communitiesCtrl.removeNodeFromCommunity)
 
 // STATISTICS
 .get('/statistics/', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.getStatistics)

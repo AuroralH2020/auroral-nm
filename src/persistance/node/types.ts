@@ -35,6 +35,7 @@ export interface INode {
     defaultOwner: DefaultOwnerType,
     visible: boolean, // True if is it discoverable in the P2P network
     hasItems: string[], // Ids of items under the node
+    hasCommunities: string[] // Ids of communities where node is part of
     itemsCount: number, // Count of items (hasItems.length())
     hasKey: boolean, // Has token auth enabled for the node
     key: string | null, // Has public key to validate token
@@ -64,6 +65,7 @@ export interface INodeCreate {
     name: string,
     type: NodeType,
     password: string,
+    communities?: string[]
     // location: string
 }
 
@@ -135,6 +137,16 @@ export interface INodeModel extends Model<INodeDocument> {
         this: INodeModel,
         agid: string,
         type: ItemType 
+    ) => Promise<void>
+    _addToCommunity: (
+        this: INodeModel,
+        agid: string,
+        commId: string,
+    ) => Promise<void>
+    _removeFromCommunity: (
+        this: INodeModel,
+        agid: string,
+        commId: string,
     ) => Promise<void>
     _count: (
         this: INodeModel,

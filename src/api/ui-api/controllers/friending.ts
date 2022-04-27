@@ -14,9 +14,9 @@ import { NotificationStatus } from '../../../persistance/notification/types'
 import { AuditModel } from '../../../persistance/audit/model'
 import { xmpp } from '../../../microservices/xmppClient'
 import { ContractModel } from '../../../persistance/contract/model'
-import { rejectContract } from './contracts'
-import { ContractService } from '../../../core'
-import { removeOrgFromContract } from '../../../core/contracts'
+import { CommunityService, ContractService } from '../../../core'
+import { CommunityModel } from '../../../persistance/community/model'
+import { CommunityType } from '../../../persistance/community/types'
 
 // Controllers
 
@@ -81,11 +81,33 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
     await OrganisationModel._delIncomingFriendReq(myCid, friendCid)
     await OrganisationModel._addFriendship(friendCid, myCid)
     await OrganisationModel._delOutgoingFriendReq(friendCid, myCid)
-    // TBD: Add all gateways in CS to friendships group
-    // Create notification
+    
+    // get orgs details
     const actorName = (await UserModel._getUser(myUid)).name
     const myOrg = await OrganisationModel._getOrganisation(myCid)
     const friendOrg = await OrganisationModel._getOrganisation(friendCid)
+
+    // create partnership in community table
+    const partnership = await CommunityService.createOne({
+      name: 'Partnership',
+      type: CommunityType.PARTNERSHIP,
+      description: 'Partnership between ' + myOrg.name + ' and ' +  friendOrg.name,
+      organisations: [
+        {
+          name: myOrg.name,
+          cid: myOrg.cid,
+          nodes: []
+        },
+        {
+          name: friendOrg.name,
+          cid: friendOrg.cid,
+          nodes: []
+        }
+      ]
+    })
+    // TBD add all nodes to partnership?
+
+    // Create notifications
     // Send notifications to nodes from both organisations
     myOrg.hasNodes.forEach(agid => {
       xmpp.notifyPartnersChanged(agid)
@@ -272,7 +294,14 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
         }
       }
     }
-
+    try {
+      // Get partnership (community) by cids
+      const community = await CommunityModel._getPartnershipByCids(myCid, friendCid)
+      // remove partnerships in Communities table
+      await CommunityService.removeOne(community.commId)
+    } catch (err) {
+      logger.warn('Can not remove partnership in community table ')
+    }
     await OrganisationModel._delFriendship(myCid, friendCid)
     await OrganisationModel._delFriendship(friendCid, myCid)
     // TBD: Remove all gateways from CS to friendships group

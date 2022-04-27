@@ -9,9 +9,10 @@ import { UserModel } from '../persistance/user/model'
 import { AccountModel } from '../persistance/account/model'
 import { removeOne } from './nodes'
 import { IOrganisationDocument } from '../persistance/organisation/types'
-import { ContractService, OrganisationService } from '../core'
+import { CommunityService, ContractService, OrganisationService } from '../core'
 import { IAuditLocals } from '../types/locals-types'
 import { OrganisationModel } from '../persistance/organisation/model'
+import { CommunityModel } from '../persistance/community/model'
 
 // Functions
 
@@ -32,18 +33,22 @@ import { OrganisationModel } from '../persistance/organisation/model'
         }))
         // 2a - Remove partnerships
         await Promise.all(organisation.knows.map(async it => {
-            OrganisationModel._delFriendship(it, cid)
-            OrganisationModel._delFriendship(cid, it)
+            await OrganisationModel._delFriendship(it, cid)
+            await OrganisationModel._delFriendship(cid, it)
+            // Get partnership (community) by cids
+            const community = await CommunityModel._getPartnershipByCids(cid, it)
+            // remove partnerships in Communities table
+            await CommunityService.removeOne(community.commId)
         }))
         // 2a - Remove partnerships from requests
          await Promise.all(organisation.knowsRequestsFrom.map(async it => {
-            OrganisationModel._delFriendship(it, cid)
-            OrganisationModel._delIncomingFriendReq(cid, it)
+            await OrganisationModel._delFriendship(it, cid)
+            await OrganisationModel._delIncomingFriendReq(cid, it)
         }))
         // 2c - Remove partnerships to requests
          await Promise.all(organisation.knowsRequestsTo.map(async it => {
-            OrganisationModel._delIncomingFriendReq(it, cid)
-            OrganisationModel._delOutgoingFriendReq(cid, it)
+            await OrganisationModel._delIncomingFriendReq(it, cid)
+            await OrganisationModel._delOutgoingFriendReq(cid, it)
         }))
 
         // 3 - Remove nodes and items
