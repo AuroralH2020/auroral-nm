@@ -31,11 +31,22 @@ docker login ${REGISTRY}
 # Compile dist
 tsc
 
+
+# Multiarch builder
+docker buildx use multiplatform
+
+# Build images & push to private registry
+docker buildx build --platform linux/amd64 \
+                    --tag ${REGISTRY}/${IMAGE_NAME}:${ENV} \
+                    -f Dockerfile . --push
+# Pull local arch version
+# docker pull ${REGISTRY}/${IMAGE_NAME}:${ENV}
+
 # Build depending on env
-docker build --tag ${IMAGE_NAME} -f Dockerfile .
+# docker build --tag ${IMAGE_NAME} -f Dockerfile .
 
 # Tag the image
-docker image tag ${IMAGE_NAME} ${REGISTRY}/${IMAGE_NAME}:${ENV}
+# docker image tag ${IMAGE_NAME} ${REGISTRY}/${IMAGE_NAME}:${ENV}
 
 # Push image
-docker push ${REGISTRY}/${IMAGE_NAME}:${ENV}
+# docker push ${REGISTRY}/${IMAGE_NAME}:${ENV}
