@@ -6,12 +6,13 @@
  import { createClient, RedisClientOptions } from 'redis'
  import { Config } from '../config'
  import { logger } from '../utils/logger'
+ import { errorHandler } from '../utils/error-handler'
 
 // Create Redis Client for sessions
 const redisSessionsOptions = {
     port: Number(Config.REDIS.PORT), 
-    host: Config.REDIS.HOST,
-    auth_pass: Config.REDIS.PASSWORD,
+    url: Config.REDIS.HOST,
+    password: Config.REDIS.PASSWORD,
     database: 0 // DB for sessions
  } as RedisClientOptions
 
@@ -28,6 +29,8 @@ export const redisDb = {
             await client.connect()
             logger.info('Connected successfully to Redis!!')
         } catch (err) {
+            const error = errorHandler(err)
+            logger.error(error.message)
             logger.error('Could not connect to Redis...')
         }
     },
