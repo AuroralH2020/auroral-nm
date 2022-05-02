@@ -27,3 +27,6 @@ SLACK_HOST=https://hooks.slack.com/
 SLACK_HOOK=services/T036UPEUUTZ/B0376NNSCSZ/aFo4DGjwFIL3jqskksPMmWst
 ELK_URL="https://elastic.url"
 ELK_TOKEN='secret_token'
+REDIS_PASSWORD=
+REDIS_HOST=redis://cache-db
+REDIS_PORT=6379
