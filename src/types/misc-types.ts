@@ -7,6 +7,22 @@ export type KeyValue = {
     value: string
 }
 
+export enum SearchResultType{
+    ITEM = 'item',
+    ORGANISATION = 'organisation',
+    CONTRACT = 'contract',
+    COMMUNITY = 'community',
+    NODE = 'node',
+    USER = 'user',
+}
+
+export type SearchResult = {
+    name: string,
+    id: string,
+    type: SearchResultType,
+    avatar?: string
+}
+
 export enum RelationshipType{
     ME = 'me',
     FRIEND = 'friend',

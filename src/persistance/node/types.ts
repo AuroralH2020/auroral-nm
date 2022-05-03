@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { SearchResult } from '../../types/misc-types'
 import { ItemType } from '../../persistance/item/types'
 
 export enum NodeType {
@@ -151,4 +152,11 @@ export interface INodeModel extends Model<INodeDocument> {
     _count: (
         this: INodeModel,
     ) => Promise<number>
+    _search: (
+        this: INodeModel,
+        cid: string,
+        text: string,
+        limit: number,
+        offset: number
+    ) => Promise<SearchResult[]>
 }

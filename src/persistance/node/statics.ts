@@ -159,3 +159,33 @@ export async function removeFromCommunity(
     throw new Error('Error adding community to node')
   }
 }
+
+export async function search(
+  this: INodeModel, cid: string, text: string, limit: number, offset: number
+): Promise<void> {
+  const record = await this.aggregate([
+    {
+      '$match': {
+        'cid': cid,
+        'status': { '$ne': NodeStatus.DELETED },
+        'name': {
+          '$regex': text,
+          '$options': 'i'
+        }
+      }
+    }, {
+      '$project': {
+        'name': '$name',
+        'id': '$agid',
+        'type': 'Node',
+        '_id': 0
+      }
+    }
+  ]).sort({ name: -1 }).skip(offset).limit(limit)
+  .exec()
+  if (record) {
+    return record 
+  } else {
+    throw new Error('Error adding community to node')
+  }
+}

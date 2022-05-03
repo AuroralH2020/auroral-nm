@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { SearchResult } from '../../types/misc-types'
 import { ItemType } from '../../persistance/item/types'
 import { RolesEnum } from '../../types/roles' 
 
@@ -12,12 +13,10 @@ export enum UserStatus {
     ACTIVE = 'active',
     DELETED = 'deleted'
 }
-
 export interface HasNodeType {
     agid: string,
     type: ItemType
 }
-
 export interface IUser {
     // context: string
     uid: string, // Auroral Id
@@ -159,4 +158,12 @@ export interface IUserModel extends Model<IUserDocument> {
     _count: (
         this: IUserModel,
     ) => Promise<number>
+    _search: (
+        this: IUserModel,
+        cid: string,
+        knows: string[],
+        text: string,
+        limit: number,
+        offset: number
+    ) => Promise<SearchResult[]>
 }

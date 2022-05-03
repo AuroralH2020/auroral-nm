@@ -140,3 +140,45 @@ export async function count(
     }
 }
 
+export async function search(
+  this: IUserModel, cid: string, knows: string[],  text: string, limit: number, offset: number
+  ): Promise<void> {
+    const record = await this.aggregate([
+      {
+        '$match': {
+          '$or': [
+            {
+              'cid': cid
+            }, 
+            {
+              'cid': {
+                '$in': knows
+              },
+              'accessLevel': {
+                '$ne': 0
+              }
+            }
+          ],
+          'status': { '$ne': UserStatus.DELETED },
+          'name': {
+            '$regex': text,
+            '$options': 'i'
+          }
+        }
+      },
+      {
+        '$project': {
+          'name': '$name',
+          'id': '$uid',
+          'type': 'User',
+          '_id': 0
+        }
+      }
+    ]).sort({ name: -1 }).skip(offset).limit(limit)
+    .exec()
+    if (record) {
+      return record 
+    } else {
+      throw new Error('Error searching in users')
+    }
+}

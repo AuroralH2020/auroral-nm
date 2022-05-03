@@ -53,7 +53,7 @@ function startServer() {
     logger.info(`  App root path is ${Config.HOME_PATH}`)
     logger.info('  Press CTRL-C to stop\n')
     logger.info('Initializing services... Will take some seconds')
-    setTimeout(bootstrap, 10000)  // Initialize everything else (Wait 10 for other services to be ready)
+    setTimeout(bootstrap, 1000)  // Initialize everything else (Wait 10 for other services to be ready)
   }), 3000)
 }
 

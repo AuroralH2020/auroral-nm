@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count, removeDefaultItemOwner, addDefaultItemOwner, addToCommunity, removeFromCommunity } from './statics'
+import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count, removeDefaultItemOwner, addDefaultItemOwner, addToCommunity, removeFromCommunity, search } from './statics'
 import { updateNode, removeNode } from './methods'
 import { INodeDocument, INodeModel, NodeType, NodeStatus, DefaultOwnerType } from './types'
 
@@ -48,6 +48,7 @@ NodeSchema.statics._addDefaultOwner = addDefaultItemOwner
 NodeSchema.statics._removeDefaultOwner = removeDefaultItemOwner
 NodeSchema.statics._addToCommunity = addToCommunity
 NodeSchema.statics._removeFromCommunity = removeFromCommunity
+NodeSchema.statics._search = search
 
 // Methods
 NodeSchema.methods._updateNode = updateNode

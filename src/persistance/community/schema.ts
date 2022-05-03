@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { ItemDomainType } from '../../persistance/item/types'
-import { addNodeToCommunity, addOrganisationToCommunity, createCommunity, getAllCommunitiesUI, getCommunity, getCommunityUI, getOrganisationsInCommunity, getPartnershipByCids, removeCommunity, removeNodeFromCommunity, removeOrgsWithoutNodes } from './statics'
+import { addNodeToCommunity, addOrganisationToCommunity, createCommunity, getAllCommunitiesUI, getCommunity, getCommunityUI, getOrganisationsInCommunity, getPartnershipByCids, removeCommunity, removeNodeFromCommunity, removeOrgsWithoutNodes, search } from './statics'
 import { communityOrganisation, CommunityType, ICommunityDocument, ICommunityModel  } from './types'
 
 const Schema = mongoose.Schema
@@ -37,6 +37,7 @@ CommunitySchema.statics._getOrganisationsInCommunity = getOrganisationsInCommuni
 CommunitySchema.statics._addOrganisationToCommunity = addOrganisationToCommunity
 CommunitySchema.statics._removeOrgsWithoutNodes = removeOrgsWithoutNodes
 CommunitySchema.statics._getPartnershipByCids = getPartnershipByCids
+CommunitySchema.statics._search = search
 // Methods
 
 // eslint-disable-next-line import/no-default-export

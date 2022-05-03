@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { SearchResult } from '../../types/misc-types'
 import { ItemDomainType } from '../../persistance/item/types'
 
 export enum CommunityType {
@@ -106,4 +107,11 @@ export interface ICommunityModel extends Model<ICommunityDocument> {
         this: ICommunityModel,
         commId: string
     ) => Promise<ICommunityDocument>
+    _search: (
+        this: ICommunityModel,
+        cid: string,
+        text: string,
+        limit: number,
+        offset: number
+    ) => Promise<SearchResult[]>
 }

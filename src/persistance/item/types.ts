@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { SearchResult } from '../../types/misc-types'
 import { getAllCompanyItemsContractView } from './statics'
 
 export enum ItemType {
@@ -224,4 +225,12 @@ export interface IItemModel extends Model<IItemDocument> {
     _count: (
         this: IItemModel,
     ) => Promise<number>
+    _search: (
+        this: IItemModel,
+        cid: string,
+        knows: string[],
+        text: string,
+        limit: number,
+        offset: number
+    ) => Promise<SearchResult[]>
 }
