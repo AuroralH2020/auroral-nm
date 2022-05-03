@@ -31,7 +31,6 @@ export const globalSearch: globalSearchController = async (req, res) => {
 			SearchResultType.ORGANISATION,
 			SearchResultType.ITEM,
 			SearchResultType.COMMUNITY,
-			SearchResultType.ORGANISATION,
 			SearchResultType.NODE,
 			SearchResultType.USER
 		]
@@ -58,10 +57,6 @@ export const globalSearch: globalSearchController = async (req, res) => {
 			// get ITEMS 
 			result =  sType === SearchResultType.ITEM ? 
 			[...result, ...await ItemModel._search(myOrganisation.cid, myOrganisation.knows, text, availibleSpace,  searchOffset)] : result
-			
-			// get COMMUNITY
-			result = sType === SearchResultType.COMMUNITY ? 
-			[...result, ...await CommunityModel._search(myOrganisation.cid, text, availibleSpace, searchOffset)] : result
 
 			// get ORGANISATIONS
 			result = sType === SearchResultType.ORGANISATION ? 
@@ -74,6 +69,10 @@ export const globalSearch: globalSearchController = async (req, res) => {
 			// get USERS
 			result = sType === SearchResultType.USER ? 
 			[...result, ...await UserModel._search(myOrganisation.cid, myOrganisation.knows, text, availibleSpace, searchOffset)] : result
+
+			// get COMMUNITY
+			// result = sType === SearchResultType.COMMUNITY ? 
+			// [...result, ...await CommunityModel._search(myOrganisation.cid, text, availibleSpace, searchOffset)] : result
 		}
 		return responseBuilder(HttpStatusCode.OK, res, null, result)
 	} catch (err) {
