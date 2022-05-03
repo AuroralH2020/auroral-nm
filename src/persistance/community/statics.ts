@@ -51,10 +51,10 @@ export async function getAllCommunitiesUI(
   offset = offset || 0
   // standardize values to be array
   const typeArray = Array.isArray(type) ? type : [type]
-  let domainArray = Array.isArray(domain) ? domain : [domain]
+  let domainArray  = Array.isArray(domain) ? domain : [domain]
   // 'undefined' -> undefined
   domainArray = domainArray.map(value => {
-    return value === 'Undefined' ? undefined : value 
+    return value === 'Undefined' ? undefined as any : value  as string
   })
   // create filter 
   const filter = {
