@@ -7,6 +7,7 @@ import * as loginCtrl from './controllers/login'
 import * as sessionsCtrl from './controllers/sessions'
 import * as registrationCtrl from './controllers/registration'
 import * as statisticsCtrl from './controllers/statistics'
+import * as searchCtrl from './controllers/search'
 import * as invitationCtrl from './controllers/invitation'
 import * as organisationCtrl from './controllers/organisation'
 import * as friendingCtrl from './controllers/friending'
@@ -149,5 +150,8 @@ UiRouter
 .get('/statistics/', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.getStatistics)
 .get('/statistics/:date', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.getStatistics)
 .post('/statistics/', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.storeStatistics)
+
+// SEARCH
+.get('/search/global', addOrigin(Interfaces.UI), jwt(), searchCtrl.globalSearch)
 
 export { UiRouter }

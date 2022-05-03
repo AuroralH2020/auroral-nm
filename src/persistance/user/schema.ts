@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { RolesEnum } from '../../types/roles'
-import { getUser, getDoc, createUser, findDuplicatesUser, getAllUsers, getUserByRole, addItemToUser, removeItemFromUser, count, addNodeToUser, removeNodeFromUser } from './statics'
+import { getUser, getDoc, createUser, findDuplicatesUser, getAllUsers, getUserByRole, addItemToUser, removeItemFromUser, count, addNodeToUser, removeNodeFromUser, search } from './statics'
 import { updateUser, updateUserRoles, removeUser } from './methods'
 import { IUserDocument, IUserModel, UserVisibility, UserStatus, HasNodeType } from './types'
 import { ItemType } from '../../persistance/item/types'
@@ -54,6 +54,7 @@ UserSchema.statics._removeItemFromUser = removeItemFromUser
 UserSchema.statics._addNodeToUser = addNodeToUser
 UserSchema.statics._removeNodeFromUser = removeNodeFromUser
 UserSchema.statics._count = count
+UserSchema.statics._search = search
 
 // Methods
 

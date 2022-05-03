@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { SearchResult } from '../../types/misc-types'
 
 export enum UISkins {
     BLUE = 'blue',
@@ -219,4 +220,10 @@ export interface IOrganisationModel extends Model<IOrganisationDocument> {
     _count: (
         this: IOrganisationModel,
     ) => Promise<number>
+    _search: (
+        this: IOrganisationModel,
+        text: string,
+        limit: number,
+        offset: number
+    ) => Promise<SearchResult[]>
 }

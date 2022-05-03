@@ -11,6 +11,7 @@ XMPP_CLIENT_URL=http://localhost:5555
 XMPP_USERNAME=auroral-dev-user
 CS_SECRET_KEY=
 CS_URL=http://localhost:9090
+SESSIONS_ENABLED=true
 SMTP_HOST=
 SMTP_USER=
 SMTP_PASSWORD=

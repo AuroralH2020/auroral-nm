@@ -2,6 +2,7 @@ import { IOrganisationDocument, IOrganisationModel, IOrganisationCreate, IOrgani
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
 import { logger } from '../../utils/logger'
+import { SearchResult } from '../../types/misc-types'
 
 export async function getOrganisation(
   this: IOrganisationModel, cid: string
@@ -358,3 +359,33 @@ export async function count(
       throw new MyError('Organisations count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
     }
   }
+
+  export async function search(
+    this: IOrganisationModel, text: string, limit: number, offset: number
+): Promise<SearchResult[]> {
+  const record = await this.aggregate([
+      {
+        '$match': {
+          'status': OrganisationStatus.ACTIVE, 
+          'name': {
+            '$regex': text, 
+            '$options': 'i'
+          }
+        }
+      },
+      {
+        '$project': {
+          'name': '$name',
+          'id': '$cid',
+          'type': 'Organisation',
+          '_id': 0
+        }
+      }
+    ]).sort({ name: -1 }).skip(offset).limit(limit)
+    .exec() as unknown as SearchResult[]
+  if (record) {
+    return record
+  } else {
+    throw new Error('Error searching in organisations')
+  }
+}

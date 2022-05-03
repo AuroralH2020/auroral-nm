@@ -12,6 +12,7 @@ import {
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
 import { logger } from '../../utils/logger'
+import { SearchResult, SearchResultType } from '../../types/misc-types'
 
 export async function getItem(
   this: IItemModel, oid: string
@@ -239,10 +240,54 @@ export async function getItemsPrivacy(
 
 export async function count(
 this: IItemModel): Promise<Number> {
-  const record = await this.countDocuments({ status: { $ne: ItemStatus.DELETED } }).exec()
+  const record = await this.aggregate([
+  ]).exec()
   if (record) {
     return record
   } else {
     throw new MyError('Items count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
   }
 }
+
+export async function search(
+  this: IItemModel, cid: string, knows: string[], text: string, limit: number, offset: number): Promise<SearchResult[]> {
+    const record = await this.aggregate([
+      {
+        '$match': {
+          '$or': [
+            {
+              'cid': cid
+            }, 
+            {
+              'cid': {
+                '$in': knows
+              },
+              'accessLevel': {
+                '$ne': 0
+              }
+            }
+          ],
+          'status': { '$ne': ItemStatus.DELETED }
+        }
+      }, {
+        '$match': {
+          'name': {
+            '$regex': text,
+            '$options': 'i'
+          }
+        }
+      }, {
+        '$project': {
+          'name': '$name',
+          'id': '$oid',
+          'type': 'Item',
+          '_id': 0
+        }
+      }]).sort({ name: -1 }).skip(offset).limit(limit)
+      .exec() as unknown as SearchResult[]
+    if (record) {
+      return record 
+    } else {
+      throw new MyError('Items search error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+    }
+  }

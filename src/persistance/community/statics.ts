@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ErrorSource, MyError } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils'
 import {  CommunityType, ICommunity, ICommunityCreate, ICommunityDocument, ICommunityModel, ICommunityUIList } from './types'
+import { SearchResult } from '../../types/misc-types'
 
 export async function getCommunity(
   this: ICommunityModel, commId: string
@@ -44,7 +45,7 @@ export async function getCommunityUI(
 }
 
 export async function getAllCommunitiesUI(
-  this: ICommunityModel, type: CommunityType, offset: number, domain: number, cid: string
+  this: ICommunityModel, type: CommunityType, offset: number, domain: string, cid: string
 ): Promise<ICommunityUIList[]> {
   // default offset
   offset = offset || 0
@@ -53,7 +54,7 @@ export async function getAllCommunitiesUI(
   let domainArray = Array.isArray(domain) ? domain : [domain]
   // 'undefined' -> undefined
   domainArray = domainArray.map(value => {
-    return value === 'Undefined' ? undefined : value
+    return value === 'Undefined' ? undefined : value 
   })
   // create filter 
   const filter = {
@@ -310,6 +311,67 @@ export async function getOrganisationsInCommunity(
       return (record[0].organisations) 
     } else {
       throw new Error('Error adding community to node')
+    }
+}
+
+export async function search(
+  this: ICommunityModel,  cid: string, text: string, limit: number, offset: number): Promise<SearchResult[]> {
+  const record = await this.aggregate(
+    [
+      {
+        '$match': {
+          '$or': [
+            {
+              'type': CommunityType.COMMUNITY
+            }, {
+              'type': CommunityType.PARTNERSHIP,
+              'organisations.cid': cid
+            }
+          ]
+        }
+      },
+      {
+        '$match': {
+          '$or': [
+              { 
+                'name': {
+                '$regex': text, 
+                '$options': 'i'
+                }
+              },
+              { 
+                'description': {
+                '$regex': text, 
+                '$options': 'i'
+                }
+              },
+          ]
+        }
+      },
+      {
+        '$project': {
+          '_id': 0, 
+          'type': '$type', 
+          'id': '$commId', 
+          'name': {
+            '$cond': {
+              'if': {
+                '$eq': [
+                  '$type', 'Partnership'
+                ]
+              }, 
+              'then': '$description', 
+              'else': '$name'
+            }
+          }
+        }
+      }
+    ]).sort({ name: -1 }).skip(offset).limit(limit)
+    .exec() as unknown as SearchResult[]
+    if (record) {
+      return record 
+    } else {
+      throw new Error('Error searching in communities')
     }
 }
 
