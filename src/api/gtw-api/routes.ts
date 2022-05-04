@@ -5,6 +5,7 @@ import { guard, addOrigin, createAudit, validateBody } from '../middlewares/inde
 // Controllers
 import * as miscCtrl from './controllers/misc'
 import * as agentCtrl from './controllers/agent'
+import * as discoveryCtrl from './controllers/discovery'
 import * as itemsCtrl from './controllers/items'
 // Types
 import { Interfaces } from '../../types/locals-types'
@@ -28,6 +29,14 @@ GtwRouter
 .get('/agent/partners', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPartners) 
 .get('/agent/partner/:cid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPartner)
 .get('/agent/contract/items/:cid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getContractedItemsByCid)
+
+// DISCOVERY
+.get('/agent/communities', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getCommunities)
+.get('/discovery/nodes/organisation', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getNodesInOrganisation)
+.get('/discovery/nodes/organisation/:cid', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getNodesInOrganisation)
+.get('/discovery/nodes/community/:commId', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getNodesInCommunity)
+.get('/discovery/items/organisation', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getItemsInOrganisation)
+.get('/discovery/items/contract/:ctid', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getItemsInContract)
 
 // .get('/agent/relationship/:reqid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getRelationship) 
 // .post('/items/td', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getTd) // Remove once Gateway is updated, deprecated use

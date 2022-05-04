@@ -7,6 +7,19 @@ export type KeyValue = {
     value: string
 }
 
+export type GtwNodeInfo = {
+    cid: string,
+    agid: string
+    company: string
+}
+
+export type GtwItemInfo = {
+    cid: string,
+    oid: string
+    name: string,
+    company: string
+}
+
 export enum SearchResultType{
     ITEM = 'item',
     ORGANISATION = 'organisation',

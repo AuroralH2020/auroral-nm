@@ -238,6 +238,54 @@ export async function getItemsPrivacy(
   }
 }
 
+export async function getAllCompanyItems(
+  this: IItemModel, cid: string
+): Promise<{oid: string, cid: string, name: string}[]> {
+  // get from mongo
+  const record = await this.aggregate([
+    { $match: { cid: cid, status: { $ne: ItemStatus.DELETED } } },
+    { $project: { oid: 1, cid: 1, _id: 0, name: 1 } },
+  ]).exec()
+  if (record) {
+    return record
+  } else {
+    throw new MyError('Items not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+  }
+}
+
+export async function getAllContractItems(
+  this: IItemModel, ctid: string
+): Promise<{oid: string, cid: string, name: string}[]> {
+  // get from mongo
+  const record = await this.aggregate([
+    { $match: { hasContracts: ctid, status: { $ne: ItemStatus.DELETED } } },
+   {
+        '$lookup': {
+          'from': 'organisations', 
+          'localField': 'cid', 
+          'foreignField': 'cid', 
+          'as': 'organisation'
+        }
+      }, {
+        '$project': {
+          'oid': 1, 
+          'cid': 1, 
+          '_id': 0, 
+          'name': 1, 
+          'company': {
+            '$first': '$organisation.name'
+          }
+        }
+      }
+  ]).exec()
+  if (record) {
+    return record
+  } else {
+    throw new MyError('Items not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+  }
+}
+
+
 export async function count(
 this: IItemModel): Promise<Number> {
   const record = await this.aggregate([

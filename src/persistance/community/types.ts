@@ -103,6 +103,10 @@ export interface ICommunityModel extends Model<ICommunityDocument> {
         cid1: string,
         cid2: string
     ) => Promise<ICommunity>
+    _getCommunitiesByAgid: (
+        this: ICommunityModel,
+        agid: string,
+    ) => Promise<{name: string, description: string, commId: string}[]>
     _getDoc: (
         this: ICommunityModel,
         commId: string

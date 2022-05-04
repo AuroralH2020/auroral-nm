@@ -375,3 +375,27 @@ export async function search(
     }
 }
 
+export async function getCommunitiesByAgid(
+  this: ICommunityModel, agid: string
+): Promise<{name: string, commId: string, description: string }[]> {
+  const record = await this.aggregate([
+    {
+      '$match': {
+        'type': 'Community', 
+        'organisations.nodes': agid
+      }
+    }, {
+      '$project': {
+        '_id': 0, 
+        'commId': 1, 
+        'name': 1, 
+        'description': 1
+      }
+    }
+  ]).exec()
+  if (record) {
+    return record
+  } else {
+    throw new Error('Error gettintg communities by agid')
+  }
+}

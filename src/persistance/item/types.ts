@@ -193,6 +193,14 @@ export interface IItemModel extends Model<IItemDocument> {
         params: GetByOwnerQuery,
         offset: number,
     )=> Promise<IItem[]>
+    _getAllCompanyItems: (
+        this: IItemModel,
+        cid: string,
+    )=> Promise<{oid: string, cid: string, name: string}[]>
+    _getAllContractItems: (
+        this: IItemModel,
+        cid: string,
+    )=> Promise<{oid: string, cid: string, name: string}[]>
     _addUserToItem: (
         this: IItemModel,
         oid: string,
