@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { GtwItemInfo } from '../../types/misc-types'
 import { IItem, ItemLabelsObj, ItemType } from '../item/types'
 import { getItemsInContractByAgid } from './statics'
 
@@ -146,6 +147,10 @@ export interface IContractModel extends Model<IContractDocument> {
         ctid: string,
         offset: number
     ) => Promise<ContractItemType[]>
+    _getContractItemsGtw: (
+        this: IContractModel,
+        ctid: string,
+    ) => Promise<GtwItemInfo[]>
     _getContractItems: (
         this: IContractModel,
         ctid: string,

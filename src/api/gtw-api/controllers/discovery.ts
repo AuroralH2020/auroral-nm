@@ -9,6 +9,7 @@ import { OrganisationModel } from '../../../persistance/organisation/model'
 import { GtwItemInfo, GtwNodeInfo } from '../../../types/misc-types'
 import { ContractModel } from '../../../persistance/contract/model'
 import { ItemModel } from '../../../persistance/item/model'
+import { NodeModel } from '../../../persistance/node/model'
 
 // Controller specific imports
 
@@ -40,20 +41,32 @@ export const getNodesInOrganisation: getNodesInOrgController = async (req, res) 
 	const { cid } = req.params
 	try {
 		if (decoded) {
-			const myOrg = await OrganisationModel._getOrganisation(decoded.aud)
-			if (!cid || cid === decoded.aud) {
+			const myCid = (await NodeModel._getNode(decoded.iss)).cid
+			const myOrg = await OrganisationModel._getOrganisation(myCid)
+			if (!cid || cid === myCid) {
 				const nodes = myOrg.hasNodes.map(node => {
 					return { cid: myOrg.cid, agid: node, company: myOrg.name }
 				})
 				return responseBuilder(HttpStatusCode.OK, res, null, nodes)
 			} else {
+				let nodeInCommunity = false
 				const partnership = await CommunityModel._getPartnershipByCids(myOrg.cid, cid)
 				const nodes = []  as GtwNodeInfo[]
-				partnership.organisations.filter(org => org.cid === cid).forEach(org => {
+				partnership.organisations.forEach(org => {
 					org.nodes.forEach((node) => {
-						nodes.push({ cid: org.cid, company: org.name, agid: node })
+						// requested org
+						if (org.cid === cid) {
+							nodes.push({ cid: org.cid, company: org.name, agid: node })
+						}
+						// test if my node is part of that 
+						if (node === decoded.iss) {
+							nodeInCommunity = true
+						}
 					})
 				})
+				if (!nodeInCommunity) {
+					return responseBuilder(HttpStatusCode.OK, res, null, [] as GtwNodeInfo[])
+				}
 				return responseBuilder(HttpStatusCode.OK, res, null, nodes)
 			}
 		} else {
@@ -79,11 +92,18 @@ export const getNodesInCommunity: getNodesInCommunityController = async (req, re
 			}
 			const community = await CommunityModel._getCommunity(commId)
 			const nodes = [] as GtwNodeInfo[]
+			let nodeInCommunity = false
 			community.organisations.forEach((org) => {
 				org.nodes.forEach((node) => {
+					if (node === decoded.iss) {
+						nodeInCommunity = true
+					}
 					nodes.push({ company: org.name, cid: org.cid, agid: node })
 				}) 
 			})
+			if (!nodeInCommunity) {
+				return responseBuilder(HttpStatusCode.OK, res, null, [] as GtwNodeInfo[])
+			}
 			return responseBuilder(HttpStatusCode.OK, res, null, nodes)
 		} else {
 			logger.error('Gateway unauthorized access attempt')
@@ -102,8 +122,9 @@ export const getItemsInOrganisation: getItemsInOrganisationController = async (r
 	const { decoded } = res.locals
 	try {
 		if (decoded) {
-			const organisation = await OrganisationModel._getOrganisation(decoded.aud)
-			const items =  (await ItemModel._getAllCompanyItems(decoded.aud)).map((item) => {
+			const myCid = (await NodeModel._getNode(decoded.iss)).cid
+			const organisation = await OrganisationModel._getOrganisation(myCid)
+			const items =  (await ItemModel._getAllCompanyItems(myCid)).map((item) => {
 				return { ...item, company: organisation.name }
 			})
 			return responseBuilder(HttpStatusCode.OK, res, null, items)
@@ -128,11 +149,12 @@ export const getItemsInContract: getItemsInContractController = async (req, res)
 			if (!ctid) {
 				return responseBuilder(HttpStatusCode.BAD_REQUEST, res, 'ctid not provided')
 			}
+			const myCid = (await NodeModel._getNode(decoded.iss)).cid
 			const contract = await ContractModel._getContract(ctid)
-			if (!contract.organisations.includes(decoded.aud)) {
-				return responseBuilder(HttpStatusCode.BAD_REQUEST, res, 'Your organisation is not part of contract')
+			if (!contract.organisations.includes(myCid)) {
+				return responseBuilder(HttpStatusCode.OK, res, null, [] as GtwItemInfo[])
 			}
-			const items =  await ItemModel._getAllContractItems(ctid)
+			const items =  await ContractModel._getContractItemsGtw(ctid)
 			return responseBuilder(HttpStatusCode.OK, res, null, items)
 		} else {
 			logger.error('Gateway unauthorized access attempt')

@@ -15,6 +15,7 @@ import {
 } from './types'
 import { ErrorSource, MyError } from '../../utils/error-handler'
 import { HttpStatusCode, obj } from '../../utils'
+import { GtwItemInfo } from '../../types/misc-types'
 
 export async function getContract(
   this: IContractModel, ctid: string
@@ -54,6 +55,63 @@ export async function getContractItems(
   }
 }
 
+export async function getContractItemsGtw(
+  this: IContractModel, ctid: string
+  ): Promise<GtwItemInfo[]> {
+    const record = await this.aggregate([
+      {
+        '$match': {
+          'ctid': ctid
+        }
+      }, {
+        '$unwind': {
+          'path': '$items', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$project': {
+          'oid': '$items.oid', 
+          'cid': '$items.cid', 
+          'enabled': '$items.enabled'
+        }
+      }, {
+        '$match': {
+          'enabled': true
+        }
+      }, {
+        '$lookup': {
+          'from': 'items', 
+          'localField': 'oid', 
+          'foreignField': 'oid', 
+          'as': 'item'
+        }
+      }, {
+        '$lookup': {
+          'from': 'organisations', 
+          'localField': 'cid', 
+          'foreignField': 'cid', 
+          'as': 'organisation'
+        }
+      }, {
+        '$project': {
+          '_id': 0, 
+          'oid': 1, 
+          'cid': 1, 
+          'name': {
+            '$first': '$item.name'
+          }, 
+          'company': {
+            '$first': '$organisation.name'
+          }
+        }
+      }]).exec()
+    if (record) {
+      return record
+    } else {
+      // logger.warn('Contract not found')
+      throw new MyError('Contract not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.CONTRACT })
+    }
+  }
 export async function getContractUI(
     this: IContractModel, ctid: string
 ): Promise<IContractUI> {

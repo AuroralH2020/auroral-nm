@@ -39,8 +39,8 @@ export type ILocals = {
 export type ILocalsGtw = {
     origin: IOriginLocals
     decoded: {
-        iss: string,
-        aud: string
+        iss: string, // AGID
+        aud: string // static 'NM'
     } | null
     token: string | null
     audit: IAuditLocals
