@@ -90,6 +90,7 @@ export const getNodesInCommunity: getNodesInCommunityController = async (req, re
 			if (!commId) {
 				return responseBuilder(HttpStatusCode.BAD_REQUEST, res, 'CommID not provided')
 			}
+			const myCid = (await NodeModel._getNode(decoded.iss)).cid
 			const community = await CommunityModel._getCommunity(commId)
 			const nodes = [] as GtwNodeInfo[]
 			let nodeInCommunity = false

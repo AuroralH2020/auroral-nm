@@ -50,8 +50,9 @@ export async function getAllItems(
   const record = await this.find(
     params
   )
+  .sort({ 'created': -1 })
   .skip(offset)
-  .limit(12)
+  .limit(24)
   .lean()
   .exec()
   if (record) {
@@ -69,7 +70,7 @@ export async function getByOwner(
     params
   )
   .skip(offset)
-  .limit(12)
+  .limit(24)
   .lean()
   .exec()
   if (record) {

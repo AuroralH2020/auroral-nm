@@ -23,7 +23,7 @@ export async function getOrganisations(
   this: IOrganisationModel, cid: string, type: number, offset: number
 ): Promise<IOrganisationUI[]> {
   // Define variables and constants
-  const LIMIT = 12 // max num of items when pagination active
+  const LIMIT = 24 // max num of items when pagination active
   const query = { status: OrganisationStatus.ACTIVE }
   let record: IOrganisationUI[] = [] // final result
   // Retrieve all organisations
@@ -31,7 +31,7 @@ export async function getOrganisations(
     record = await this.find(
       query,
       { hasNotifications: 0, hasAudits: 0, hasUsers: 0, hasNodes: 0 }
-    ).skip(offset).limit(LIMIT).lean()
+    ).sort({ name: 1 }).skip(offset).limit(LIMIT)
       .exec()
     // Retrieve all friends
   } else if (type === 1) {
