@@ -256,8 +256,7 @@ export async function getAllCompanyItems(
 
 export async function count(
 this: IItemModel): Promise<Number> {
-  const record = await this.aggregate([
-  ]).exec()
+  const record = await this.countDocuments({ status: { $ne: ItemStatus.DELETED } }).exec()
   if (record) {
     return record
   } else {
