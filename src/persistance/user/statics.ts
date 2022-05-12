@@ -132,12 +132,7 @@ export async function removeNodeFromUser(
 
 export async function count(
   this: IUserModel): Promise<number> {
-    const record = await this.countDocuments({ status: { $ne: UserStatus.DELETED } }).exec()
-    if (record) {
-      return record
-    } else {
-      throw new MyError('User count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
-    }
+    return this.countDocuments({ status: { $ne: UserStatus.DELETED } }).exec()
 }
 
 export async function search(

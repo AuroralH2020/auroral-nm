@@ -352,12 +352,7 @@ export async function removeMultipleContractRequests(
 
 export async function count(
   this: IOrganisationModel): Promise<Number> {
-    const record = await this.countDocuments({ status: { $ne: OrganisationStatus.DELETED } }).exec()
-    if (record) {
-      return record
-    } else {
-      throw new MyError('Organisations count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
-    }
+    return this.countDocuments({ status: { $ne: OrganisationStatus.DELETED } }).exec()
   }
 
   export async function search(

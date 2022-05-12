@@ -25,7 +25,7 @@ export const storeStatistics = async (): Promise<void> => {
         const slackMessage = 'Items ' + String(items) + ' / Nodes: ' + String(nodes) + ' / Users: ' + String(users) + ' / Organisations: ' + String(organisations) + ' / Contracts: ' + String(contracts) 
         await slack.pushMessage(' This is your daily platform update!')
         await slack.pushMessage(slackMessage)
-        StatisticsModel._createStatistics(data)
+        await StatisticsModel._createStatistics(data)
 }
 export const getLastStatistics = async (): Promise<IStatistics> => {
     return StatisticsModel._getLast()

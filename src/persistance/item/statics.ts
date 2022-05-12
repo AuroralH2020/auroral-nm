@@ -256,12 +256,7 @@ export async function getAllCompanyItems(
 
 export async function count(
 this: IItemModel): Promise<Number> {
-  const record = await this.countDocuments({ status: { $ne: ItemStatus.DELETED } }).exec()
-  if (record) {
-    return record
-  } else {
-    throw new MyError('Items count error', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
-  }
+  return this.countDocuments({ status: { $ne: ItemStatus.DELETED } }).exec()
 }
 
 export async function search(
