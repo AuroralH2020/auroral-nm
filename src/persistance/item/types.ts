@@ -83,6 +83,7 @@ export interface IItemUI extends IItem {
     // Query enrichment
     companyName?: string, // Organisation Name: Is added after the get query
     online?: boolean // Is online in CS
+    ttl?: number // Time left to delete item CS status in redis cache
     owner?: { // User owner info
         name: string,
         email: string

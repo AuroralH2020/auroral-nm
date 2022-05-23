@@ -1,8 +1,10 @@
 import got, { Method, Headers } from 'got'
+import { RedisClientOptions } from 'redis'
 import { JsonType } from '../types/misc-types'
 import { Config } from '../config'
 import { csGroup, csSession, csSessionCount, csUser, csUserGroups, csUserRoster } from '../types/cs-types'
 import { logger } from '../utils/logger'
+import { RedisFactory } from './redisConnector'
 
 // CONSTANTS 
 
@@ -24,10 +26,23 @@ const ApiHeader = {
     Accept: 'application/json',
     simple: 'false' } 
 
+// REDIS CACHING
+// Create Redis Client for XMPP
+const redisOptions = {
+    port: Number(Config.REDIS.PORT), 
+    url: Config.REDIS.HOST,
+    password: Config.REDIS.PASSWORD,
+    database: 1 // DB for sessions
+ } as RedisClientOptions
+
+const redisDb = new RedisFactory(redisOptions)
+redisDb.start()
+logger.info('Connected successfully Redis for CommServer!!')
+
 // FUNCTIONS
 
 export const cs = {
-    initialize: async (username?: string) => {
+    initialize: async () => {
         if (!Config.XMPP_CLIENT.URL) {
             logger.warn('XMPP client configuration missing...Please check...')
         }
@@ -42,12 +57,19 @@ export const cs = {
             logger.info(`Global xmpp user ${xmpp_user.name}`)
         }
         // Get sessions
-        const sessions = (await cs.getSessions()).sessions.length
-        logger.info(`Communication server connected, there are ${sessions} sessions active`)
+        const sessions = await cs.getCountOfSessions()
+        logger.info(`Communication server connected, there are ${sessions.localSessions} session(s) active`)
     },
-    getSessions: async (username?: string) => {
-        const uri = username ? 'sessions/' + username : 'sessions'
-        return request(uri, 'GET', undefined, ApiHeader) as Promise<{ sessions: csSession[]}>
+    getSessions: async (username: string): Promise<{ session: csSession[], ttl: number }> => {
+        const uri = 'sessions/' + username
+        const session = await redisDb.getWithTTL(uri)
+        if (!session.value) {
+            const data = await request(uri, 'GET', undefined, ApiHeader) as { sessions: csSession[] }
+            await redisDb.set(uri, JSON.stringify(data), 900)
+            return { session: data.sessions, ttl: 900 }
+        } else {
+            return { session: JSON.parse(session.value).sessions, ttl: session.ttl }
+        }
     },
     closeSessions: async (username: string) => {
         return request('sessions/' + username, 'DELETE', undefined, ApiHeader) as Promise<void>

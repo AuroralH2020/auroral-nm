@@ -1,6 +1,19 @@
-import { redisDb } from '../microservices/redisConnector'
+import { RedisClientOptions } from 'redis'
+import { RedisFactory } from '../microservices/redisConnector'
 import { Config } from '../config'
 import { logger } from '../utils/logger'
+
+// Create Redis Client for sessions
+const redisSessionsOptions = {
+    port: Number(Config.REDIS.PORT), 
+    url: Config.REDIS.HOST,
+    password: Config.REDIS.PASSWORD,
+    database: 0 // DB for sessions
+ } as RedisClientOptions
+
+const redisDb = new RedisFactory(redisSessionsOptions)
+redisDb.start()
+logger.info('Connected successfully Redis for sessions!!')
 
 // Functions
 
