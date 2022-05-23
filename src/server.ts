@@ -5,7 +5,6 @@ import { Config } from './config'
 import { logger } from './utils/logger'
 import { mongo } from './persistance/mongo'
 import { cs } from './microservices/commServer'
-import { redisDb } from './microservices/redisConnector'
 import { scheduledJobs } from './core/scheduler'
 
 /**
@@ -29,7 +28,6 @@ async function bootstrap() {
       logger.info('Scheduler NOT enabled')
       scheduledJobs.stop()
     }
-    await redisDb.start()
     logger.info('All services initialized')
   } catch (error: unknown) {
     const err = error as Error

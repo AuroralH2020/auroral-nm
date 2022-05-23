@@ -48,7 +48,7 @@ import { ContractModel } from '../persistance/contract/model'
             return {
                 ...it,
                 companyName: cid === it.cid ? myCompanyName : (await OrganisationModel._getOrganisation(it.cid)).name,
-                online: (await cs.getSessions(it.oid)).sessions.length >= 1
+                online: (await cs.getSessions(it.oid)).session.length > 0
             }
         }))
     } catch (err) {
@@ -82,7 +82,8 @@ import { ContractModel } from '../persistance/contract/model'
         return {
                 ...data,
                 companyName: company.name,
-                online: csObject.sessions.length >= 1,
+                online: csObject.session.length > 0,
+                ttl: csObject.ttl,
                 owner,
                 gateway: {
                     name: gateway.name

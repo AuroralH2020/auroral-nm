@@ -3,47 +3,52 @@
  * Interface to REDIS DB
  * @interface
  */
- import { createClient, RedisClientOptions } from 'redis'
+ import { createClient, RedisClientOptions, RedisClientType } from 'redis'
  import { Config } from '../config'
  import { logger } from '../utils/logger'
  import { errorHandler } from '../utils/error-handler'
 
-// Create Redis Client for sessions
-const redisSessionsOptions = {
+ const redisSessionsOptionsXMPP = {
     port: Number(Config.REDIS.PORT), 
     url: Config.REDIS.HOST,
     password: Config.REDIS.PASSWORD,
-    database: 0 // DB for sessions
+    database: 1 // DB for sessions
  } as RedisClientOptions
 
-const client = createClient(redisSessionsOptions)
+const clientXMPP = createClient(redisSessionsOptionsXMPP)
 
-// Exposes functions for working with the cache db REDIS
-export const redisDb = {
+export class RedisFactory {
+    private client: RedisClientType
+  
+    constructor(options: RedisClientOptions) {
+      this.client = createClient(options)
+    }
+
     /**
     * Starts REDIS and listens to connect or error events;
     * @returns {void}
     */
-    start: async () => {
+    public start = async () => {
         try {
-            await client.connect()
-            logger.info('Connected successfully to Redis!!')
+            await this.client.connect()
         } catch (err) {
             const error = errorHandler(err)
             logger.error(error.message)
             logger.error('Could not connect to Redis...')
         }
-    },
+    }
+
     /**
      * Checks REDIS connection status;
      * Rejects if REDIS not ready;
      * @async
      * @returns {void}
      */
-    health: async (): Promise<void> => {
-        const reply = await client.ping()
+    public health = async (): Promise<void> => {
+        const reply = await this.client.ping()
         logger.debug('Redis is ready: ' + reply)
-    },
+    }
+
     // PERSIST
     /**
      * Force saving changes to dump.rdb;
@@ -52,9 +57,10 @@ export const redisDb = {
      * @async
      * @returns {string}
      */
-    save: async (): Promise<void> => {
-        await client.save()
-    },
+    public save = async (): Promise<void> => {
+        await this.client.save()
+    }
+
     // BASIC STRING STORAGE & REMOVAL
     /**
      * Save a string;
@@ -66,9 +72,10 @@ export const redisDb = {
      * @param {integer} ttl
      * @returns {void}
      */
-    set: async (key: string, item: string, ttl: number): Promise<void> => {
-        await client.set(key, item, { 'EX': ttl }) // Other options NX, GET (Check redis for more)...
-    },
+    public set = async (key: string, item: string, ttl: number): Promise<void> => {
+        await this.client.set(key, item, { 'EX': ttl }) // Other options NX, GET (Check redis for more)...
+    }
+
     /**
      * Remove manually one key or list stored;
      * rejects on error a boolean;
@@ -76,9 +83,10 @@ export const redisDb = {
      * @param {string} key
      * @returns {void}
      */
-    remove: async (key: string): Promise<void> => {
-        await client.del(key)
-    },
+    public remove = async (key: string): Promise<void> => {
+        await this.client.del(key)
+    }
+
     /**
      * Get manually one key or list stored;
      * rejects on error a boolean;
@@ -86,9 +94,10 @@ export const redisDb = {
      * @param {string} key
      * @returns {string | null}
      */
-    get: (key: string): Promise<string | null> => {
-        return client.get(key)
-    },
+    public get = (key: string): Promise<string | null> => {
+        return this.client.get(key)
+    }
+
     /**
      * Get manually one key or list stored;
      * rejects on error a boolean;
@@ -96,7 +105,20 @@ export const redisDb = {
      * @param {string} key
      * @returns {string | null}
      */
-    scan: (cursor: number): Promise<{ cursor: number, keys: string[]}> => {
-        return client.scan(cursor)
+    public getWithTTL = async (key: string): Promise<{ value: string | null, ttl: number }> => {
+        const ttl = await this.client.TTL(key)
+        const value = await this.client.get(key)
+        return { value, ttl }
+    }
+
+    /**
+     * Get manually one key or list stored;
+     * rejects on error a boolean;
+     * @async
+     * @param {string} key
+     * @returns {string | null}
+     */
+    public scan = (cursor: number): Promise<{ cursor: number, keys: string[]}> => {
+        return this.client.scan(cursor)
     }
 }
