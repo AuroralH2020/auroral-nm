@@ -75,7 +75,8 @@ export interface IItem {
 // Interface used to send item  privacy value to Nodes
 export interface IItemPrivacy {
     oid: string, // Auroral Id
-    privacy: ItemPrivacy, // Privacy level of the item
+    privacy: ItemPrivacy, // Privacy level of the item,
+    status: string
 }
 
 // Interface to Items returned to UI

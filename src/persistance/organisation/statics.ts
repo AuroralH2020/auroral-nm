@@ -31,7 +31,8 @@ export async function getOrganisations(
     record = await this.find(
       query,
       { hasNotifications: 0, hasAudits: 0, hasUsers: 0, hasNodes: 0 }
-    ).sort({ name: 1 }).skip(offset).limit(LIMIT)
+    ).collation({ locale: 'en' }).sort({ name: 1 }).skip(offset)
+      .limit(LIMIT)
       .exec()
     // Retrieve all friends
   } else if (type === 1) {
@@ -376,7 +377,8 @@ export async function count(
           '_id': 0
         }
       }
-    ]).sort({ name: -1 }).skip(offset).limit(limit)
+    ]).collation({ locale: 'en' }).sort({ name: -1 }).skip(offset)
+    .limit(limit)
     .exec() as unknown as SearchResult[]
   if (record) {
     return record

@@ -229,7 +229,7 @@ export async function getItemsPrivacy(
   // get from mongo
   const record = await this.aggregate([
     { $match: { oid: { $in: oids }, status: { $ne: ItemStatus.DELETED } } },
-    { $project: { oid: 1, privacy: '$accessLevel', _id: 0 } },
+    { $project: { oid: 1, privacy: '$accessLevel', _id: 0, status: 1 } },
   ])
     .exec()
   if (record) {
