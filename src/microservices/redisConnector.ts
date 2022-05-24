@@ -8,15 +8,6 @@
  import { logger } from '../utils/logger'
  import { errorHandler } from '../utils/error-handler'
 
- const redisSessionsOptionsXMPP = {
-    port: Number(Config.REDIS.PORT), 
-    url: Config.REDIS.HOST,
-    password: Config.REDIS.PASSWORD,
-    database: 1 // DB for sessions
- } as RedisClientOptions
-
-const clientXMPP = createClient(redisSessionsOptionsXMPP)
-
 export class RedisFactory {
     private client: RedisClientType
   
