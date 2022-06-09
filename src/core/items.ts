@@ -147,7 +147,9 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
         }
         // Remove item from contracts
         if (item.hasContracts.length > 0) {
-            await ContractModel._removeItemFromAllContracts(oid)
+            for (const con of item.hasContracts) {
+                await ContractModel._removeItems(con, [item.oid])
+            }
         }
         // Remove item in Mongo
         await item._removeItem()

@@ -469,7 +469,7 @@ export async function removeItems(
 
 export async function removeItemFromAllContracts(
     this: IContractModel, oid: string): Promise<void> {
-  const record = await this.updateOne(
+  const record = await this.updateMany(
       { 'items.oid': oid },
       { $pull: { items: { oid } } })
       .exec()
