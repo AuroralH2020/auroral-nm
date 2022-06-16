@@ -88,7 +88,7 @@ function getType(x: string): string {
   const actions = ['CANCELTASK', 'GETLISTOFACTIONS', 'GETTASKSTATUS', 'STARTACTION']
   const events = ['GETEVENTCHANNELSTATUS', 'GETLISTOFEVENTS', 'SUBSCRIBETOEVENTCHANNEL', 'UNSUBSCRIBEFROMEVENTCHANNEL', 'EVENTMESSAGE']
   const properties = ['GETLISTOFPROPERTIES', 'GETPROPERTYVALUE', 'SETPROPERTYVALUE']
-  const agent = ['GETTHINGDESCRIPTION']
+  const agent = ['GETTHINGDESCRIPTION','SENDNOTIFICATION']
   if (actions.indexOf(x) !== -1) {
     return 'action' 
   }
