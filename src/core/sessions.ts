@@ -5,7 +5,7 @@ import { logger } from '../utils/logger'
 
 // Create Redis Client for sessions
 const redisSessionsOptions = {
-    port: Number(Config.REDIS.PORT), 
+    // port: Number(Config.REDIS.PORT), 
     url: Config.REDIS.HOST,
     password: Config.REDIS.PASSWORD,
     database: 0 // DB for sessions

@@ -29,7 +29,7 @@ const ApiHeader = {
 // REDIS CACHING
 // Create Redis Client for XMPP
 const redisOptions = {
-    port: Number(Config.REDIS.PORT), 
+    // port: Number(Config.REDIS.PORT), 
     url: Config.REDIS.HOST,
     password: Config.REDIS.PASSWORD,
     database: 1 // DB for sessions

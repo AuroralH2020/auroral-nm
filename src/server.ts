@@ -60,7 +60,7 @@ const server = startServer()
 
 // gracefully shut down server
 function shutdown() {
-  server.stop((err: Error) => {
+  server.stop((err: Error | undefined) => {
     if (err) {
       logger.error(err)
       process.exitCode = 1
