@@ -1,5 +1,7 @@
 import path from 'path'
 import { createLogger, format, transports } from 'winston'
+import ecsFormat from '@elastic/ecs-winston-format'
+
 import dotenv from 'dotenv'
 
 const { combine, timestamp, label, json, colorize, simple } = format
@@ -22,11 +24,7 @@ const options = {
     handleExceptions: true,
     maxsize: MAX_FILE_SIZE,
     maxFiles: MAX_FILES,
-    format: combine(
-        label({ label: process.env.LOGGER_LABEL  }),
-        timestamp(),
-        json()
-    )
+    format: ecsFormat()
   },
   errorfile: {
     level: 'error',
@@ -34,11 +32,7 @@ const options = {
     handleExceptions: true,
     maxsize: MAX_FILE_SIZE,
     maxFiles: MAX_FILES,
-    format: combine(
-        label({ label: process.env.LOGGER_LABEL  }),
-        timestamp(),
-        json()
-    )
+    format: ecsFormat()
 },
   console: {
     level: 'debug',

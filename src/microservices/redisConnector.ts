@@ -3,10 +3,15 @@
  * Interface to REDIS DB
  * @interface
  */
- import { createClient, RedisClientOptions, RedisClientType } from 'redis'
+//  import { createClient, RedisClientOptions, RedisClientType } from 'redis'
+ import { createClient } from 'redis'
  import { Config } from '../config'
  import { logger } from '../utils/logger'
  import { errorHandler } from '../utils/error-handler'
+
+ // Workaround to solve Redis issue with types
+ type RedisClientType = ReturnType<typeof createClient>
+ type RedisClientOptions = Parameters<typeof createClient>[0]
 
 export class RedisFactory {
     private client: RedisClientType
