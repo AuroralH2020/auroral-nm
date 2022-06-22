@@ -15,6 +15,7 @@ import { GtwRouter } from './api/gtw-api/routes'
 import { accessControl } from './api/middlewares/access-control'
 import { Config } from './config'
 import { logger } from './utils/logger'
+import { ExternalRouter } from './api/external-api/routes'
 
 // Create Express server
 const app = express()
@@ -36,6 +37,7 @@ app.use(accessControl())
  
 app.use('/api/ui/v1/', UiRouter)
 app.use('/api/gtw/v1/', GtwRouter)
+app.use('/api/external/v1/', ExternalRouter)
 
 /**
  * Not Found

@@ -18,6 +18,8 @@ import * as auditCtrl from './controllers/audit'
 import * as itemsCtrl from './controllers/items'
 import * as contractsCtrl from './controllers/contracts'
 import * as communitiesCtrl from './controllers/communities'
+import * as externalUsersCtrl from './controllers/externalUsers'
+
 // Types
 import { Interfaces } from '../../types/locals-types'
 import { SourceType } from '../../types/misc-types'
@@ -54,6 +56,11 @@ UiRouter
 .get('/sessions/all/:cursor', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getAll)
 .get('/sessions/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getOne)
 .delete('/sessions/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.delOne)
+
+// API KEYS
+.post('/api-keys', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN, RolesEnum.DEV_OWNER, RolesEnum.SERV_PROVIDER, RolesEnum.SYS_INTEGRATOR]), externalUsersCtrl.createExternalUser)
+.get('/api-keys', addOrigin(Interfaces.UI), jwt(), externalUsersCtrl.getExternalUserByCid)
+.delete('/api-keys/:keyid', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), externalUsersCtrl.removeExternalUser)
 
 // REGISTRATION
 .get('/registration', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), registrationCtrl.getAllRegistrations)
