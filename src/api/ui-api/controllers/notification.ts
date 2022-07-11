@@ -3,7 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler } from '../../../utils/error-handler'
+import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { NotificationModel } from '../../../persistance/notification/model'
@@ -49,7 +49,12 @@ type setReadController = expressTypes.Controller<{ notificationId: string }, {},
 
 export const setRead: setReadController = async (req, res) => {
   const { notificationId } = req.params
+  const { decoded } = res.locals
 	try {
+		const notif = await NotificationModel._getDoc(notificationId)
+		if (notif.owner !== decoded.uid && notif.owner !== decoded.org) { 
+			throw new MyError('You are not allowed to set read this notification', HttpStatusCode.FORBIDDEN)
+		}
 		await NotificationModel._setRead(notificationId)
 		return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {

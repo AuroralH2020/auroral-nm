@@ -53,7 +53,7 @@ export const editContract: editContractController = async (req, res) => {
         // Check contract ownership
         const contract = await ContractModel._getContractUI(ctid)
         if (!contract.organisations.includes(decoded.org)) {
-            throw new MyError('You are not allowed to edit this contract', HttpStatusCode.BAD_REQUEST)
+            throw new MyError('You are not allowed to edit this contract', HttpStatusCode.FORBIDDEN)
         }
         await ContractService.updateOne(ctid, data)
         return responseBuilder(HttpStatusCode.OK, res, null)
@@ -260,7 +260,7 @@ export const editItem: editItemController = async (req, res) => {
     try {
         const item = await ItemModel._getDoc(oid)
         if (item.cid !== decoded.org) {
-            throw new MyError('You are not allowed to edit this item', HttpStatusCode.BAD_REQUEST)
+            throw new MyError('You are not allowed to edit this item', HttpStatusCode.FORBIDDEN)
         }
         await ContractService.editItem(ctid, oid, { enabled, rw })
         // TODO Notif and audits
@@ -280,7 +280,7 @@ export const removeItem: removeItemController = async (req, res) => {
     try {
         const item = await ItemModel._getItem(oid)
         if (item.cid !== decoded.org) {
-            throw new MyError('You are not allowed to remove this item', HttpStatusCode.BAD_REQUEST)
+            throw new MyError('You are not allowed to remove this item', HttpStatusCode.FORBIDDEN)
         }
         await ContractService.removeItems(ctid, [oid], decoded.org)
         // TODO Notif and audits

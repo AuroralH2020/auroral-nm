@@ -97,7 +97,7 @@ export const updateNode: putNodeController = async (req, res) => {
 	try {
     const node = await NodeModel._getDoc(agid)
     if (node.cid !== decoded.org) {
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Node does not belong to your organisation')
+      return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'Node does not belong to your organisation')
     }
     await NodeService.updateOne(agid, data)
     // TBD: Consider updating password too 
@@ -216,7 +216,7 @@ export const updateDefaultOwner: updateDefaultItemOwnerController = async (req, 
     const myNode = await NodeModel._getNode(agid)
     // check if node belongs to your organisation
     if (myNode.cid !== decoded.org) {  
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Node does not belong to your organisation')
+      return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'Node does not belong to your organisation')
     }
     // role check
     if (update.Device !== undefined && update.Device !== null) {

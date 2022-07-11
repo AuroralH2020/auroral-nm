@@ -102,7 +102,7 @@ export const updateOrganisation: updateOrganisationController = async (req, res)
         try {
                 const myUser = await UserModel._getUser(decoded.uid)
                 if (myUser.cid !== cid) {
-                        return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'You are not authorised to update this organisation')
+                        return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'You are not authorised to update this organisation')
                 }
                 const orgDoc = await OrganisationModel._getDoc(cid)
                 const myOrg = await OrganisationModel._getOrganisation(cid)
