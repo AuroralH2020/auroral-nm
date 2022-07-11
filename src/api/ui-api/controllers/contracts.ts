@@ -50,6 +50,11 @@ export const editContract: editContractController = async (req, res) => {
     const { decoded } = res.locals
     const data = req.body
     try {
+        // Check contract ownership
+        const contract = await ContractModel._getContractUI(ctid)
+        if (!contract.organisations.includes(decoded.org)) {
+            throw new MyError('You are not allowed to edit this contract', HttpStatusCode.BAD_REQUEST)
+        }
         await ContractService.updateOne(ctid, data)
         return responseBuilder(HttpStatusCode.OK, res, null)
     } catch (err) {
@@ -251,7 +256,12 @@ type editItemController = expressTypes.Controller<{ctid: string, oid: string}, {
 export const editItem: editItemController = async (req, res) => {
     const { ctid, oid } = req.params
     const { rw, enabled } = req.body
+    const { decoded } = res.locals
     try {
+        const item = await ItemModel._getDoc(oid)
+        if (item.cid !== decoded.org) {
+            throw new MyError('You are not allowed to edit this item', HttpStatusCode.BAD_REQUEST)
+        }
         await ContractService.editItem(ctid, oid, { enabled, rw })
         // TODO Notif and audits
         return responseBuilder(HttpStatusCode.OK, res, null, null)

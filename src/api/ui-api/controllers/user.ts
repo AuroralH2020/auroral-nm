@@ -73,6 +73,10 @@ export const removeUser: removeUserController = async (req, res) => {
 
                 // Ger user
                 const userDoc = await UserModel._getDoc(uid)
+                // Test if user belongs to same company
+                if (userDoc.cid !== decoded.org) {
+                        throw new MyError('You are not allowed to remove user from different company', HttpStatusCode.FORBIDDEN)
+                }
                 // Test if user has some items
                 if ((userDoc.hasItems.length) !== 0) {
                         throw new MyError('User has some enabled items', HttpStatusCode.FORBIDDEN)
@@ -125,6 +129,9 @@ export const updateUser: updateUserController = async (req, res) => {
         try {
                 const userDoc = await UserModel._getDoc(uid)
                 const myUserDoc = await UserModel._getDoc(my_uid)
+                if (myUserDoc.cid !== userDoc.cid) {
+                        throw new MyError('You can only update account in your company', HttpStatusCode.FORBIDDEN)
+                }
                 // If updating roles verify there are no conflicts
                 if (payload.roles) {
                         UserService.checkRoles(myUserDoc, userDoc, payload.roles)
@@ -156,6 +163,9 @@ export const updateUserPassword: updateUserPwdController = async (req, res) => {
         const { uid } = req.params
         const { newPwd, oldPwd } = req.body
         try {
+                if (uid !== res.locals.decoded.uid) {
+                        throw new MyError('You can only update your own password', HttpStatusCode.FORBIDDEN)
+                }
                 if (!newPwd || !oldPwd) {
                         throw new Error('Wrong body')
                 }

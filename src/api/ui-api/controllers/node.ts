@@ -3,7 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler } from '../../../utils/error-handler'
+import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { DefaultOwnerTypeUpdate, INodeCreate, INodeUI, INodeUpdate } from '../../../persistance/node/types'
@@ -96,7 +96,9 @@ export const updateNode: putNodeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     const node = await NodeModel._getDoc(agid)
-
+    if (node.cid !== decoded.org) {
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Node does not belong to your organisation')
+    }
     await NodeService.updateOne(agid, data)
     // TBD: Consider updating password too 
     
@@ -140,6 +142,9 @@ export const removeNode: removeNodeController = async (req, res) => {
     // Validate that agid belongs to organisation by passing optional CID param to _getNode
     const myUser = await UserModel._getUser(decoded.uid)
     const myNode = await NodeModel._getNode(agid)
+    if (myUser.cid !== myNode.cid) {
+      throw new MyError('You are not allowed to remove this node', HttpStatusCode.FORBIDDEN)
+    }
     // Remove node
     await NodeService.removeOne(agid, decoded.org)
     // Audit
@@ -181,6 +186,10 @@ export const removeKey: removeKeyController = async (req, res) => {
     await NodeModel._removeKey(agid)
     const myUser = await UserModel._getUser(decoded.uid)
     const myNode = await NodeModel._getNode(agid)
+
+    if (myUser.cid !== myNode.cid) {
+      throw new MyError('You are not allowed to remove key from this node', HttpStatusCode.FORBIDDEN)
+    }
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
@@ -205,6 +214,10 @@ export const updateDefaultOwner: updateDefaultItemOwnerController = async (req, 
   const { decoded } = res.locals
 	try {
     const myNode = await NodeModel._getNode(agid)
+    // check if node belongs to your organisation
+    if (myNode.cid !== decoded.org) {  
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Node does not belong to your organisation')
+    }
     // role check
     if (update.Device !== undefined && update.Device !== null) {
       const user = await UserModel._getUser(update.Device)

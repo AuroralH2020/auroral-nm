@@ -50,8 +50,8 @@ type setReadController = expressTypes.Controller<{ notificationId: string }, {},
 export const setRead: setReadController = async (req, res) => {
   const { notificationId } = req.params
 	try {
-	await NotificationModel._setRead(notificationId)
-    return responseBuilder(HttpStatusCode.OK, res, null, null)
+		await NotificationModel._setRead(notificationId)
+		return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		const error = errorHandler(err)
 		logger.error(error.message)
