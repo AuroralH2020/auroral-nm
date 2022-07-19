@@ -5,7 +5,7 @@
 
 ## Variables
 SERVER=auroral.dev.bavenir.eu
-USER=jorge
+USER=peterdrahovsky
 CONN=${USER}@${SERVER}
 FOLDER='/opt/auroral_dev_cloud'
 APP='registry.bavenir.eu/auroral_nm_api' # Container to be reloaded

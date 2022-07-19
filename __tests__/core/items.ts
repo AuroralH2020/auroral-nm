@@ -11,6 +11,7 @@ import { cs } from '../../src/microservices/commServer'
 import { NodeModel } from '../../src/persistance/node/model'
 import { INodeUI, NodeStatus, NodeType } from '../../src/persistance/node/types'
 import { ErrorSource, MyError } from '../../src/utils/error-handler'
+import { csSession } from '../../src/types/cs-types'
 
 jest.mock('../../src/persistance/organisation/model.ts')
 jest.mock('../../src/persistance/contract/model.ts')
@@ -83,7 +84,7 @@ describe('Items', () => {
   it('getMany', async () => {
     const spy = jest.spyOn(items, 'getMany')
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValue(org1)
-    jest.spyOn(cs, 'getSessions').mockResolvedValue({ sessions: [] })
+    jest.spyOn(cs, 'getSessions').mockResolvedValue({ session: [], ttl: 0 })
     jest.spyOn(ItemModel, '_getAllItems').mockResolvedValue([item1])
     const response1 = await items.getMany('cid', ItemType.DEVICE, 0, 0)
     expect(response1).toMatchObject([{ agid: 'agid' }])
@@ -99,7 +100,7 @@ describe('Items', () => {
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValue(org1)
     jest.spyOn(NodeModel, '_getNode').mockResolvedValue(node1)
-    jest.spyOn(cs, 'getSessions').mockResolvedValue({ sessions: [] })
+    jest.spyOn(cs, 'getSessions').mockResolvedValue({ session: [], ttl: 0 })
 
     const response1 = await items.getOne('cid', ItemType.DEVICE)
     expect(response1).toMatchObject({ agid: 'agid' })
@@ -129,7 +130,7 @@ describe('Items', () => {
     jest.spyOn(ItemModel, '_getDoc').mockResolvedValue({ ...item1, _removeItem: async () => {} } as IItemDocument)
 
     await items.removeOne('oid', 'uid')
-    await expect(items.removeOne('oid', 'aaa')).rejects.toMatchObject({ status: 401 })
+    await expect(items.removeOne('oid', 'aaa')).rejects.toMatchObject({ status: 403 })
     
     jest.spyOn(cs, 'deleteUser').mockImplementation(async () => {
       throw new Error('MOCK')
@@ -142,9 +143,9 @@ describe('Items', () => {
     jest.spyOn(ItemModel, '_getDoc').mockResolvedValue({ ...item1, _updateItem: async () => { } } as unknown as IItemDocument)
     jest.spyOn(ItemModel, '_getItem').mockResolvedValue(item1)
     await items.updateOne('oid',{})
-    await expect(items.updateOne('oid', {},'owner3')).rejects.toMatchObject({ status: 401 })
-    await expect(items.updateOne('oid', { status: ItemStatus.DISABLED },'owner3')).rejects.toMatchObject({ status: 401 })
-    await expect(items.updateOne('oid', { status: ItemStatus.DELETED },'owner3')).rejects.toMatchObject({ status: 401 })
+    await expect(items.updateOne('oid', {},'owner3')).rejects.toMatchObject({ status: 403 })
+    await expect(items.updateOne('oid', { status: ItemStatus.DISABLED },'owner3')).rejects.toMatchObject({ status: 403 })
+    await expect(items.updateOne('oid', { status: ItemStatus.DELETED },'owner3')).rejects.toMatchObject({ status: 403 })
     jest.spyOn(ItemModel, '_getItem').mockResolvedValue({ ...item1, hasContracts: [] })
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
 

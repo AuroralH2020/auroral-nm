@@ -3,6 +3,7 @@ import crypto from 'bcrypt'
 import * as auth from '../../src/auth-server/auth-server'
 import { AccountModel } from '../../src/persistance/account/model'
 import { IAccountDocument } from '../../src/persistance/account/types'
+import { errorHandler } from '../../src/utils/error-handler'
 
 describe('Authentication server', () => {
     it('Hash password and verify hash', async () => {
@@ -14,7 +15,8 @@ describe('Authentication server', () => {
         expect(response2).toBe(true)
         try {
             await auth.comparePassword('myuser', 'test')
-        } catch (error) {
+        } catch (err) {
+            const error = errorHandler(err)
             expect(error.message).toMatch('Wrong password')
         }
         // expect(spy).toHaveBeenCalledTimes(1)
@@ -32,9 +34,9 @@ describe('Authentication server', () => {
         const spy1 = jest.spyOn(auth, 'signAppToken')
         const spy2 = jest.spyOn(auth, 'signAppToken')
         jest.spyOn(AccountModel, '_getAccount').mockResolvedValue({ username: '', uid: '', cid: '', roles: [], lastUpdated: 123, created: 123 })
-        const response1 = await auth.signAppToken('username')
-        expect(typeof response1).toBe('string')
-        const response2 = await auth.verifyToken(response1)
+        const response1 = await auth.signAppToken('username', '172.16.0.1')
+        expect(typeof response1.token).toBe('string')
+        const response2 = await auth.verifyToken(response1.token)
         expect(response2.iss).toMatch('username')
         expect(spy1).toHaveBeenCalledTimes(1)
         expect(spy2).toHaveBeenCalledTimes(1)

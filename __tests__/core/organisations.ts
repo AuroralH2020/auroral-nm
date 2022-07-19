@@ -8,8 +8,13 @@ import { IUserDocument, IUserUIProfile } from '../../src/persistance/user/types'
 import { INodeUI, NodeStatus, NodeType } from '../../src/persistance/node/types'
 import { MyError } from '../../src/utils/error-handler'
 import { IAuditLocals } from '../../src/types/locals-types'
+import { AccountModel } from '../../src/persistance/account/model'
+import { IAccountDocument } from '../../src/persistance/account/types'
+import { CommunityModel } from '../../src/persistance/community/model'
+import { ICommunity, ICommunityModel } from '../../src/persistance/community/types'
 
 jest.mock('../../src/persistance/organisation/model.ts')
+jest.mock('../../src/persistance/community/model.ts')
 jest.mock('../../src/persistance/contract/model.ts')
 jest.mock('../../src/persistance/user/model.ts')
 jest.mock('../../src/persistance/account/model.ts')
@@ -18,6 +23,7 @@ jest.mock('../../src/persistance/node/model.ts')
 jest.mock('../../src/microservices/commServer.ts')
 jest.mock('../../src/microservices/xmppClient')
 jest.mock('../../src/core/contracts.ts')
+jest.mock('../../src/core/communities.ts')
 jest.mock('../../src/core/nodes')
 jest.mock('../../src/utils/logger')
 
@@ -63,6 +69,12 @@ const user1 = {
   accessLevel: ItemPrivacy.FOR_FRIENDS
 } as any as IUserUIProfile
 
+const account1 = {
+  name: 'username1',
+  email: '1@1.cz',
+  accessLevel: ItemPrivacy.FOR_FRIENDS
+} as any as IAccountDocument
+
 const node1 = {
   agid: 'agid1', // unique Node id
   name: 'noideName',
@@ -81,6 +93,7 @@ describe('organisations', () => {
   it('remove', async () => {
     const spy = jest.spyOn(organisations, 'remove')
     jest.spyOn(UserModel, '_getDoc').mockResolvedValue({ ...user1, _removeUser: async () => {} } as any as IUserDocument)
+    jest.spyOn(CommunityModel, '_getPartnershipByCids').mockResolvedValue({ commId: '123' } as any as ICommunity)
     await organisations.remove({ ...org1, _removeOrganisation: async () => {} } as any as IOrganisationDocument, 'uid', {} as IAuditLocals)
     await expect(organisations.remove({ ...org1,
      _removeOrganisation: async () => {
