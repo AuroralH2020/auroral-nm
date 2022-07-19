@@ -1,4 +1,5 @@
 // Controller common imports
+import { Config } from '../../../config'
 import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
@@ -226,6 +227,29 @@ export const getContractedItemsByCid: getContractedItemsByCidCtrl = async (req, 
       logger.error('Gateway unauthorized access attempt')
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
+  }
+}
+
+type getAgentPubkeyCtrl = expressTypes.Controller<{ agid: string }, {}, {}, string, localsTypes.ILocalsGtw>
+
+export const getAgentPubkey: getAgentPubkeyCtrl = async (req, res) => {
+  const { agid } = req.params
+  const { decoded } = res.locals
+  try {
+    if (!decoded && Config.NODE_ENV === 'production') {
+      logger.warn({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
+    } 
+
+    const node = await NodeModel._getDoc(agid)
+    if (!node.hasKey) {
+      throw new MyError('No public key found for this agent', HttpStatusCode.NOT_FOUND)
+    }
+    return responseBuilder(HttpStatusCode.OK, res, null, node.key)
   } catch (err) {
     const error = errorHandler(err)
     logger.error(error.message)

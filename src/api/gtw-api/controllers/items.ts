@@ -260,3 +260,22 @@ export const updateItem: updateItemController = async (req, res) => {
     return responseBuilder(error.status, res, error.message)
   }
 }
+
+type getAgidByOidCtrl = expressTypes.Controller<{oid: string}, {}, {}, string, localsTypes.ILocalsGtw>
+
+export const getAgidByOid: getAgidByOidCtrl = async (req, res) => {
+  const { oid } = req.params
+  const { decoded } = res.locals
+  try {
+    if (!decoded && Config.NODE_ENV === 'production') {
+      logger.error('Gateway unauthorized access attempt')
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Gateway unauthorized access attempt')
+    }
+    const item = await ItemModel._getItem(oid)
+    return responseBuilder(HttpStatusCode.OK, res, null, item.agid)
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error({ msg: error.message, id: res.locals.reqId })
+    return responseBuilder(error.status, res, error.message)
+  }
+}

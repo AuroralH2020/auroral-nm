@@ -22,6 +22,7 @@ GtwRouter
 .post('/items/register', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), validateBody(createItemSchema), itemsCtrl.registration)
 .post('/items/remove', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), itemsCtrl.deleteItems)
 .put('/items/modify', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), validateBody(updateItemGtwSchema), itemsCtrl.updateItem) // Update item
+.get('/items/agid/:oid', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.getAgidByOid) // Get AGID by OID
 .delete('/agent/:agid', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.NODE), agentCtrl.deleteAgent)
 .get('/agent/:agid/items', addOrigin(Interfaces.GATEWAY), guard(),createAudit(SourceType.NODE), agentCtrl.getAgentItems) // change to post if depends on update or use query
 .get('/agent/privacy', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPrivacy) 
@@ -29,6 +30,7 @@ GtwRouter
 .get('/agent/partners', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPartners) 
 .get('/agent/partner/:cid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPartner)
 .get('/agent/contract/items/:cid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getContractedItemsByCid)
+.get('/agent/key/:agid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getAgentPubkey)
 
 // DISCOVERY
 .get('/agent/communities', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getCommunities)
