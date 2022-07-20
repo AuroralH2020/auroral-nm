@@ -7,7 +7,6 @@ import { errorHandler, MyError } from '../../../utils/error-handler'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { NotificationModel } from '../../../persistance/notification/model'
 import { ContractModel } from '../../../persistance/contract/model'
-import { UserModel } from '../../../persistance/user/model'
 import { ContractService } from '../../../core'
 import {
     ContractItemType,

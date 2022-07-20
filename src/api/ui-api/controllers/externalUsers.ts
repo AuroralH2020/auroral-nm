@@ -20,7 +20,6 @@ export const createExternalUser: createExternalUserController = async (req, res)
     const { ACL, name } = req.body 
     const { decoded } = res.locals
     try {
-        const approvedACL: ACLObject = { cid: [], agid: [], oid: [] }
         // CID LEVEL
         if (ACL.cid) {
             // Check ROLES
