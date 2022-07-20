@@ -39,7 +39,7 @@ export const getNode: getNodeController = async (req, res) => {
 
 type getNodesController = expressTypes.Controller<{}, {}, {}, INodeUI[], localsTypes.ILocals>
  
-export const getNodes: getNodesController = async (req, res) => {
+export const getNodes: getNodesController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
     const nodes = (await OrganisationModel._getOrganisation(decoded.org)).hasNodes
@@ -151,7 +151,7 @@ export const removeNode: removeNodeController = async (req, res) => {
     await AuditModel._createAudit({
       ...res.locals.audit,
       actor: { id: decoded.uid, name: myUser.name },
-      target: { id: agid, name: myNode.name }, // TODO
+      target: { id: agid, name: myNode.name }, 
       type: EventType.nodeRemoved,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
     })

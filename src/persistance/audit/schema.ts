@@ -1,4 +1,3 @@
-import { func, number, string } from 'joi'
 import mongoose from 'mongoose'
 import { AuditObj, IAuditDocument, IAuditModel, LabelsType } from './types'
 import { getAudits, getDoc, createAudit } from './statics'
@@ -10,7 +9,6 @@ const Schema = mongoose.Schema
 const auditStatusType = Object.values(ResultStatusType)
 const auditSourceType = Object.values(SourceType)
 const auditOriginType = Object.values(Interfaces)
-// const statuses = Object.values(NotificationStatus)
 
 const AuditObjSchema = new Schema<AuditObj>({
     id: String,

@@ -13,9 +13,6 @@ import { errorHandler } from '../utils/error-handler'
 import { UserModel } from '../persistance/user/model'
 import { ItemType } from '../persistance/item/types'
 
-// Constants
-// const PUBLIC_NODES = 'PUBLIC_NODES' // CS group for nodes
-
 // Functions
 export const createOne = async (cid: string, name: string, type: NodeType, password: string): Promise<string> => {
     try {

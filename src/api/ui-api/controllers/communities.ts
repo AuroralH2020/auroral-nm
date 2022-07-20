@@ -16,7 +16,6 @@ type getCommunityController = expressTypes.Controller<{ commId: string }, {}, {}
 
 export const getCommunity: getCommunityController = async (req, res) => {
     const { commId } = req.params 
-    // const { decoded } = res.locals
     try {
         // Get community
         const community = await CommunityModel._getCommunityUI(commId)

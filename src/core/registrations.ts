@@ -210,7 +210,7 @@ export const sendVerificationMail = async (status: RegistrationStatus, registrat
     await devOpsNotifications(registrationObj)
 }
 
-export const resendVerificationMail = async (status: RegistrationStatus, registrationId: string, locals: localsTypes.ILocals): Promise<void> => {
+export const resendVerificationMail = async (_status: RegistrationStatus, registrationId: string, locals: localsTypes.ILocals): Promise<void> => {
     // Retrieve the registration object
     const registrationObj = await RegistrationModel._getDoc(registrationId)
     // Generate account validation token
@@ -220,7 +220,7 @@ export const resendVerificationMail = async (status: RegistrationStatus, registr
     verificationMail(registrationObj.email, newToken, registrationObj.type, locals.origin?.realm)
 }
 
-export const declineRegistration = async (status: RegistrationStatus, registrationId: string, locals: localsTypes.ILocals): Promise<void> => {
+export const declineRegistration = async (status: RegistrationStatus, registrationId: string, _locals: localsTypes.ILocals): Promise<void> => {
     // Retrieve the registration object
     const registrationObj = await RegistrationModel._getDoc(registrationId)
     // Update status to declined (user approval)

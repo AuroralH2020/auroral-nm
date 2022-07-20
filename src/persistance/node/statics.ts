@@ -97,7 +97,7 @@ export async function removeKey(
 }
 
 export async function count(
-  this: INodeModel): Promise<Number> {
+  this: INodeModel): Promise<number> {
     return this.countDocuments({ status: { $ne: NodeStatus.DELETED } }).exec()
   }
 

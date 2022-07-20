@@ -3,10 +3,10 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler, MyError } from '../../../utils/error-handler'
+import { errorHandler } from '../../../utils/error-handler'
 
 // Controller specific imports
-import { getAllSessions, getSession, delSession } from '../../../core/sessions'
+import { getAllSessions, delSession } from '../../../core/sessions'
 
 // Controllers
 

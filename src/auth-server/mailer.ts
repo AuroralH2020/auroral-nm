@@ -29,7 +29,7 @@ const transporter = nodemailer.createTransport({
 
 const sendMail = async (mails: string | string[], cc: string | string[] | undefined, bcc: string | string[] | undefined, html: string, subject: string, attachments?: Attachment[]) => {
     try {
-        const mail_msg = await transporter.sendMail({
+        await transporter.sendMail({
             from: Config.SMTP.USER, // sender address
             to: mails, // list of receivers
             cc: cc, // list of cc receivers

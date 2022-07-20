@@ -4,7 +4,6 @@
 
 // Imports
 import * as crypto from 'crypto'
-import { number } from 'joi'
 import { errorHandler, ErrorSource, MyError } from '../utils/error-handler'
 import { HttpStatusCode, logger } from '../utils'
 import { cs } from '../microservices/commServer'
@@ -59,7 +58,7 @@ import { ContractModel } from '../persistance/contract/model'
 /**
  * Get One Item
  */
- export const getOne = async (cid: string, oid: string): Promise<IItemUI> => {
+ export const getOne = async (_cid: string, oid: string): Promise<IItemUI> => {
     try {
         // Get Item
         const data = await ItemModel._getItem(oid)
@@ -115,9 +114,7 @@ import { ContractModel } from '../persistance/contract/model'
         // TBD: Add notifications and audits
         return password
     } catch (err) {
-        const error = errorHandler(err)
-        // logger.error(error.message)
-        throw error
+        throw errorHandler(err)
     }
 }
 

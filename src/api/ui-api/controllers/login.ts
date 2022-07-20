@@ -91,13 +91,13 @@ type refreshTokenController = expressTypes.Controller<{}, { refreshToken: string
  
 export const refreshToken: refreshTokenController = async (req, res) => {
         const { decoded } = res.locals
-        const { refreshToken } = req.body
+        const myRefreshToken = req.body.refreshToken
         if (!decoded) {
                 logger.warn('Missing token')
                 return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Missing token')
 	}
         try {
-                const original = await verifyToken(refreshToken)
+                const original = await verifyToken(myRefreshToken)
                 if (original.aud === 'refresh' && original.uid === decoded.uid) {
                         const tokens = await signAppToken(decoded.iss, res.locals.origin.originIp, decoded.iat)
                         return responseBuilder(HttpStatusCode.OK, res, null, tokens)
@@ -157,7 +157,7 @@ export const processPasswordless: processPasswordlessController = async (req, re
 
 type rememberCookieController =  expressTypes.Controller<{}, {}, {}, string, localsTypes.ILocals>
  
-export const rememberCookie: rememberCookieController = async (req, res) => {
+export const rememberCookie: rememberCookieController = async (_req, res) => {
         const { decoded } = res.locals // Requester organisation ID
         try {
                 const secret = generateSecret()

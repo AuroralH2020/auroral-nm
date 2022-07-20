@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
-import { IAuditDocument, IAuditModel, IAuditCreate, IAudit, AuditObj } from './types'
+import { IAuditDocument, IAuditModel, IAuditCreate, IAudit } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
 import { logger } from '../../utils/logger'
 import { EventType } from '../../types/misc-types'
 
 export async function getAudits(
-  this: IAuditModel, cid: string, id: string, days: number = 7
+  this: IAuditModel, _cid: string, id: string, days: number = 7
 ): Promise<IAudit[]> {
   const d = new Date()
   d.setHours(0, 0, 0, 0)

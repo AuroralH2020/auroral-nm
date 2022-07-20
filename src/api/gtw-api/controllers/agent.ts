@@ -8,7 +8,7 @@ import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { NodeModel } from '../../../persistance/node/model'
-import { IItemPrivacy, ItemStatus } from '../../../persistance/item/types'
+import { IItemPrivacy } from '../../../persistance/item/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { OrgGatewayType } from '../../../persistance/organisation/types'
 import { ItemModel } from '../../../persistance/item/model'
@@ -77,7 +77,11 @@ export const getPartner: getPartnerController = async (req, res) => {
   const { decoded } = res.locals
   try {
     if (decoded) {
-      // const myOrg = await OrganisationModel._getOrganisation(decoded.aud)
+      const myCid = (await NodeModel._getNode(decoded.iss)).cid
+      const knows = (await OrganisationModel._getOrganisation(myCid)).knows
+      if (!(cid in knows)) {
+        return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'You are not allowed to access this partner')
+      }
       const org = await OrganisationModel._getOrganisation(cid)
       return responseBuilder(HttpStatusCode.OK, res, null, { nodes: org.hasNodes, name: org.name })
     } else {
@@ -93,7 +97,7 @@ export const getPartner: getPartnerController = async (req, res) => {
 
 type getPartnersController = expressTypes.Controller<{}, {}, {}, [string], localsTypes.ILocalsGtw>
 // returns nodes organisation knows array 
-export const getPartners: getPartnersController = async (req, res) => {
+export const getPartners: getPartnersController = async (_req, res) => {
   const { decoded } = res.locals
   try {
     if (decoded) {
@@ -181,7 +185,7 @@ export const getRelationship: getAgentRelationship = async (req, res) => {
 
 type getAgentPrivacy = expressTypes.Controller<{}, {}, {}, IItemPrivacy[], localsTypes.ILocalsGtw>
 
-export const getPrivacy: getAgentPrivacy = async (req, res) => {
+export const getPrivacy: getAgentPrivacy = async (_req, res) => {
   const { decoded } = res.locals
 	try {
     if (decoded) {

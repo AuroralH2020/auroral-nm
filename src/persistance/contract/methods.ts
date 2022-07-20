@@ -1,4 +1,4 @@
-import { ContractStatus, IContractDocument, IContractItemUpdate, IContractUpdate } from './types'
+import { ContractStatus, IContractDocument, IContractUpdate } from './types'
 
 export async function updateContract(this: IContractDocument, data: IContractUpdate): Promise<void> {
     this.description = data.description !== undefined ? data.description : this.description

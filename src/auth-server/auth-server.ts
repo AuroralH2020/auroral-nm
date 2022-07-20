@@ -113,7 +113,7 @@ export const signAppToken = async (username: string, ip: string, started_at?: nu
 
 export const verifyToken = async (token: string): Promise<jwtTypes.JWTDecodedToken> => {
     const { secret, algorithm } = getSecretAndAlg()
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
         jwt.verify(token, secret, { algorithms: [algorithm] }, (err, decoded) => {
             if (err) {
                 if (err.name === 'TokenExpiredError') {

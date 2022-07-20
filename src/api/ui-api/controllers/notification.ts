@@ -31,7 +31,7 @@ export const getNotifications: getNotificationsController = async (req, res) => 
 type refreshNotificationsController = expressTypes.Controller<{}, {}, {}, { count: number }, localsTypes.ILocals>
 
 // Return count of unread or pending notifications
-export const refreshNotifications: refreshNotificationsController = async (req, res) => {
+export const refreshNotifications: refreshNotificationsController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
 	const cid = decoded.org

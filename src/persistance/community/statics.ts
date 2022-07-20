@@ -241,7 +241,7 @@ export async function addOrganisationToCommunity(
 }
 
 export async function removeOrgsWithoutNodes(
-  this: ICommunityModel, commId: string, cid: string,  
+  this: ICommunityModel, commId: string, _cid: string,  
 ): Promise<void> {
   const record = await this.updateOne(
     {

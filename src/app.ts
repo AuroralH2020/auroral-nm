@@ -2,8 +2,7 @@
 /* eslint-disable import/first */
 import apm_service from './utils/apm-service'
 
-apm_service().then(() => {
-}).catch((error) => {
+apm_service().catch((error) => {
   logger.error(error.message)
 })
 

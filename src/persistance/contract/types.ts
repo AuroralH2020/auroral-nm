@@ -1,7 +1,6 @@
 import { Document, Model } from 'mongoose'
 import { GtwItemInfo } from '../../types/misc-types'
-import { IItem, ItemLabelsObj, ItemType } from '../item/types'
-import { getItemsInContractByAgid } from './statics'
+import { IItem, ItemType } from '../item/types'
 
 export enum ContractType {
     PRIVATE = 'Private',

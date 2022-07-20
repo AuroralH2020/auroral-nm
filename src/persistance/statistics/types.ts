@@ -30,6 +30,6 @@ export interface IStatisticsModel extends Model<IStatisticsDocument> {
     ) => Promise<IStatisticsDocument>
     _getByDate: (
         this: IStatisticsModel,
-        date: Number
+        date: number
     ) => Promise<IStatisticsDocument>
 }

@@ -1,7 +1,6 @@
 import { IRegistrationDocument, IRegistrationModel, IRegistrationPost, IRegistration, RegistrationStatus, RegistrationType } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
-import { logger } from '../../utils/logger'
 
 export async function getDoc(
   this: IRegistrationModel, registrationId: string

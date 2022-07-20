@@ -1,7 +1,6 @@
 import { IOrganisationDocument, IOrganisationModel, IOrganisationCreate, IOrganisationUI, OrganisationStatus, OrgConfiguration } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
-import { logger } from '../../utils/logger'
 import { SearchResult } from '../../types/misc-types'
 
 export async function getOrganisation(
@@ -352,7 +351,7 @@ export async function removeMultipleContractRequests(
 }
 
 export async function count(
-  this: IOrganisationModel): Promise<Number> {
+  this: IOrganisationModel): Promise<number> {
     return this.countDocuments({ status: { $ne: OrganisationStatus.DELETED } }).exec()
   }
 

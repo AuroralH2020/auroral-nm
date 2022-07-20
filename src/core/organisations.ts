@@ -4,12 +4,11 @@
 
 // Imports
 import { errorHandler } from '../utils/error-handler'
-import { logger } from '../utils/logger'
 import { UserModel } from '../persistance/user/model'
 import { AccountModel } from '../persistance/account/model'
 import { removeOne } from './nodes'
 import { IOrganisationDocument } from '../persistance/organisation/types'
-import { CommunityService, ContractService, OrganisationService } from '../core'
+import { CommunityService, ContractService } from '../core'
 import { IAuditLocals } from '../types/locals-types'
 import { OrganisationModel } from '../persistance/organisation/model'
 import { CommunityModel } from '../persistance/community/model'

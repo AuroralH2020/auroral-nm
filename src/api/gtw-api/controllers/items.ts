@@ -44,7 +44,6 @@ type registrationRemoveResponse = {
 type registrationController = expressTypes.Controller<{}, { agid: string, items: IItemCreate[] }, {}, registrationResponse[], localsTypes.ILocalsGtw>
 
 export const registration: registrationController = async (req, res) => {
-  // const { agid, thingDescriptions } = req.body
   const { decoded } = res.locals
   try {
     logger.debug('Registering items in node: ' + req.body.agid)
@@ -52,61 +51,60 @@ export const registration: registrationController = async (req, res) => {
     if (!decoded && Config.NODE_ENV === 'production') {
       logger.error('Gateway unauthorized access attempt')
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, response)
-    } else {
-      if (!decoded) {
+    } 
+    if (!decoded) {
         logger.warn('Gateway anonymous access, it will be forbidden in production...')
-      }
-      const agid = decoded ? decoded.iss : req.body.agid
-      const node = await NodeModel._getNode(agid)
-
-      const itemsToActivate: { oid:string, data:  IItemUpdate, uid: string }[] = []
-      // Async registration of items
-      await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
-        try {
-          // Create item
-          const password = await ItemService.createOne(it, agid, node.cid)
-          // Autoenable item if setted up
-          if (node.defaultOwner && node.defaultOwner[it.type]) { 
-            itemsToActivate.push({ oid: it.oid, data: { status: ItemStatus.ENABLED }, uid: node.defaultOwner[it.type] })
-          }
-          // Create response
-          response.push({ name: it.name, oid: it.oid, password })
-          // Create Notification
-          const myOrgName = (await OrganisationModel._getOrganisation(node.cid)).name
-          await NotificationModel._createNotification({
-            owner: node.cid,
-            actor: { id: node.cid, name: myOrgName },
-            target: { id: it.oid, name: it.name },
-            type: EventType.itemDiscovered,
-            status: NotificationStatus.INFO
-          })
-          // Audit
-          await AuditModel._createAudit({
-            ...res.locals.audit,
-            cid: node.cid,
-            actor: { id: agid, name: node.name },
-            target: { id: it.oid, name: it.name },
-            type: EventType.itemDiscovered,
-            labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
-          })
-          return true
-        } catch (err) {
-          // Create response
-          const error = errorHandler(err)
-          logger.error({ msg: error.message, id: res.locals.reqId })
-          response.push({ name: it.name, oid: it.oid, password: null, error: true })
-          return false
-        }
-      }))
-      logger.info('Gateway with id ' + agid + ' registered items')
-      for (const item of itemsToActivate) {
-        setTimeout(() => { // enable item in 30seconds
-          logger.info('Autoenabling item registered under: ' + agid)
-          ItemService.updateOne(item.oid, item.data, item.uid)
-        }, 30000)
-      }
-      return responseBuilder(HttpStatusCode.OK, res, null, response)
     }
+    const agid = decoded ? decoded.iss : req.body.agid
+    const node = await NodeModel._getNode(agid)
+
+    const itemsToActivate: { oid:string, data:  IItemUpdate, uid: string }[] = []
+    // Async registration of items
+    await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
+      try {
+        // Create item
+        const password = await ItemService.createOne(it, agid, node.cid)
+        // Autoenable item if configured
+        if (node.defaultOwner && node.defaultOwner[it.type]) { 
+          itemsToActivate.push({ oid: it.oid, data: { status: ItemStatus.ENABLED }, uid: node.defaultOwner[it.type] })
+        }
+        // Create response
+        response.push({ name: it.name, oid: it.oid, password })
+        // Create Notification
+        const myOrgName = (await OrganisationModel._getOrganisation(node.cid)).name
+        await NotificationModel._createNotification({
+          owner: node.cid,
+          actor: { id: node.cid, name: myOrgName },
+          target: { id: it.oid, name: it.name },
+          type: EventType.itemDiscovered,
+          status: NotificationStatus.INFO
+        })
+        // Audit
+        await AuditModel._createAudit({
+          ...res.locals.audit,
+          cid: node.cid,
+          actor: { id: agid, name: node.name },
+          target: { id: it.oid, name: it.name },
+          type: EventType.itemDiscovered,
+          labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+        })
+        return true
+      } catch (err) {
+        // Create response
+        const error = errorHandler(err)
+        logger.error({ msg: error.message, id: res.locals.reqId })
+        response.push({ name: it.name, oid: it.oid, password: null, error: true })
+        return false
+      }
+    }))
+    logger.info('Gateway with id ' + agid + ' registered items')
+    for (const item of itemsToActivate) {
+      setTimeout(() => { // enable item in 30seconds
+        logger.info('Autoenabling item registered under: ' + agid)
+        ItemService.updateOne(item.oid, item.data, item.uid)
+      }, 30000)
+    }
+    return responseBuilder(HttpStatusCode.OK, res, null, response)
   } catch (err) {
     const error = errorHandler(err)
     logger.error({ msg: error.message, id: res.locals.reqId })
@@ -194,10 +192,10 @@ export const deleteItems: deleteItemsController = async (req, res) => {
 type updateItemController = expressTypes.Controller<{}, { agid: string, items: IGatewayItemUpdate[] }, {}, registrationUpdateResponse[], localsTypes.ILocalsGtw>
 
 export const updateItem: updateItemController = async (req, res) => {
-  const { items } = req.body
+  const {  agid, items } = req.body
   const { decoded } = res.locals
   try {
-    logger.debug('Registering items in node: ' + req.body.agid)
+    logger.debug('Registering items in node: ' + agid)
     const response: registrationUpdateResponse[] = []
 
     if (!decoded && Config.NODE_ENV === 'production') {
@@ -207,10 +205,10 @@ export const updateItem: updateItemController = async (req, res) => {
       if (!decoded) {
         logger.warn('Gateway anonymous access, it will be forbidden in production...')
       }
-      const agid = decoded ? decoded.iss : req.body.agid
-      const node = await NodeModel._getNode(agid)
+      const reqAgid = decoded ? decoded.iss : agid
+      const node = await NodeModel._getNode(reqAgid)
       // Async updating of items
-      await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
+      await Promise.all(items.map(async (it): Promise<boolean> => {
         try {
           // Test if AP contains this item
           if (!node.hasItems.includes(it.oid)) {
@@ -238,7 +236,7 @@ export const updateItem: updateItemController = async (req, res) => {
           await AuditModel._createAudit({
             ...res.locals.audit,
             cid: node.cid,
-            actor: { id: agid, name: node.name },
+            actor: { id: reqAgid, name: node.name },
             target: { id: updatedItem.oid, name: updatedItem.name },
             type: EventType.itemUpdatedByNode,
             labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }

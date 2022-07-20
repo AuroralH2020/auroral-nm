@@ -88,7 +88,7 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
     const friendOrg = await OrganisationModel._getOrganisation(friendCid)
 
     // create partnership in community table
-    const partnership = await CommunityService.createOne({
+    await CommunityService.createOne({
       name: 'Partnership',
       type: CommunityType.PARTNERSHIP,
       description: 'Partnership between ' + myOrg.name + ' and ' +  friendOrg.name,
@@ -106,7 +106,6 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
       ]
     })
     // TBD add all nodes to partnership?
-
     // Create notifications
     // Send notifications to nodes from both organisations
     myOrg.hasNodes.forEach(agid => {

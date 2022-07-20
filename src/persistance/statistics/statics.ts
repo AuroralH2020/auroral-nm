@@ -1,6 +1,6 @@
 import { HttpStatusCode } from '../../utils'
 import { MyError, ErrorSource } from '../../utils/error-handler'
-import { IStatistics, IStatisticsCreate, IStatisticsDocument, IStatisticsModel } from './types'
+import { IStatistics, IStatisticsCreate, IStatisticsModel } from './types'
 
 export async function createStatistics(
     this: IStatisticsModel, data: IStatisticsCreate

@@ -15,7 +15,7 @@ import { errorHandler } from '../../../utils/error-handler'
 // Validate gateway login
 type handshakeController = expressTypes.Controller<{}, {}, {}, string, localsTypes.ILocalsGtw>
  
-export const handshake: handshakeController = async (req, res) => {
+export const handshake: handshakeController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
     const data = decoded ? `Gateway ${decoded.iss} authenticated` : 'Gateway connected as anonymous, restrictions might apply'
@@ -61,7 +61,7 @@ export const sendCounters: sendCountersController = async (req, res) => {
 // Receive the count of messages from the Gateway
 type getCountersController = expressTypes.Controller<{}, {}, {}, null, localsTypes.ILocalsGtw>
  
-export const getCounters: getCountersController = async (req, res) => {
+export const getCounters: getCountersController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
     if (decoded) {

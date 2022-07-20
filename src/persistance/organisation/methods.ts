@@ -12,18 +12,12 @@ export async function updateOrganisation(this: IOrganisationDocument, data: IOrg
 }
 
 export async function removeOrganisation(this: IOrganisationDocument): Promise<void> {
-    // this.firstName
-    // this.lastName
     this.name = this.name + '/' + uuidv4() // Organisationname/Unique
     this.businessId = ''
-    // this.cid
-    // this.skinColor
     this.location = ''
     this.avatar = ''
     this.status = OrganisationStatus.DELETED
     this.notes = ''
-    // this.hasNotifications
-    // this.hasAudits
     this.hasNodes = []
     this.hasUsers = []
     this.hasContracts = []
@@ -32,6 +26,5 @@ export async function removeOrganisation(this: IOrganisationDocument): Promise<v
     this.knowsRequestsFrom = []
     this.knowsRequestsTo = []
     this.lastUpdated = new Date().getTime()
-    // this.created
     await this.save()
 }

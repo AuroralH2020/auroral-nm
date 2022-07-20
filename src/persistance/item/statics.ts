@@ -11,8 +11,7 @@ import {
 } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
-import { logger } from '../../utils/logger'
-import { SearchResult, SearchResultType } from '../../types/misc-types'
+import { SearchResult } from '../../types/misc-types'
 
 export async function getItem(
   this: IItemModel, oid: string

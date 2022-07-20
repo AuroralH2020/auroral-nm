@@ -3,9 +3,7 @@
  * Interface to REDIS DB
  * @interface
  */
-//  import { createClient, RedisClientOptions, RedisClientType } from 'redis'
  import { createClient } from 'redis'
- import { Config } from '../config'
  import { logger } from '../utils/logger'
  import { errorHandler } from '../utils/error-handler'
 

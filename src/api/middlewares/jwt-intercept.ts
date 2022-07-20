@@ -3,7 +3,7 @@ import { Controller } from '../../types/express-types'
 import { responseBuilder } from '../../utils/response-builder'
 import { ILocals } from '../../types/locals-types'
 import { RolesEnum } from '../../types/roles'
-import { errorHandler, MyError } from '../../utils/error-handler'
+import { errorHandler } from '../../utils/error-handler'
 import { getSession } from '../../core/sessions'
 import { HttpStatusCode } from '../../utils'
 import { logger } from '../../utils/logger'
@@ -21,9 +21,7 @@ type JwtController = Controller<{}, {}, {}, null, ILocals>
 export const jwt = (roles?: RolesEnum[]) => {
     return function(req, res, next) {
         try {
-            // const authHeader = req.headers.authorization
             const authHeader = req.headers.authorization as string
-            // const token = authHeader && authHeader.split(' ')[1]
             const token = authHeader ? authHeader.split(' ')[1] : null
             if (!token) {
                 throw new Error('Unauthorized, missing token')
@@ -74,13 +72,13 @@ export const jwt = (roles?: RolesEnum[]) => {
                             return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, decoded.uid + ': Session expired')
                         }
                     }
-                ).catch((err) => {
+                ).catch(() => {
                     // Verify session error block
                     return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, 'Error retrieving session')
                 })
-            }).catch((err) => {
+            }).catch((err1) => {
                 // Verify token error block
-                const error = errorHandler(err)
+                const error = errorHandler(err1)
                 try {
                     const tokenData = Auth.decode(token) as JsonType
                     logger.error('uid - ' + tokenData.uid + ' : ' + error.message)
@@ -90,8 +88,8 @@ export const jwt = (roles?: RolesEnum[]) => {
                     return responseBuilder(finalerror.status, res, finalerror.message)
                 }
             })     
-        } catch (err) {
-            const error = errorHandler(err)
+        } catch (err2) {
+            const error = errorHandler(err2)
             logger.error(error.message)
             return responseBuilder(error.status, res, error.message)
         }

@@ -34,7 +34,7 @@ export const getRegistration: getRegistrationController = async (req, res) => {
 
 type getRegistrationsController = expressTypes.Controller<{}, {}, {}, IRegistration[], localsTypes.ILocals>
  
-export const getAllRegistrations: getRegistrationsController = async (req, res) => {
+export const getAllRegistrations: getRegistrationsController = async (_req, res) => {
 	try {
     const data = await RegistrationModel._getAllRegistration()
     return responseBuilder(HttpStatusCode.OK, res, null, data)
@@ -47,7 +47,7 @@ export const getAllRegistrations: getRegistrationsController = async (req, res) 
 
 type getCompanyRegistrationsController = expressTypes.Controller<{}, {}, {}, IRegistration[], localsTypes.ILocals>
  
-export const getAllCompanyRegistrations: getCompanyRegistrationsController = async (req, res) => {
+export const getAllCompanyRegistrations: getCompanyRegistrationsController = async (_req, res) => {
 	try {
     const data = await RegistrationModel._getAllCompanyTypeRegistration()
     return responseBuilder(HttpStatusCode.OK, res, null, data)

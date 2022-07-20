@@ -24,7 +24,6 @@ export const getOne: getOneController = async (req, res) => {
         const { cid } = req.params // Requested organisation info
         try {
                 const data = await OrganisationModel._getOrganisation(cid)
-                const myOrg = await OrganisationModel._getOrganisation(decoded.org)
                 // Complete organisation data with friendships
                 let isNeighbour = false
                 let canSendNeighbourRequest = true
@@ -139,7 +138,7 @@ export const getConfiguration: getConfigurationController = async (req, res) => 
 
 type removeOrganisationController = expressTypes.Controller<{}, {}, {}, null, localsTypes.ILocals>
  
-export const removeOrganisation: removeOrganisationController = async (req, res) => {
+export const removeOrganisation: removeOrganisationController = async (_req, res) => {
         const decoded = res.locals.decoded
         try {
                 const orgDoc = await OrganisationModel._getDoc(decoded.org)

@@ -69,7 +69,7 @@ export interface ICommunityModel extends Model<ICommunityDocument> {
     _getAllCommunitiesUI: (
         this: ICommunityModel,
         type: CommunityType,
-        offset: Number,
+        offset: number,
         domain: ItemDomainType,
         cid: string
     ) => Promise<ICommunityUIList[]>

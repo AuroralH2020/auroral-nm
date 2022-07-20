@@ -7,7 +7,6 @@ import { errorHandler, MyError } from '../../../utils/error-handler'
 import { SearchResult, SearchResultType } from '../../../types/misc-types'
 import { ItemModel } from '../../../persistance/item/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
-import { CommunityModel } from '../../../persistance/community/model'
 import { NodeModel } from '../../../persistance/node/model'
 import { UserModel } from '../../../persistance/user/model'
 
@@ -54,25 +53,25 @@ export const globalSearch: globalSearchController = async (req, res) => {
 			if (availibleSpace === 0) {
 				break
 			}
-			// get ITEMS 
-			result =  sType === SearchResultType.ITEM ? 
-			[...result, ...await ItemModel._search(myOrganisation.cid, myOrganisation.knows, text, availibleSpace,  searchOffset)] : result
-
-			// get ORGANISATIONS
-			result = sType === SearchResultType.ORGANISATION ? 
-			[...result, ...await OrganisationModel._search(text, availibleSpace, searchOffset)] : result
-
-			// get NODES
-			result = sType === SearchResultType.NODE ? 
-			[...result, ...await NodeModel._search(myOrganisation.cid, text, availibleSpace, searchOffset)] : result
-
-			// get USERS
-			result = sType === SearchResultType.USER ? 
-			[...result, ...await UserModel._search(myOrganisation.cid, myOrganisation.knows, text, availibleSpace, searchOffset)] : result
-
-			// get COMMUNITY
-			// result = sType === SearchResultType.COMMUNITY ? 
-			// [...result, ...await CommunityModel._search(myOrganisation.cid, text, availibleSpace, searchOffset)] : result
+			switch (sType) {
+				case SearchResultType.ITEM:
+					result = [...result, ...await ItemModel._search(myOrganisation.cid, myOrganisation.knows, text, availibleSpace,  searchOffset)]
+					break
+				case SearchResultType.ORGANISATION:
+					result = [...result, ...await OrganisationModel._search(text, availibleSpace, searchOffset)]
+					break
+				case SearchResultType.NODE:
+					result = [...result, ...await NodeModel._search(myOrganisation.cid, text, availibleSpace, searchOffset)] 
+					break
+				case SearchResultType.USER:
+					result = [...result, ...await UserModel._search(myOrganisation.cid, myOrganisation.knows, text, availibleSpace, searchOffset)]
+					break
+				// case SearchResultType.COMMUNITY:
+				//	result = // [...result, ...await CommunityModel._search(myOrganisation.cid, text, availibleSpace, searchOffset)]
+				//	break
+				default:
+					break
+			}
 		}
 		return responseBuilder(HttpStatusCode.OK, res, null, result)
 	} catch (err) {

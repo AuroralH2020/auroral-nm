@@ -31,7 +31,7 @@ export const getInvitation: getInvitationController = async (req, res) => {
 
 type getAllInvitationsCtrl = expressTypes.Controller<{}, {}, {}, IInvitation[], localsTypes.ILocals>
  
-export const getAllInvitations: getAllInvitationsCtrl = async (req, res) => {
+export const getAllInvitations: getAllInvitationsCtrl = async (_req, res) => {
         const { decoded } = res.locals
         try {
                 const data = await InvitationModel._getAllInvitations(decoded.org)

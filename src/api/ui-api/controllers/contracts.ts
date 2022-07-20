@@ -107,7 +107,6 @@ export const inviteOrganisations: inviteOrganisationsController = async (req, re
         }
         // get my data
         const myOrg = await OrganisationModel._getOrganisation(decoded.org)
-        const myUser = await UserModel._getUser(decoded.uid)
         cids.forEach((cid) => {
             if (!(myOrg.knows).includes(cid)) {
                 throw new MyError('You have to be friends to send contract request', HttpStatusCode.BAD_REQUEST)

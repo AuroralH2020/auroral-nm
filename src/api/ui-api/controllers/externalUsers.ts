@@ -2,7 +2,7 @@
 import { errorHandler, MyError } from '../../../utils/error-handler'
 import { ExternalUserModel } from '../../../persistance/externalUsers/model'
 import { ACLObject, IExternalUserCreatedUi, IExternalUserUi } from '../../../persistance/externalUsers/types'
-import { generateSecret,  hashPassword, verifyHash } from '../../../auth-server/auth-server'
+import { generateSecret,  hashPassword } from '../../../auth-server/auth-server'
 import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode, logger, responseBuilder } from '../../../utils'
 import { ItemModel } from '../../../persistance/item/model'
@@ -20,19 +20,24 @@ export const createExternalUser: createExternalUserController = async (req, res)
     const { ACL, name } = req.body 
     const { decoded } = res.locals
     try {
+        const approvedACL: ACLObject = { cid: [], agid: [], oid: [] }
         // CID LEVEL
         if (ACL.cid) {
+            // Check ROLES
             if (!decoded.roles.includes(RolesEnum.ADMIN)) {
                 throw new MyError('Missing proper roles', HttpStatusCode.FORBIDDEN)
             }
-            for (const cid of ACL.cid) {
-                if (cid !== decoded.org) {
+            // Only myOrg can be part of the ACL
+            ACL.cid.forEach(c => {
+                // Test CIDs are valid
+                if (c !== decoded.org) {
                     throw new MyError('Invalid CID', HttpStatusCode.FORBIDDEN,)
                 }
-            }
+            })
         }
         // OID LEVEL
         if (ACL.oid) {
+            // Check ROLES
             if (!decoded.roles.includes(RolesEnum.SERV_PROVIDER) && !decoded.roles.includes(RolesEnum.DEV_OWNER)) {
                 throw new MyError('Missing proper roles', HttpStatusCode.FORBIDDEN)
             }
@@ -40,18 +45,17 @@ export const createExternalUser: createExternalUserController = async (req, res)
             if (ACL.oid.includes('all')) {
                 const myUserDoc = await UserModel._getDoc(decoded.uid)
                 ACL.oid = myUserDoc.hasItems
-            } else {
-                for (const oid of ACL.oid) {
-                    const item = await ItemModel._getItem(oid)
-                    if (!item) {
-                        throw new MyError('Invalid OID', HttpStatusCode.BAD_REQUEST)
-                    }
-                    if (item.cid !== decoded.org) {
-                        throw new MyError('Item does not belong under your org', HttpStatusCode.BAD_REQUEST)
-                    }
-                    if (item.uid !== decoded.uid) {
-                        throw new MyError('Item does not belong under your user', HttpStatusCode.BAD_REQUEST)
-                    }
+            }
+            for (const oid of ACL.oid) {
+                const item = await ItemModel._getItem(oid)
+                if (!item) {
+                    throw new MyError('Invalid OID', HttpStatusCode.FORBIDDEN)
+                }
+                if (item.cid !== decoded.org) {
+                    throw new MyError('Item does not belong to your org', HttpStatusCode.FORBIDDEN)
+                }
+                if (item.uid !== decoded.uid) {
+                    throw new MyError('Item does not belong to your user', HttpStatusCode.FORBIDDEN)
                 }
             }
         }
@@ -63,15 +67,19 @@ export const createExternalUser: createExternalUserController = async (req, res)
             for (const agid of ACL.agid) {
                 const node = await NodeModel._getNode(agid)
                 if (!node) {
-                    throw new MyError('Invalid AGID', HttpStatusCode.BAD_REQUEST)
+                    throw new MyError('Invalid AGID', HttpStatusCode.FORBIDDEN)
                 }
                 if (node.cid !== decoded.org) {
-                    throw new MyError('Node does not belong under your org', HttpStatusCode.BAD_REQUEST)
+                    throw new MyError('Node does not belong under your org', HttpStatusCode.FORBIDDEN)
                 }
             }
         }
         const secretKey = generateSecret()
         const secretKeyHash = await hashPassword(secretKey)
+        // Remove duplicates
+        ACL.oid = [...new Set(ACL.oid)]
+        ACL.agid = [...new Set(ACL.agid)]
+        ACL.cid = [...new Set(ACL.cid)]
         // Create external user
         const externalUser = await ExternalUserModel._createExternalUser({ ACL, name, cid: decoded.org, secretKey: secretKeyHash })
         return responseBuilder(HttpStatusCode.OK, res, null, { keyid: externalUser.keyid, name: externalUser.name, ACL: externalUser.ACL, secretKey, created: externalUser.created, ttl: externalUser.ttl })
@@ -104,7 +112,7 @@ export const removeExternalUser: removeExternalUserController = async (req, res)
 
 type getExternalUserByCidController = expressTypes.Controller<{}, {}, {}, IExternalUserUi[], localsTypes.ILocals>
 
-export const getExternalUserByCid: getExternalUserByCidController = async (req, res) => {
+export const getExternalUserByCid: getExternalUserByCidController = async (_req, res) => {
     const { decoded } = res.locals
     try {
         const eUsers = await ExternalUserModel._getExternalUsersByCid(decoded.org)

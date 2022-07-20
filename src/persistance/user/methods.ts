@@ -23,23 +23,14 @@ export async function updateUserRoles(this: IUserDocument, roles: RolesEnum[]): 
 }
 
 export async function removeUser(this: IUserDocument): Promise<void> {
-    // this.firstName
-    // this.lastName
     this.name = ''
     this.email = this.email + '/' + uuidv4() // Username/Unique
-    // this.contactMail
-    // this.cid
-    // this.occupation
     this.location = ''
     this.avatar = ''
     this.status = UserStatus.DELETED
     this.accessLevel = UserVisibility.PRIVATE
     this.roles = [RolesEnum.USER]
-    // this.hasNotifications
-    // this.hasAudits
     this.hasItems = []
-    // this.hasContracts = []
     this.lastUpdated = new Date().getTime()
-    // this.created
     await this.save()
 }

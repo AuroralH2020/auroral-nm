@@ -3,7 +3,7 @@ import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode } from '../../../utils/http-status-codes'
 import { logger } from '../../../utils/logger'
 import { responseBuilder } from '../../../utils/response-builder'
-import { errorHandler, MyError } from '../../../utils/error-handler'
+import { errorHandler } from '../../../utils/error-handler'
 import { CommunityModel } from '../../../persistance/community/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
 import { GtwItemInfo, GtwNodeInfo } from '../../../types/misc-types'
@@ -17,7 +17,7 @@ import { NodeModel } from '../../../persistance/node/model'
 
 type getCommunitiesController = expressTypes.Controller<{}, {}, {}, { commId: string, name: string, description: string }[], localsTypes.ILocals>
  
-export const getCommunities: getCommunitiesController = async (req, res) => {
+export const getCommunities: getCommunitiesController = async (_req, res) => {
 	const { decoded } = res.locals
 	try {
 		if (decoded) {
@@ -40,38 +40,39 @@ export const getNodesInOrganisation: getNodesInOrgController = async (req, res) 
 	const { decoded } = res.locals
 	const { cid } = req.params
 	try {
-		if (decoded) {
-			const myCid = (await NodeModel._getNode(decoded.iss)).cid
-			const myOrg = await OrganisationModel._getOrganisation(myCid)
-			if (!cid || cid === myCid) {
-				const nodes = myOrg.hasNodes.map(node => {
-					return { cid: myOrg.cid, agid: node, company: myOrg.name }
-				})
-				return responseBuilder(HttpStatusCode.OK, res, null, nodes)
-			} else {
-				let nodeInCommunity = false
-				const partnership = await CommunityModel._getPartnershipByCids(myOrg.cid, cid)
-				const nodes = []  as GtwNodeInfo[]
-				partnership.organisations.forEach(org => {
-					org.nodes.forEach((node) => {
-						// requested org
-						if (org.cid === cid) {
-							nodes.push({ cid: org.cid, company: org.name, agid: node })
-						}
-						// test if my node is part of that 
-						if (node === decoded.iss) {
-							nodeInCommunity = true
-						}
-					})
-				})
-				if (!nodeInCommunity) {
-					return responseBuilder(HttpStatusCode.OK, res, null, [] as GtwNodeInfo[])
-				}
-				return responseBuilder(HttpStatusCode.OK, res, null, nodes)
-			}
-		} else {
+		if (!decoded) {			
 			logger.error('Gateway unauthorized access attempt')
 			return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Gateway unauthorized access attempt')
+		}
+		const myCid = (await NodeModel._getNode(decoded.iss)).cid
+		const myOrg = await OrganisationModel._getOrganisation(myCid)
+		if (!cid || cid === myCid) {
+			// Requesting my own nodes
+			const nodes = myOrg.hasNodes.map(node => {
+				return { cid: myOrg.cid, agid: node, company: myOrg.name }
+			})
+			return responseBuilder(HttpStatusCode.OK, res, null, nodes)
+		} else {
+			// Other nodes
+			let nodeInCommunity = false
+			const partnership = await CommunityModel._getPartnershipByCids(myOrg.cid, cid)
+			const nodes = []  as GtwNodeInfo[]
+			partnership.organisations.forEach(org => {
+				org.nodes.forEach((node) => {
+					// requested org
+					if (org.cid === cid) {
+						nodes.push({ cid: org.cid, company: org.name, agid: node })
+					}
+					// test if my node is part of that 
+					if (node === decoded.iss) {
+						nodeInCommunity = true
+					}
+				})
+			})
+			if (!nodeInCommunity) {
+				return responseBuilder(HttpStatusCode.OK, res, null, [] as GtwNodeInfo[])
+			}
+			return responseBuilder(HttpStatusCode.OK, res, null, nodes)
 		}
 	} catch (err) {
 		const error = errorHandler(err)
@@ -90,7 +91,6 @@ export const getNodesInCommunity: getNodesInCommunityController = async (req, re
 			if (!commId) {
 				return responseBuilder(HttpStatusCode.BAD_REQUEST, res, 'CommID not provided')
 			}
-			const myCid = (await NodeModel._getNode(decoded.iss)).cid
 			const community = await CommunityModel._getCommunity(commId)
 			const nodes = [] as GtwNodeInfo[]
 			let nodeInCommunity = false
@@ -119,7 +119,7 @@ export const getNodesInCommunity: getNodesInCommunityController = async (req, re
 
 type getItemsInOrganisationController = expressTypes.Controller<{  }, {}, {}, GtwItemInfo[], localsTypes.ILocals>
  
-export const getItemsInOrganisation: getItemsInOrganisationController = async (req, res) => {
+export const getItemsInOrganisation: getItemsInOrganisationController = async (_req, res) => {
 	const { decoded } = res.locals
 	try {
 		if (decoded) {

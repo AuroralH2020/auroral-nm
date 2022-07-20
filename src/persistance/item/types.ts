@@ -1,6 +1,5 @@
 import { Document, Model } from 'mongoose'
 import { SearchResult } from '../../types/misc-types'
-import { getAllCompanyItemsContractView } from './statics'
 
 export enum ItemType {
     DEVICE = 'Device',

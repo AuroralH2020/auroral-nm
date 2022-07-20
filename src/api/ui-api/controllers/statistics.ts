@@ -6,7 +6,6 @@ import { responseBuilder } from '../../../utils/response-builder'
 import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
-import { AuditModel } from '../../../persistance/audit/model'
 import { IStatistics } from '../../../persistance/statistics/types'
 import { StatisticsService } from '../../../core'
 
@@ -19,8 +18,7 @@ export const getStatistics: getStatisticsController = async (req, res) => {
 	try {
 		// no date specified
 		if (date === undefined) {
-			const statistics = await StatisticsService.getLastStatistics()
-			return responseBuilder(HttpStatusCode.OK, res, null, statistics)
+			return responseBuilder(HttpStatusCode.OK, res, null, await StatisticsService.getLastStatistics())
 		} 
 		// test date parse
 		const parsedDate = new Date(date).setHours(0,0,0,0)
@@ -40,9 +38,9 @@ export const getStatistics: getStatisticsController = async (req, res) => {
 
 type storeStatisticsController = expressTypes.Controller<{}, {}, {}, null, localsTypes.ILocals>
  
-export const storeStatistics: storeStatisticsController = async (req, res) => {
+export const storeStatistics: storeStatisticsController = async (_req, res) => {
 	try {
-		const statistics = await StatisticsService.storeStatistics()
+		await StatisticsService.storeStatistics()
 		return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		const error = errorHandler(err)

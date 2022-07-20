@@ -49,9 +49,8 @@ export const getMany = async (args: getContractstOptions): Promise<IContractUI[]
         }
         // Get your contracts data
         // TBD offset not working
-        const contracts = await ContractModel._getAllContracts(query, Number(args.offset))
         // TBD enrich data
-        return contracts
+        return await ContractModel._getAllContracts(query, Number(args.offset))
     } catch (err) {
         throw errorHandler(err)
     }
@@ -492,7 +491,7 @@ const testAfterRemoving = async (ctid: string): Promise<boolean> => {
         const cs_users = await cs.getGroup(ctid)
         for (const user of cs_users.members) {
             // Members contain domain, exclude it before calling cs
-            const jid = user.indexOf('@') !== -1 ? user.substr(0, user.indexOf('@')) : user
+            const jid = user.indexOf('@') !== -1 ? user.substring(0, user.indexOf('@')) : user
             await cs.deleteUserFromGroup(jid, ctid)
         }
         // Remove openfire group
