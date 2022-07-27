@@ -23,7 +23,7 @@ const app = express()
 app.set('port', Config.PORT || 4000)
 app.set('ip', Config.IP || 'localhost')
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
 // Trust proxy, accepting only last hop (1)
 app.set('trust proxy', 1)
