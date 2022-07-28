@@ -269,8 +269,15 @@ export const getAgidByOid: getAgidByOidCtrl = async (req, res) => {
       logger.error('Gateway unauthorized access attempt')
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Gateway unauthorized access attempt')
     }
-    const item = await ItemModel._getItem(oid)
-    return responseBuilder(HttpStatusCode.OK, res, null, item.agid)
+    try {
+      // Check if 'oid' is actually agid
+      await NodeModel._getNode(oid)
+      return responseBuilder(HttpStatusCode.OK, res, null, oid)
+    } catch (error) { 
+      // Get AGID by oid
+      const item = await ItemModel._getItem(oid)
+      return responseBuilder(HttpStatusCode.OK, res, null, item.agid)
+    }
   } catch (err) {
     const error = errorHandler(err)
     logger.error({ msg: error.message, id: res.locals.reqId })
