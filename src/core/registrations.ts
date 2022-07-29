@@ -149,7 +149,7 @@ export const registerAfterVerification = async (status: RegistrationStatus, toke
           labels: { ...locals.audit.labels, status: ResultStatusType.SUCCESS, source: SourceType.USER }
         })
         // Add organisation group to commServer
-        await cs.postGroup(registrationObj.cid, registrationObj.name)
+        await cs.postGroup(registrationObj.cid, registrationObj.companyName)
         await cs.addUserToGroup(Config.XMPP_CLIENT.NAME, registrationObj.cid)
         // Add user to organisation
         await OrganisationModel._addUserToCompany(registrationObj.cid, uid)

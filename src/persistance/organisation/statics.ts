@@ -13,8 +13,8 @@ export async function getOrganisation(
   if (record) {
     return record
   } else {
-    // logger.warn('Organisation not found')
-    throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
+    // logger.warn('Organisation not found ' + cid)
+    throw new MyError('Organisation not found ' + cid, HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -49,8 +49,8 @@ export async function getOrganisations(
   if (record) {
     return record
   } else {
-    // logger.warn('Organisation not found')
-    throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
+    // logger.warn('Organisation not found ' + cid)
+    throw new MyError('Organisation not found ' + cid, HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -61,8 +61,8 @@ export async function getDoc(
   if (record) {
     return record
   } else {
-    // logger.warn('Organisation not found')
-    throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
+    // logger.warn('Organisation not found ' + cid)
+    throw new MyError('Organisation not found ' + cid, HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 
@@ -95,8 +95,8 @@ export async function getConfiguration(
       skinColor: record.skinColor
     }
   } else {
-    // logger.warn('Organisation not found')
-    throw new MyError('Organisation not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
+    // logger.warn('Organisation not found ' + cid)
+    throw new MyError('Organisation not found ' + cid, HttpStatusCode.NOT_FOUND, { source: ErrorSource.NODE })
   }
 }
 

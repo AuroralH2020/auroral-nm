@@ -45,6 +45,7 @@ export const errorHandler = (err: unknown): MyError => {
     } else {
         logger.warn('Caught unexpected error type...')
         logger.warn('Error type: ' + typeof err)
+        logger.warn(err)
         return {
             status: HttpStatusCode.INTERNAL_SERVER_ERROR,
             message: 'Server error',

@@ -55,20 +55,23 @@ export const getNodesInOrganisation: getNodesInOrgController = async (req, res) 
 		} else {
 			// Other nodes
 			let nodeInCommunity = false
-			const partnership = await CommunityModel._getPartnershipByCids(myOrg.cid, cid)
 			const nodes = []  as GtwNodeInfo[]
-			partnership.organisations.forEach(org => {
-				org.nodes.forEach((node) => {
-					// requested org
-					if (org.cid === cid) {
-						nodes.push({ cid: org.cid, company: org.name, agid: node })
-					}
-					// test if my node is part of that 
-					if (node === decoded.iss) {
-						nodeInCommunity = true
-					}
+			try {
+				const partnership = await CommunityModel._getPartnershipByCids(myOrg.cid, cid)
+				partnership.organisations.forEach(org => {
+					org.nodes.forEach((node) => {
+						// requested org
+						if (org.cid === cid) {
+							nodes.push({ cid: org.cid, company: org.name, agid: node })
+						}
+						// test if my node is part of that 
+						if (node === decoded.iss) {
+							nodeInCommunity = true
+						}
+					})
 				})
-			})
+			// eslint-disable-next-line no-empty
+			} catch (error) {}
 			if (!nodeInCommunity) {
 				return responseBuilder(HttpStatusCode.OK, res, null, [] as GtwNodeInfo[])
 			}

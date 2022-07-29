@@ -25,7 +25,6 @@ export const createOne = async (data: ICommunityCreate): Promise<void> => {
                 }
             }
         }
-       
         // create cs group (with name)
         if (data.type === CommunityType.PARTNERSHIP) {
             await cs.postGroup(community.commId, community.description)
