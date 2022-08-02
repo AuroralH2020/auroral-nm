@@ -16,6 +16,7 @@ import { RelationshipType } from '../../../types/misc-types'
 import { NodeService } from '../../../core'
 import { ContractModel } from '../../../persistance/contract/model'
 import { agentContractType } from '../../../persistance/contract/types'
+import { getMyPubkey } from '../../../auth-server/auth-server'
 
 // Controllers
 
@@ -251,7 +252,12 @@ export const getAgentPubkey: getAgentPubkeyCtrl = async (req, res) => {
       logger.warn({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     } 
-
+    // in case node is asking for pubkey of 'auroral-dev-user'
+    if (agid === Config.XMPP_CLIENT.NAME) {
+      Config.NODE_ENV === 'development' ? logger.warn('Request for platform pubkey in development mode') : null
+      return responseBuilder(HttpStatusCode.OK, res, null, getMyPubkey())
+    }
+    // all the other cases
     const node = await NodeModel._getDoc(agid)
     if (!node.hasKey) {
       throw new MyError('No public key found for this agent', HttpStatusCode.NOT_FOUND)

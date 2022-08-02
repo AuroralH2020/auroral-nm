@@ -7,7 +7,7 @@ import { AccountModel } from '../persistance/account/model'
 import { Config } from '../config'
 import { logger } from '../utils/logger'
 import { jwtTypes } from '../types/index'
-import { MyError } from '../utils/error-handler'
+import { errorHandler, MyError } from '../utils/error-handler'
 import { HttpStatusCode } from '../utils'
 import { setSession } from '../core/sessions'
 import { JsonType } from '../types/misc-types'
@@ -15,7 +15,8 @@ import { JsonType } from '../types/misc-types'
 // Algorithms
 enum Algorithms {
     SYNC = 'HS512',
-    ASYNC = 'RS256'
+    ASYNC = 'RS256',
+    HASH = 'sha256'
 }
 
 // Secrets and keys
@@ -31,9 +32,11 @@ if (Config.NODE_ENV === 'test') {
 } else {
     // Load keys
     try {
+        console.log(path.join(Config.HOME_PATH, '/keys/private-key.pem'))
         priv_cert = fs.readFileSync(path.join(Config.HOME_PATH, '/keys/private-key.pem'))
         pub_cert = fs.readFileSync(path.join(Config.HOME_PATH, '/keys/public-key.pem'))
     } catch (err) {
+        console.log(err)
         logger.error('Auth server Production mode not ready, please set up the certificate and keys')
         process.exit(0)
     }
@@ -55,6 +58,24 @@ export const comparePassword = async (username: string, password: string): Promi
         throw new MyError('Wrong password', HttpStatusCode.BAD_REQUEST)
     }
     return true
+}
+
+export async function signMessage(message: string): Promise<string> {
+    try {
+        logger.debug('Signing message...')
+        return nodejsCrypto.sign(Algorithms.HASH, Buffer.from(message), {
+            key: priv_cert!.toString(),
+            padding: nodejsCrypto.constants.RSA_PKCS1_PSS_PADDING,
+          }).toString('base64')
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.error('Failed to sign...', HttpStatusCode.BAD_REQUEST)
+        throw new MyError(error.message)
+    }
+}
+
+export function getMyPubkey(): string {
+    return pub_cert!.toString()
 }
 
 export const signMailToken = async (username: string, purpose: string, idInLink?: string): Promise<string> => {

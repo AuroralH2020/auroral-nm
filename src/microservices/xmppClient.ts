@@ -3,6 +3,7 @@ import { JsonType, XmppNotificationTypes } from '../types/misc-types'
 import { Config } from '../config'
 import { logger } from '../utils'
 import { errorHandler } from '../utils/error-handler'
+import { signMessage } from '../auth-server/auth-server'
 
 // CONSTANTS 
 
@@ -21,7 +22,8 @@ const callApi = got.extend({
 const ApiHeader = { 
     'Content-Type': 'application/json; charset=utf-8',
     Accept: 'application/json',
-    simple: 'false' } 
+    simple: 'false' 
+} 
 
 // FUNCTIONS
 
@@ -29,7 +31,8 @@ export const xmpp = {
     notifyPrivacy: async (agid?: string): Promise<void> => {
         if (agid) {
             try {
-                await request(agid + '/' + XmppNotificationTypes.PRIVACY, 'POST', undefined, ApiHeader)
+                const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PRIVACY, '')
+                await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
                 logger.debug('XMPP notif [' + XmppNotificationTypes.PRIVACY + '] sent to: ' + agid)
             } catch (err) {
                 const error = errorHandler(err)
@@ -40,7 +43,8 @@ export const xmpp = {
     notifyPartnersChanged: async (agid?: string): Promise<void> => {
         if (agid) {
             try {
-                await request(agid + '/' + XmppNotificationTypes.PARTNERS, 'POST', undefined, ApiHeader)
+                const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PARTNERS, '')
+                await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
                 logger.debug('XMPP notif [' + XmppNotificationTypes.PARTNERS + '] sent to: ' + agid)
             } catch (err) {
                 const error = errorHandler(err)
@@ -50,7 +54,8 @@ export const xmpp = {
     },
     notifyContractCreated: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            await request(agid + '/' + XmppNotificationTypes.CONTRACT_CREATE, 'POST', body, ApiHeader)
+            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_CREATE, JSON.stringify(body))
+            await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_CREATE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
@@ -59,7 +64,8 @@ export const xmpp = {
     },
     notifyContractRemoved: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            await request(agid + '/' + XmppNotificationTypes.CONTRACT_REMOVE, 'POST', body, ApiHeader)
+            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_REMOVE, JSON.stringify(body))
+            await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_REMOVE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
@@ -68,7 +74,8 @@ export const xmpp = {
     },
     notifyContractItemUpdate: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            await request(agid + '/' + XmppNotificationTypes.CONTRACT_ITEM_UPDATE, 'POST', body, ApiHeader)
+            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_UPDATE, JSON.stringify(body))
+            await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_UPDATE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
@@ -77,7 +84,8 @@ export const xmpp = {
     },
     notifyContractItemRemoved: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            await request(agid + '/' + XmppNotificationTypes.CONTRACT_ITEM_REMOVE, 'POST', body, ApiHeader)
+            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_REMOVE, JSON.stringify(body))
+            await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_REMOVE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
@@ -87,6 +95,20 @@ export const xmpp = {
 }
 
 // PRIVATE FUNCTIONS
+
+const buildXmppMessageBody = function(destinationOid: string, nid: string, body: string) { 
+    return {
+        messageType: 1,
+        requestId: 0,
+        sourceOid: 'auroral-dev-user',
+        destinationOid,
+        requestBody: body,
+        requestOperation: 12,
+        attributes: { nid },
+        parameters: {} 
+    }
+}
+
 const request = async (endpoint: string, method: Method, json?: JsonType, headers?: Headers, searchParams?: string) => {
     const response = await callApi(endpoint, { method, json, headers, searchParams }) as JsonType
     return response.body
