@@ -147,9 +147,7 @@ export const getContracts: getContractsController = async (req, res) => {
         const data = await ContractService.getMany({ ctid: contracts, type, status, offset })
         return responseBuilder(HttpStatusCode.OK, res, null, data)
     } catch (err) {
-        const error = errorHandler(err)
-        logger.error({ msg: error.message, id: res.locals.reqId })
-        return responseBuilder(error.status, res, error.message)
+        return responseBuilder(HttpStatusCode.OK, res, null, [] as IContractUI[])
     }
 }
 

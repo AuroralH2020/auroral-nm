@@ -81,6 +81,9 @@ export const cs = {
         const uri = username ? 'users/' + username : 'users'
         return request(uri, 'GET', undefined, ApiHeader) as Promise<csUser | csUser[]>
     },
+    searchUser: async (username: string) => {
+        return request('users', 'GET', undefined, ApiHeader, { search: username }) as Promise<csUser[]>
+    },
     postUser: async (username: string, password: string) => {
         return request('users', 'POST', { username, password }, ApiHeader) as Promise<void>
     },
@@ -113,12 +116,22 @@ export const cs = {
     },
     deleteGroup: async (name: string) => {
         return request('groups/' + name, 'DELETE', undefined, ApiHeader) as Promise<void>
-    }  
+    },
+    addAuroralUsersToGroup: async (groupName: string) => {
+        const auroral_users = await cs.searchUser('auroral_') as csUser[]
+        if (auroral_users.length === 0) {
+            logger.error('No auroral users found in CommServer')
+            return
+        }
+        for (const user of auroral_users) {
+            await cs.addUserToGroup(user.username, groupName)
+        }
+    }
 }
 
 // PRIVATE FUNCTIONS
 
-const request = async (endpoint: string, method: Method, json?: JsonType, headers?: Headers, searchParams?: string) => {
+const request = async (endpoint: string, method: Method, json?: JsonType, headers?: Headers, searchParams?: JsonType) => {
     const response = await callApi(endpoint, { method, json, headers, searchParams }) as JsonType
     return response.body
 }
