@@ -4,6 +4,9 @@
  * @interface
  */
  import { createClient } from 'redis'
+ import fs from 'fs'
+ import path from 'path'
+ import { Config } from '../config'
  import { logger } from '../utils/logger'
  import { errorHandler } from '../utils/error-handler'
 
@@ -15,7 +18,19 @@ export class RedisFactory {
     private client: RedisClientType
   
     constructor(options: RedisClientOptions) {
-      this.client = createClient(options)
+        if (Config.REDIS.TLS) {
+            this.client = createClient(
+                { 
+                    ...options, 
+                    socket: { 
+                        tls: true,
+                        rejectUnauthorized: false,
+                        cert: fs.readFileSync(path.join(Config.HOME_PATH, Config.REDIS.CERT))
+                    }
+                })
+        } else {
+            this.client = createClient(options)
+        }
     }
 
     /**

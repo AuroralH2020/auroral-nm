@@ -37,12 +37,16 @@ export const Config = {
 		PASSWORD: process.env.MONGO_PASSWORD!,
 		URL: process.env.MONGO_URL!, 
 		PORT: process.env.MONGO_PORT!,
-		DB: process.env.MONGO_DB!
+		DB: process.env.MONGO_DB!,
+		TLS: process.env.MONGO_TLS_ENABLED === 'true' ? true : false,
+		CERT: process.env.MONGO_TLS_CERT!
 	},
 	REDIS: {
 		PASSWORD: process.env.REDIS_PASSWORD,
 		HOST: process.env.REDIS_HOST || 'localhost', 
 		PORT: process.env.REDIS_PORT || 6379,
+		TLS: process.env.REDIS_TLS_ENABLED === 'true' ? true : false,
+		CERT: process.env.REDIS_TLS_CERT!,
 		CACHE: process.env.REDIS_CACHE === 'true' ? true : false,
 		CACHE_TTL: process.env.REDIS_CACHE_TTL || 60, // default 60s
 	},

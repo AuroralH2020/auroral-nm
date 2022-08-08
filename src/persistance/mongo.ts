@@ -1,4 +1,6 @@
 import mongoose from 'mongoose'
+import fs from 'fs'
+import path from 'path'
 import { Config } from '../config'
 import { logger } from '../utils/logger'
 
@@ -18,12 +20,25 @@ export const mongo = {
       return
     }
 
-    mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useFindAndModify: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    })
+    if (Config.MONGO.TLS) {
+      mongoose.connect(uri, {
+        useNewUrlParser: true,
+        useFindAndModify: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        ssl: true,
+        sslValidate: true,
+        tlsAllowInvalidHostnames: true,
+        sslCA: [fs.readFileSync(path.join(Config.HOME_PATH, Config.MONGO.CERT))]
+      })
+    } else {
+      mongoose.connect(uri, {
+        useNewUrlParser: true,
+        useFindAndModify: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true
+      })
+    }
 
     database = mongoose.connection
 
