@@ -118,7 +118,7 @@ export const cs = {
         return request('groups/' + name, 'DELETE', undefined, ApiHeader) as Promise<void>
     },
     addAuroralUsersToGroup: async (groupName: string) => {
-        const auroral_users = await cs.searchUser('auroral_') as csUser[]
+        const auroral_users = await cs.searchUser('auroral') as csUser[]
         if (auroral_users.length === 0) {
             logger.error('No auroral users found in CommServer')
             return
