@@ -253,7 +253,7 @@ export const getAgentPubkey: getAgentPubkeyCtrl = async (req, res) => {
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     } 
     // in case node is asking for pubkey of 'auroral-dev-user' or 'auroral_user_1'
-    if (agid.toLowerCase().includes(Config.XMPP_CLIENT.ENVIROMENT)) {
+    if (agid.toLowerCase().includes(Config.XMPP_CLIENT.ENVIRONMENT)) {
       Config.NODE_ENV === 'development' ? logger.warn('Request for platform pubkey in development mode') : null
       return responseBuilder(HttpStatusCode.OK, res, null, getMyPubkey())
     }

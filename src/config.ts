@@ -31,7 +31,7 @@ export const Config = {
 		PASSWORD: process.env.XMPP_PASSWORD || 'changeme',
 		DOMAIN: process.env.XMPP_DOMAIN || 'redis://localhost',
 		NAME: process.env.XMPP_USERNAME || 'auroral-dev-user',
-		ENVIROMENT: process.env.XMPP_ENVIROMENT || 'auroral'
+		ENVIRONMENT: process.env.XMPP_ENVIRONMENT || 'auroral'
 	},
 	MONGO: {
 		USER: process.env.MONGO_USER!, 
