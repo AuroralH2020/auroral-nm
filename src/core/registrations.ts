@@ -150,7 +150,6 @@ export const registerAfterVerification = async (status: RegistrationStatus, toke
         })
         // Add organisation group to commServer
         await cs.postGroup(registrationObj.cid, registrationObj.companyName)
-        await cs.addAuroralUsersToGroup(registrationObj.cid)
         // Add user to organisation
         await OrganisationModel._addUserToCompany(registrationObj.cid, uid)
         // Verify account
@@ -284,7 +283,6 @@ export const registerAfterMasterVerification = async (status: RegistrationStatus
         })
         // Add organisation group to commServer
         await cs.postGroup(registrationObj.cid, registrationObj.name)
-        await cs.addAuroralUsersToGroup(registrationObj.cid)
         // Add user to organisation
         await OrganisationModel._addUserToCompany(registrationObj.cid, uid)
         // Verify account
