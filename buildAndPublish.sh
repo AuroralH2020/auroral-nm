@@ -30,6 +30,13 @@ docker login ${REGISTRY}
 
 # Compile dist
 tsc
+if [ $? != 0 ] 
+then
+    echo "Error running tsc"
+    say 'Error running tsc'
+    exit 1;
+fi
+
 
 # Multiarch builder
 docker buildx use multiplatform
@@ -39,14 +46,5 @@ docker buildx build --platform linux/amd64 \
                     --tag ${REGISTRY}/${IMAGE_NAME}:${ENV} \
                     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
                     -f Dockerfile . --push
-# Pull local arch version
-# docker pull ${REGISTRY}/${IMAGE_NAME}:${ENV}
-
-# Build depending on env
-# docker build --tag ${IMAGE_NAME} -f Dockerfile .
-
-# Tag the image
-# docker image tag ${IMAGE_NAME} ${REGISTRY}/${IMAGE_NAME}:${ENV}
-
-# Push image
-# docker push ${REGISTRY}/${IMAGE_NAME}:${ENV}
+echo Build and publish ended successfully!
+say 'Done!'

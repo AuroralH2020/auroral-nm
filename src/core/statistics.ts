@@ -7,6 +7,7 @@ import { UserModel } from '../persistance/user/model'
 import { IStatistics } from '../persistance/statistics/types'
 import { ContractModel } from '../persistance/contract/model'
 import { slack } from '../microservices/slackBot'
+import { Config } from '../config'
 
 export const storeStatistics = async (): Promise<void> => {
         logger.info('Creating statistics')
@@ -23,7 +24,7 @@ export const storeStatistics = async (): Promise<void> => {
             contracts
         }
         const slackMessage = 'Items ' + String(items) + ' / Nodes: ' + String(nodes) + ' / Users: ' + String(users) + ' / Organisations: ' + String(organisations) + ' / Contracts: ' + String(contracts) 
-        await slack.pushMessage(' This is your daily platform update!')
+        await slack.pushMessage(' This is your daily platform update from ' + Config.NODE_ENV + '!')
         await slack.pushMessage(slackMessage)
         await StatisticsModel._createStatistics(data)
 }

@@ -22,7 +22,7 @@ export const elastic = {
             return
         }
         logger.info('Sending:' + updateBody?.length + ' documents to elastic')
-        const body = (updateBody as any).flatMap((doc: any) => [{ index: { _index: counterIndex } }, doc])
+        const body = (updateBody as any).flatMap((doc: any) => [{ index: { _index: counterIndex } },{ ...doc, enviroment: Config.NODE_ENV }])
         const { body: bulkResponse } = await elkClient.bulk({ refresh: true, body })
         // refresh index
         await elkClient.indices.refresh({ index: counterIndex })
