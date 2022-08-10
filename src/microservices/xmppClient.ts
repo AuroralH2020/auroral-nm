@@ -32,7 +32,14 @@ export const xmpp = {
         if (agid) {
             try {
                 const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PRIVACY, '')
-                await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
+                const bodyMessage: {payload: any, signature?: string} = { payload }
+                try {
+                    const signature = await signMessage(JSON.stringify(payload)) 
+                    bodyMessage.signature = signature
+                } catch (error) { 
+                    // Sending without signature 
+                }
+                await request(agid, 'POST', bodyMessage, ApiHeader)
                 logger.debug('XMPP notif [' + XmppNotificationTypes.PRIVACY + '] sent to: ' + agid)
             } catch (err) {
                 const error = errorHandler(err)
@@ -44,7 +51,14 @@ export const xmpp = {
         if (agid) {
             try {
                 const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PARTNERS, '')
-                await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
+                const bodyMessage: {payload: any, signature?: string} = { payload }
+                try {
+                    const signature = await signMessage(JSON.stringify(payload)) 
+                    bodyMessage.signature = signature
+                } catch (error) { 
+                    // Sending without signature 
+                }
+                await request(agid, 'POST', bodyMessage, ApiHeader)
                 logger.debug('XMPP notif [' + XmppNotificationTypes.PARTNERS + '] sent to: ' + agid)
             } catch (err) {
                 const error = errorHandler(err)
@@ -55,7 +69,14 @@ export const xmpp = {
     notifyContractCreated: async (agid: string, body: JsonType): Promise<void> => {
         try {
             const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_CREATE, JSON.stringify(body))
-            await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
+            const bodyMessage: {payload: any, signature?: string} = { payload }
+                try {
+                    const signature = await signMessage(JSON.stringify(payload)) 
+                    bodyMessage.signature = signature
+                } catch (error) { 
+                    // Sending without signature 
+                }
+            await request(agid, 'POST', bodyMessage, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_CREATE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
@@ -65,7 +86,14 @@ export const xmpp = {
     notifyContractRemoved: async (agid: string, body: JsonType): Promise<void> => {
         try {
             const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_REMOVE, JSON.stringify(body))
-            await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
+            const bodyMessage: {payload: any, signature?: string} = { payload }
+                try {
+                    const signature = await signMessage(JSON.stringify(payload)) 
+                    bodyMessage.signature = signature
+                } catch (error) { 
+                    // Sending without signature 
+                }
+            await request(agid, 'POST', bodyMessage, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_REMOVE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
@@ -75,7 +103,14 @@ export const xmpp = {
     notifyContractItemUpdate: async (agid: string, body: JsonType): Promise<void> => {
         try {
             const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_UPDATE, JSON.stringify(body))
-            await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
+            const bodyMessage: {payload: any, signature?: string} = { payload }
+                try {
+                    const signature = await signMessage(JSON.stringify(payload)) 
+                    bodyMessage.signature = signature
+                } catch (error) { 
+                    // Sending without signature 
+                }
+            await request(agid, 'POST', bodyMessage, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_UPDATE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
@@ -85,7 +120,14 @@ export const xmpp = {
     notifyContractItemRemoved: async (agid: string, body: JsonType): Promise<void> => {
         try {
             const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_REMOVE, JSON.stringify(body))
-            await request(agid, 'POST', { payload, signature: await signMessage(JSON.stringify(payload)) }, ApiHeader)
+            const bodyMessage: {payload: any, signature?: string} = { payload }
+                try {
+                    const signature = await signMessage(JSON.stringify(payload)) 
+                    bodyMessage.signature = signature
+                } catch (error) { 
+                    // Sending without signature 
+                }
+            await request(agid, 'POST', bodyMessage, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_REMOVE + '] sent to: ' + agid)
         } catch (err) {
             const error = errorHandler(err)
