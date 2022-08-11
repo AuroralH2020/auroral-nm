@@ -83,7 +83,6 @@ export const getPartner: getPartnerController = async (req, res) => {
       if (!([...knows, myCid]).includes(cid)) {
         logger.warn('GTW ' + decoded.iss + ' not allowed to get partner data for ' + cid)
         logger.debug('GTW ' + decoded.iss + ' knows: ' + [...knows, myCid].toString())
-        logger.debug('Test: ' + ([...knows, myCid]).includes(cid))
         return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'You are not allowed to access this partner')
       }
       const org = await OrganisationModel._getOrganisation(cid)
