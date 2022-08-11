@@ -157,6 +157,7 @@ UiRouter
 .get('/statistics/', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.getStatistics)
 .get('/statistics/:date', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.getStatistics)
 .post('/statistics/', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.storeStatistics)
+.get('/records/send', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), statisticsCtrl.sendRecords)
 
 // SEARCH
 .get('/search/global', addOrigin(Interfaces.UI), jwt(), searchCtrl.globalSearch)

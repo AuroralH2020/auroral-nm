@@ -8,6 +8,8 @@ import { errorHandler, MyError } from '../../../utils/error-handler'
 // Controller specific imports
 import { IStatistics } from '../../../persistance/statistics/types'
 import { StatisticsService } from '../../../core'
+import { RecordModel } from '../../../persistance/record/model'
+import { elastic } from '../../../microservices/elasticConnector'
 
 // Controllers
 
@@ -41,6 +43,30 @@ type storeStatisticsController = expressTypes.Controller<{}, {}, {}, null, local
 export const storeStatistics: storeStatisticsController = async (_req, res) => {
 	try {
 		await StatisticsService.storeStatistics()
+		return responseBuilder(HttpStatusCode.OK, res, null, null)
+	} catch (err) {
+		const error = errorHandler(err)
+		logger.error(error.message)
+		return responseBuilder(error.status, res, error.message)
+	}
+}
+
+// records
+
+type sendRecordsController = expressTypes.Controller<{}, {}, {}, null, localsTypes.ILocals>
+ 
+export const sendRecords: sendRecordsController = async (_req, res) => {
+	try {
+		try {
+			const todayTimestamp = new Date().setHours(0,0,0,0)
+			const aggregated = await RecordModel._getAggregated(todayTimestamp)
+			await elastic.publishCounterRecords(aggregated)
+			await RecordModel._aggregationCompleted(todayTimestamp)
+		} catch (err) {
+			const error = errorHandler(err)
+			logger.error('Could not sent aggregated data to elastic')
+			logger.error(error.message)
+		}
 		return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
 		const error = errorHandler(err)
