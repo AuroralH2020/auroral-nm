@@ -17,7 +17,8 @@ export type GtwItemInfo = {
     cid: string,
     oid: string
     name: string,
-    company: string
+    company: string,
+    agid: string,
 }
 
 export enum SearchResultType{

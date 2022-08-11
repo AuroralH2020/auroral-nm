@@ -97,6 +97,9 @@ export async function getContractItemsGtw(
           '_id': 0, 
           'oid': 1, 
           'cid': 1, 
+          'agid': {
+            '$first': '$item.agid'
+          },
           'name': {
             '$first': '$item.name'
           }, 
