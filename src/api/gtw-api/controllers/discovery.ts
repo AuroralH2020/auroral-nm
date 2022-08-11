@@ -129,7 +129,7 @@ export const getItemsInOrganisation: getItemsInOrganisationController = async (_
 			const myCid = (await NodeModel._getNode(decoded.iss)).cid
 			const organisation = await OrganisationModel._getOrganisation(myCid)
 			const items =  (await ItemModel._getAllCompanyItems(myCid)).map((item) => {
-				return { ...item, company: organisation.name, agid: decoded.iss }
+				return { ...item, agid: decoded.iss, company: organisation.name }
 			})
 			return responseBuilder(HttpStatusCode.OK, res, null, items)
 		} else {
