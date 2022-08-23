@@ -39,6 +39,7 @@ GtwRouter
 .get('/discovery/nodes/community/:commId', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getNodesInCommunity)
 .get('/discovery/items/organisation', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getItemsInOrganisation)
 .get('/discovery/items/contract/:ctid', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getItemsInContract)
+.get('/discovery/items/contract/:ctid/origin/:oid', addOrigin(Interfaces.GATEWAY), guard(), discoveryCtrl.getItemsInContract)
 
 // .get('/agent/relationship/:reqid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getRelationship) 
 // .post('/items/td', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getTd) // Remove once Gateway is updated, deprecated use

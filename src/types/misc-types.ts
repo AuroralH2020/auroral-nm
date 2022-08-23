@@ -17,6 +17,7 @@ export type GtwItemInfo = {
     cid: string,
     oid: string
     name: string,
+    dataAccess?: boolean,
     company: string,
     agid: string,
 }

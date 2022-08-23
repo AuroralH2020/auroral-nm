@@ -143,27 +143,36 @@ export const getItemsInOrganisation: getItemsInOrganisationController = async (_
 	}
 }
 
-type getItemsInContractController = expressTypes.Controller<{ ctid: string }, {}, {}, GtwItemInfo[], localsTypes.ILocals>
+type getItemsInContractController = expressTypes.Controller<{ ctid: string, oid: string }, {}, {}, GtwItemInfo[], localsTypes.ILocals>
  
 export const getItemsInContract: getItemsInContractController = async (req, res) => {
 	const { decoded } = res.locals
-	const { ctid } = req.params
+	const { ctid, oid } = req.params
 	try {
-		if (decoded) {
+		if (!decoded) {
+			logger.error('Gateway unauthorized access attempt')
+			return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Gateway unauthorized access attempt')
+		}
 			if (!ctid) {
 				return responseBuilder(HttpStatusCode.BAD_REQUEST, res, 'ctid not provided')
 			}
 			const myCid = (await NodeModel._getNode(decoded.iss)).cid
 			const contract = await ContractModel._getContract(ctid)
+			
 			if (!contract.organisations.includes(myCid)) {
 				return responseBuilder(HttpStatusCode.OK, res, null, [] as GtwItemInfo[])
 			}
 			const items =  await ContractModel._getContractItemsGtw(ctid)
+			if (oid) {
+				items.forEach(item => {
+					item.dataAccess = items.map(item => item.oid).includes(oid)
+				})
+			} else {
+				items.forEach(item => {
+					item.dataAccess = true
+				})
+			}
 			return responseBuilder(HttpStatusCode.OK, res, null, items)
-		} else {
-			logger.error('Gateway unauthorized access attempt')
-			return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Gateway unauthorized access attempt')
-		}
 	} catch (err) {
 		const error = errorHandler(err)
 		logger.error(error.message)
