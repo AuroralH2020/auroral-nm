@@ -16,8 +16,6 @@ import { HttpStatusCode } from '../utils'
 
 export const createOne = async (data: ICommunityCreate): Promise<void> => {
     try {
-        // get my data for notifications and audits
-        const community = await CommunityModel._createCommunity(data)
         if (data.type && data.type !== CommunityType.PARTNERSHIP) {
             for (const organisation of data.organisations) {
                 if (organisation.nodes.length === 0) {
@@ -25,6 +23,7 @@ export const createOne = async (data: ICommunityCreate): Promise<void> => {
                 }
             }
         }
+        const community = await CommunityModel._createCommunity(data)
         // create cs group (with name)
         if (data.type === CommunityType.PARTNERSHIP) {
             await cs.postGroup(community.commId, community.description)
