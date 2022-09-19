@@ -16,6 +16,7 @@ import { AccountModel } from '../../../persistance/account/model'
 import { hashPassword, comparePassword } from '../../../auth-server/auth-server'
 import { ResultStatusType, EventType } from '../../../types/misc-types'
 import { UserService } from '../../../core'
+import { RolesEnum } from '../../../types/roles'
 
 // Controllers
 
@@ -129,10 +130,20 @@ export const updateUser: updateUserController = async (req, res) => {
         const payload = req.body
         const my_uid = res.locals.decoded.uid
         try {
+                // INFO: ADMIN is allowed to update everything, user is allowed to update only himself (except roles)
                 const userDoc = await UserModel._getDoc(uid)
                 const myUserDoc = await UserModel._getDoc(my_uid)
+                // Only my org
                 if (myUserDoc.cid !== userDoc.cid) {
-                        throw new MyError('You can only update account in your company', HttpStatusCode.FORBIDDEN)
+                        throw new MyError('Account is not under your company', HttpStatusCode.FORBIDDEN)
+                }
+                // only my account (if not admin)
+                if (userDoc.uid !== myUserDoc.uid && !myUserDoc.roles.includes(RolesEnum.ADMIN)) {
+                        throw new MyError('You are not allowed to update different user', HttpStatusCode.FORBIDDEN)
+                }
+                // not roles if not admin
+                if (payload.roles && !myUserDoc.roles.includes(RolesEnum.ADMIN)) {
+                        throw new MyError('You are not allowed to update roles', HttpStatusCode.FORBIDDEN)
                 }
                 // If updating roles verify there are no conflicts
                 if (payload.roles) {
