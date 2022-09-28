@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { createExternalUser, getByKeyid, getExternalUsersByCid, removeExternalUser } from './statics'
-import { IExternalUserDocument, IExternalUserModel } from './types'
+import { GrantType, IExternalUserDocument, IExternalUserModel } from './types'
 
 const Schema = mongoose.Schema
 
@@ -10,12 +10,15 @@ const ACLObjectSchema = new Schema({
     oid: { type: [String], default: [] },
 },{ _id: false })
 
+const GrantTypes = Object.values(GrantType)
+
 const ExternalUserSchema = new Schema<IExternalUserDocument, IExternalUserModel>({
     keyid: { type: String, index: true, required: true, unique: true },
+    cid: { type: String, required: true },
     name: { type: String, required: true },
     secretKey: { type: String, required: true },
-    cid: { type: String, required: true },
-    ACL: { type: ACLObjectSchema, required: true },
+    grantType: [{ type: String, required: true, enum: GrantType, default: ['dataAccess'] }],
+    ACL: { type: ACLObjectSchema, default: { cid: [], agid: [], oid: [] } }, // Optional
     domain: { type: String, default: 'NONE' }, // not used
     ttl: { type: Number, default: 0 },    // not used
     created: { type: Number, default: Date.now }

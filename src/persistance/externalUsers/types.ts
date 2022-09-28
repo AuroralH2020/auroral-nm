@@ -6,9 +6,14 @@ export interface ACLObject {
     oid: string[],
 }
 
+export enum GrantType {
+    DATA_ACCESS = 'dataAccess',
+    SERVICE_STORE = 'serviceStore',
+}
 export interface IExternalUser {
     keyid: string
     name: string,
+    grantType: GrantType[],
     secretKey: string,
     cid: string,
     ACL: ACLObject,
@@ -19,35 +24,40 @@ export interface IExternalUser {
 
 // Input to create a new External user
 export interface IExternalUserCreate {
-    ACL: ACLObject,
+    secretKey: string,
     name: string,
     cid: string,
-    secretKey: string,
+    grantType?: GrantType[],
+    ACL?: ACLObject,
     // domain: string,
     // ttl: number,
 }
 
 export interface  IExternalUserCreatePost {
-    ACL: ACLObject,
     name: string,
     cid: string,
+    grantType: GrantType[],
+    ACL?: ACLObject,
 }
 
 // UI
 export interface IExternalUserUi {
     name: string,
-    ACL: ACLObject,
     created: Date,
     keyid: string,
+    grantType: GrantType[],
     ttl: number,
+    ACL: ACLObject,
 }
 export interface IExternalUserCreatedUi {
     name: string,
-    ACL: ACLObject,
     created: Date,
     keyid: string,
     ttl: number,
     secretKey: string
+    grantType: GrantType[],
+    ACL: ACLObject,
+
 }
 
 export interface IExternalUserDocument extends IExternalUser, Document {

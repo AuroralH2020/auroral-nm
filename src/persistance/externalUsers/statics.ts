@@ -25,6 +25,7 @@ export async function getExternalUsersByCid(
         keyid: 1,
         ACL: 1,
         domain: 1,
+        grantType: 1,
         ttl: 1,
         created: 1,
         _id: 0

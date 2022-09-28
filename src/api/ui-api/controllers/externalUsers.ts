@@ -1,7 +1,7 @@
 // Controller common imports
 import { errorHandler, MyError } from '../../../utils/error-handler'
 import { ExternalUserModel } from '../../../persistance/externalUsers/model'
-import { ACLObject, IExternalUserCreatedUi, IExternalUserUi } from '../../../persistance/externalUsers/types'
+import { ACLObject, GrantType, IExternalUserCreatedUi, IExternalUserUi } from '../../../persistance/externalUsers/types'
 import { generateSecret,  hashPassword } from '../../../auth-server/auth-server'
 import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode, logger, responseBuilder } from '../../../utils'
@@ -14,10 +14,11 @@ import { UserModel } from '../../../persistance/user/model'
 
 // Controllers
 
-type createExternalUserController = expressTypes.Controller<{}, { ACL: ACLObject, name: string }, {}, IExternalUserCreatedUi, localsTypes.ILocals>
+type createExternalUserController = expressTypes.Controller<{}, { ACL: ACLObject, name: string, grantType?: GrantType[] }, {}, IExternalUserCreatedUi, localsTypes.ILocals>
 
 export const createExternalUser: createExternalUserController = async (req, res) => {
     const { ACL, name } = req.body 
+    const grantType = req.body.grantType ? req.body.grantType : [GrantType.DATA_ACCESS]
     const { decoded } = res.locals
     try {
         // CID LEVEL
@@ -80,7 +81,7 @@ export const createExternalUser: createExternalUserController = async (req, res)
         ACL.agid = [...new Set(ACL.agid)]
         ACL.cid = [...new Set(ACL.cid)]
         // Create external user
-        const externalUser = await ExternalUserModel._createExternalUser({ ACL, name, cid: decoded.org, secretKey: secretKeyHash })
+        const externalUser = await ExternalUserModel._createExternalUser({ ACL, name, cid: decoded.org, secretKey: secretKeyHash, grantType })
         return responseBuilder(HttpStatusCode.OK, res, null, { keyid: externalUser.keyid, name: externalUser.name, ACL: externalUser.ACL, secretKey, created: externalUser.created, ttl: externalUser.ttl })
     } catch (err) {
         const error = errorHandler(err)
