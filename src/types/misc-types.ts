@@ -104,4 +104,6 @@ export enum EventType {
     nodeRemoved = 74,
     nodeUpdated = 75,
     nodeUpdatedKey = 76,
+    userLoggedIn = 77,
+    userLoggedOut = 78
 }
