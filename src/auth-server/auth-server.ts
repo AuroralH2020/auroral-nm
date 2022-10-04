@@ -32,7 +32,7 @@ if (Config.NODE_ENV === 'test') {
 } else {
     // Load keys
     try {
-        console.log(path.join(Config.HOME_PATH, '/keys/private-key.pem'))
+        // console.log(path.join(Config.HOME_PATH, '/keys/private-key.pem'))
         priv_cert = fs.readFileSync(path.join(Config.HOME_PATH, '/keys/private-key.pem'))
         pub_cert = fs.readFileSync(path.join(Config.HOME_PATH, '/keys/public-key.pem'))
     } catch (err) {
@@ -145,7 +145,7 @@ export const verifyToken = async (token: string): Promise<jwtTypes.JWTDecodedTok
                     logger.error(err.message)
                     throw new MyError(err.message, HttpStatusCode.INTERNAL_SERVER_ERROR)
                 }
-            } else {                
+            } else {      
                 resolve(decoded as jwtTypes.JWTDecodedToken)
             }
         })

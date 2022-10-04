@@ -137,6 +137,12 @@ const generateMessage: (data: IAuditCreate) => string = (
     case EventType.contractItemUpdated:
       message += 'Item in ' + data.target?.name + ' has been updated by user ' + data.actor.name + ' (organisation: ' + data.object?.name + ')'
       break
+    case EventType.userLoggedIn:
+      message += 'User \'' + data.target.name + '\' has logged in'
+      break
+    case EventType.userLoggedOut:
+      message += 'User \'' + data.target.name + '\' has logged out'
+      break
     default:
       message += 'Something has been updated'
       break

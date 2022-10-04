@@ -42,7 +42,7 @@ const UiRouter = Router()
 
 UiRouter
 // AUTH
-.post('/login/authenticate', addOrigin(Interfaces.UI), loginCtrl.authenticate)
+.post('/login/authenticate', addOrigin(Interfaces.UI), createAudit(SourceType.USER), loginCtrl.authenticate)
 .post('/login/refresh', addOrigin(Interfaces.UI), jwt(), loginCtrl.refreshToken)
 .post('/login/recovery', addOrigin(Interfaces.UI), loginCtrl.sendRecoverPwdMail)
 .put('/login/recovery/:token', addOrigin(Interfaces.UI), validateBody(passwordSchema), loginCtrl.processRecoverPwd)
@@ -51,6 +51,7 @@ UiRouter
 .get('/login/remember', addOrigin(Interfaces.UI), jwt(), loginCtrl.rememberCookie)
 .post('/login/remember', addOrigin(Interfaces.UI), loginCtrl.rememberGetToken)
 .delete('/login/remember/:sessionId', addOrigin(Interfaces.UI), loginCtrl.rememberDeleteToken)
+.get('/logout', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.USER), loginCtrl.logout)
 
 // SESSIONS
 .get('/sessions/all/:cursor', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getAll)

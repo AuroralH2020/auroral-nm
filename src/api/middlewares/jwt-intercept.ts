@@ -9,6 +9,7 @@ import { HttpStatusCode } from '../../utils'
 import { logger } from '../../utils/logger'
 import { JsonType } from '../../types/misc-types'
 import { Config } from '../../config'
+import { tokenBlacklist } from '../../microservices/tokenBlacklist'
 
 type JwtController = Controller<{}, {}, {}, null, ILocals>
 
@@ -54,7 +55,7 @@ export const jwt = (roles?: RolesEnum[]) => {
                 res.locals.token = token
                 // Verify session
                 getSession(decoded.uid).then(
-                    (session) => {
+                    async (session) => {
                         if (Config.SESSIONS.ENABLED === false) {
                             return next()
                         } else if (session) {
@@ -65,7 +66,10 @@ export const jwt = (roles?: RolesEnum[]) => {
                             // } else {
                             //     return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Strange activity detected, IP changed during session life, possible use of VPN or tampering attempt')
                             // }
-                            // TBD Create and check token revocation list (Redis list for each user with its revoked tokens)
+                            // Blacklisted token check
+                            if (await tokenBlacklist.checkInBlacklist(decoded.uid, token)) {
+                                return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Token is blacklisted')
+                            }
                             return next()
                         } else {
                             logger.error('Session expired')

@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testExecutions version="1">
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/core/user.ts">
-        <testCase name="users checkRoles" duration="9"/>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/core/user.ts">
+        <testCase name="users checkRoles" duration="2"/>
     </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/auth-server/auth-server.ts">
-        <testCase name="Authentication server Hash password and verify hash" duration="296"/>
-        <testCase name="Authentication server signMailToken" duration="17"/>
-        <testCase name="Authentication server signAppToken and verifyToken" duration="2"/>
-        <testCase name="Authentication server checkTempSecret" duration="2"/>
-        <testCase name="Authentication server generateSecret" duration="0"/>
-        <testCase name="Authentication server verifyHash" duration="1"/>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/auth-server/mailer.ts">
+        <testCase name="Mailer recoverPassword" duration="6"/>
+        <testCase name="Mailer verificationMail" duration="15"/>
+        <testCase name="Mailer notifyDevOpsOfNewRegistration" duration="9"/>
+        <testCase name="Mailer rejectRegistration" duration="2"/>
+        <testCase name="Mailer invitationMail" duration="2"/>
+        <testCase name="Mailer passwordlessLogin" duration="1"/>
     </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/core/statistics.ts">
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/core/statistics.ts">
         <testCase name="statistics storeStatistics" duration="3"/>
         <testCase name="statistics getLastStatistics" duration="0"/>
         <testCase name="statistics getStatistics" duration="1"/>
     </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/auth-server/mailer.ts">
-        <testCase name="Mailer recoverPassword" duration="29"/>
-        <testCase name="Mailer verificationMail" duration="17"/>
-        <testCase name="Mailer notifyDevOpsOfNewRegistration" duration="4"/>
-        <testCase name="Mailer rejectRegistration" duration="3"/>
-        <testCase name="Mailer invitationMail" duration="19"/>
-        <testCase name="Mailer passwordlessLogin" duration="3"/>
-    </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/core/nodes.ts">
-        <testCase name="nodes createOne" duration="16"/>
-        <testCase name="nodes updateOne" duration="1"/>
-        <testCase name="nodes removeOne" duration="1"/>
-    </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/core/communities.ts">
-        <testCase name="Contracts createOne" duration="7"/>
-        <testCase name="Contracts removeOne" duration="0"/>
-        <testCase name="Contracts addNode" duration="0"/>
-        <testCase name="Contracts removeNode" duration="1"/>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/core/communities.ts">
+        <testCase name="Contracts createOne" duration="15"/>
+        <testCase name="Contracts removeOne" duration="1"/>
+        <testCase name="Contracts addNode" duration="1"/>
+        <testCase name="Contracts removeNode" duration="0"/>
         <testCase name="Contracts removePartneship" duration="1"/>
     </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/core/registrations.ts">
-        <testCase name="registrations registerNewOrganisation" duration="13"/>
-        <testCase name="registrations registerInvitedUserOrOrganisation" duration="8"/>
-        <testCase name="registrations registerAfterVerification" duration="39"/>
-        <testCase name="registrations sendVerificationMail" duration="0"/>
-        <testCase name="registrations resendVerificationMail" duration="1"/>
-        <testCase name="registrations declineRegistration" duration="1"/>
-        <testCase name="registrations registerAfterMasterVerification" duration="3"/>
-    </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/core/items.ts">
-        <testCase name="Items getMany" duration="15"/>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/core/items.ts">
+        <testCase name="Items getMany" duration="3"/>
         <testCase name="Items getOne" duration="1"/>
         <testCase name="Items createOne" duration="1"/>
-        <testCase name="Items removeOne" duration="2"/>
-        <testCase name="Items updateOne" duration="5"/>
+        <testCase name="Items removeOne" duration="1"/>
+        <testCase name="Items updateOne" duration="2"/>
     </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/core/contracts.ts">
-        <testCase name="Contracts getMany" duration="4"/>
-        <testCase name="Contracts getMany fail" duration="10"/>
-        <testCase name="Contracts createOne" duration="3"/>
-        <testCase name="Contracts createOne toFail" duration="4"/>
-        <testCase name="Contracts updateOne" duration="2"/>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/core/contracts.ts">
+        <testCase name="Contracts getMany" duration="2"/>
+        <testCase name="Contracts getMany fail" duration="1"/>
+        <testCase name="Contracts createOne" duration="1"/>
+        <testCase name="Contracts createOne toFail" duration="1"/>
+        <testCase name="Contracts updateOne" duration="0"/>
         <testCase name="Contracts updateOne fail" duration="1"/>
         <testCase name="Contracts removeOrgFromContract" duration="1"/>
-        <testCase name="Contracts removeOrgFromContract - testAfterRemoving" duration="1"/>
-        <testCase name="Contracts rejectContractRequest " duration="0"/>
+        <testCase name="Contracts removeOrgFromContract - testAfterRemoving" duration="0"/>
+        <testCase name="Contracts rejectContractRequest " duration="4"/>
         <testCase name="Contracts rejectContractRequest - testAfterRemoving" duration="1"/>
-        <testCase name="Contracts acceptContractRequest" duration="1"/>
-        <testCase name="Contracts addItem" duration="0"/>
+        <testCase name="Contracts acceptContractRequest" duration="0"/>
+        <testCase name="Contracts addItem" duration="1"/>
         <testCase name="Contracts addItem fail" duration="1"/>
         <testCase name="Contracts editItem" duration="0"/>
         <testCase name="Contracts editItem fail" duration="0"/>
-        <testCase name="Contracts removeItems" duration="0"/>
+        <testCase name="Contracts removeItems" duration="1"/>
         <testCase name="Contracts removeItems fail" duration="0"/>
     </file>
-    <file path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/__tests__/core/organisations.ts">
-        <testCase name="organisations remove" duration="6"/>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/core/registrations.ts">
+        <testCase name="registrations registerNewOrganisation" duration="2"/>
+        <testCase name="registrations registerInvitedUserOrOrganisation" duration="2"/>
+        <testCase name="registrations registerAfterVerification" duration="26"/>
+        <testCase name="registrations sendVerificationMail" duration="0"/>
+        <testCase name="registrations resendVerificationMail" duration="1"/>
+        <testCase name="registrations declineRegistration" duration="0"/>
+        <testCase name="registrations registerAfterMasterVerification" duration="1"/>
+    </file>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/core/nodes.ts">
+        <testCase name="nodes createOne" duration="6"/>
+        <testCase name="nodes updateOne" duration="1"/>
+        <testCase name="nodes removeOne" duration="1"/>
+    </file>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/auth-server/auth-server.ts">
+        <testCase name="Authentication server Hash password and verify hash" duration="188"/>
+        <testCase name="Authentication server signMailToken" duration="12"/>
+        <testCase name="Authentication server signAppToken and verifyToken" duration="2"/>
+        <testCase name="Authentication server checkTempSecret" duration="1"/>
+        <testCase name="Authentication server generateSecret" duration="0"/>
+        <testCase name="Authentication server verifyHash" duration="1"/>
+    </file>
+    <file path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/__tests__/core/organisations.ts">
+        <testCase name="organisations remove" duration="12"/>
     </file>
 </testExecutions>

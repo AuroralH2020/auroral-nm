@@ -128,6 +128,19 @@ export class RedisFactory {
      * @returns {string | null}
      */
     public scan = (cursor: number): Promise<{ cursor: number, keys: string[]}> => {
+        this.client.scanIterator()
         return this.client.scan(cursor)
+    }
+    /**
+     * Returns iterator for given preffix
+     * @param preffix Prefix to search
+     * @returns 
+     */
+    public stringScanIterator = (preffix: string): AsyncIterable<string> => {
+        return this.client.scanIterator({
+            TYPE: 'string', // `SCAN` only
+            MATCH: preffix + '*',
+            COUNT: 10
+          })
     }
 }

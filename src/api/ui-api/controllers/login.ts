@@ -11,13 +11,17 @@ import { passwordlessLogin, recoverPassword } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
 import { SessionModel } from '../../../persistance/sessions/model'
 import { UserModel } from '../../../persistance/user/model'
+import { tokenBlacklist } from '../../../microservices/tokenBlacklist'
+import { AuditModel } from '../../../persistance/audit/model'
+import { EventType, ResultStatusType } from '../../../types/misc-types'
 
 // Controllers
 
-type authController = expressTypes.Controller<{}, {username: string, password: string}, {}, any, localsTypes.ILocals>
+type authController = expressTypes.Controller<{}, { username: string, password: string }, {}, any, localsTypes.ILocals>
  
 export const authenticate: authController = async (req, res) => {
     const { username, password } = req.body
+    const { decoded } = res.locals
     if (!username || !password) {
             logger.warn('Missing username or password')
             return responseBuilder(HttpStatusCode.BAD_REQUEST, res, 'Missing username or password')
@@ -25,7 +29,19 @@ export const authenticate: authController = async (req, res) => {
 	try {
                 await comparePassword(username, password)
                 const tokens = await signAppToken(username, res.locals.origin.originIp)
-                // TBD: Consider adding LOGIN audit
+                // Audit login
+                const myAccount = await AccountModel._getAccount(username)
+                const myUser = await UserModel._getUser(myAccount.uid)
+                // Login audit
+                await AuditModel._createAudit({
+                        ...res.locals.audit,
+                        cid: myAccount.cid,
+                        message: 'User logged in',
+                        actor: { id: myAccount.uid, name: myUser.name },
+                        target: { id: myAccount.uid, name: myUser.name }, 
+                        type: EventType.userLoggedIn,
+                        labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+                })
                 return responseBuilder(HttpStatusCode.OK, res, null, tokens)
 	} catch (err) {
                 const error = errorHandler(err)
@@ -201,10 +217,12 @@ type rememberDeleteTokenController =  expressTypes.Controller<{ sessionId: strin
  
 export const rememberDeleteToken: rememberDeleteTokenController = async (req, res) => {
         const { sessionId } = req.params
+        const { decoded } = res.locals
         try {
                 // split to get sessionId and secret
                 // remove session by ID
                 SessionModel._deleteSession(sessionId)
+                tokenBlacklist.addToBlacklist(decoded.uid, res.locals.token)
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
@@ -213,3 +231,27 @@ export const rememberDeleteToken: rememberDeleteTokenController = async (req, re
         }
 }
 
+type logoutController =  expressTypes.Controller<{}, {}, {}, string, localsTypes.ILocals>
+ 
+export const logout: logoutController = async (_req, res) => {
+        const { decoded } = res.locals 
+        try {
+                logger.debug('Logging out: ' + decoded.uid)
+                await tokenBlacklist.addToBlacklist(decoded.uid, res.locals.token)
+                const myUser = await UserModel._getUser(decoded.uid)
+                // Logout audit
+                await AuditModel._createAudit({
+                        ...res.locals.audit,
+                        cid: myUser.cid,
+                        actor: { id: decoded.uid, name: myUser.name },
+                        target: { id: decoded.uid, name: myUser.name }, 
+                        type: EventType.userLoggedOut,
+                        labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
+                      })
+               return responseBuilder(HttpStatusCode.OK, res, null, 'Logged out')
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
+        }
+}

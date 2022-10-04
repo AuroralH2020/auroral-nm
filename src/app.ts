@@ -29,14 +29,19 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 app.set('trust proxy', 1)
 
 // Basic cors setup
-app.use(cors())
+// app.use(cors())
 
 // Setup Headers & Access-Control
 app.use(accessControl())
+
+const corsOptions = {
+  origin: Config.NODE_ENV === 'development' ? 'https://auroral.dev.bavenir.eu' : 'https://auroral.bavenir.eu',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
  
-app.use('/api/ui/v1/', UiRouter)
-app.use('/api/gtw/v1/', GtwRouter)
-app.use('/api/external/v1/', ExternalRouter)
+app.use('/api/ui/v1/', cors(corsOptions), UiRouter)
+app.use('/api/gtw/v1/', cors(), GtwRouter)
+app.use('/api/external/v1/', cors(), ExternalRouter)
 
 /**
  * Not Found
