@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1662727095213" clover="3.2.0">
-  <project timestamp="1662727095213" name="All files">
-    <metrics statements="2464" coveredstatements="1581" conditionals="839" coveredconditionals="255" methods="430" coveredmethods="202" elements="3733" coveredelements="2038" complexity="0" loc="2464" ncloc="2464" packages="18" files="78" classes="78"/>
+<coverage generated="1664886620980" clover="3.2.0">
+  <project timestamp="1664886620980" name="All files">
+    <metrics statements="2472" coveredstatements="1583" conditionals="841" coveredconditionals="254" methods="431" coveredmethods="200" elements="3744" coveredelements="2037" complexity="0" loc="2472" ncloc="2472" packages="18" files="78" classes="78"/>
     <package name="src">
-      <metrics statements="7" coveredstatements="5" conditionals="44" coveredconditionals="27" methods="0" coveredmethods="0"/>
-      <file name="config.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/config.ts">
-        <metrics statements="7" coveredstatements="5" conditionals="44" coveredconditionals="27" methods="0" coveredmethods="0"/>
-        <line num="1" count="18" type="stmt"/>
-        <line num="2" count="18" type="stmt"/>
-        <line num="4" count="18" type="stmt"/>
-        <line num="6" count="18" type="cond" truecount="0" falsecount="1"/>
+      <metrics statements="7" coveredstatements="5" conditionals="44" coveredconditionals="26" methods="0" coveredmethods="0"/>
+      <file name="config.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/config.ts">
+        <metrics statements="7" coveredstatements="5" conditionals="44" coveredconditionals="26" methods="0" coveredmethods="0"/>
+        <line num="1" count="19" type="stmt"/>
+        <line num="2" count="19" type="stmt"/>
+        <line num="4" count="19" type="stmt"/>
+        <line num="6" count="19" type="cond" truecount="0" falsecount="1"/>
         <line num="10" count="0" type="stmt"/>
         <line num="11" count="0" type="stmt"/>
-        <line num="14" count="18" type="stmt"/>
+        <line num="14" count="19" type="stmt"/>
       </file>
     </package>
     <package name="src.auth-server">
-      <metrics statements="172" coveredstatements="141" conditionals="50" coveredconditionals="33" methods="40" coveredmethods="37"/>
-      <file name="auth-server.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/auth-server/auth-server.ts">
-        <metrics statements="109" coveredstatements="80" conditionals="30" coveredconditionals="17" methods="26" coveredmethods="23"/>
+      <metrics statements="171" coveredstatements="141" conditionals="50" coveredconditionals="33" methods="40" coveredmethods="37"/>
+      <file name="auth-server.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/auth-server/auth-server.ts">
+        <metrics statements="108" coveredstatements="80" conditionals="30" coveredconditionals="17" methods="26" coveredmethods="23"/>
         <line num="1" count="9" type="stmt"/>
         <line num="2" count="9" type="stmt"/>
         <line num="3" count="9" type="stmt"/>
@@ -43,7 +43,6 @@
         <line num="30" count="0" type="stmt"/>
         <line num="31" count="0" type="stmt"/>
         <line num="34" count="0" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
         <line num="36" count="0" type="stmt"/>
         <line num="37" count="0" type="stmt"/>
         <line num="39" count="0" type="stmt"/>
@@ -129,7 +128,7 @@
         <line num="221" count="3" type="stmt"/>
         <line num="223" count="0" type="stmt"/>
       </file>
-      <file name="mailer.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/auth-server/mailer.ts">
+      <file name="mailer.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/auth-server/mailer.ts">
         <metrics statements="63" coveredstatements="61" conditionals="20" coveredconditionals="16" methods="14" coveredmethods="14"/>
         <line num="1" count="5" type="stmt"/>
         <line num="2" count="5" type="stmt"/>
@@ -197,8 +196,8 @@
       </file>
     </package>
     <package name="src.core">
-      <metrics statements="672" coveredstatements="598" conditionals="180" coveredconditionals="122" methods="129" coveredmethods="114"/>
-      <file name="communities.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/communities.ts">
+      <metrics statements="672" coveredstatements="597" conditionals="180" coveredconditionals="122" methods="129" coveredmethods="112"/>
+      <file name="communities.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/communities.ts">
         <metrics statements="68" coveredstatements="53" conditionals="13" coveredconditionals="11" methods="12" coveredmethods="12"/>
         <line num="6" count="3" type="stmt"/>
         <line num="7" count="3" type="stmt"/>
@@ -269,7 +268,7 @@
         <line num="149" count="0" type="stmt"/>
         <line num="151" count="0" type="stmt"/>
       </file>
-      <file name="contracts.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/contracts.ts">
+      <file name="contracts.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/contracts.ts">
         <metrics statements="196" coveredstatements="186" conditionals="43" coveredconditionals="29" methods="31" coveredmethods="28"/>
         <line num="6" count="3" type="stmt"/>
         <line num="16" count="3" type="stmt"/>
@@ -468,7 +467,7 @@
         <line num="499" count="2" type="stmt"/>
         <line num="501" count="2" type="stmt"/>
       </file>
-      <file name="index.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/index.ts">
+      <file name="index.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/index.ts">
         <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="5" count="3" type="stmt"/>
         <line num="6" count="3" type="stmt"/>
@@ -480,7 +479,7 @@
         <line num="12" count="3" type="stmt"/>
         <line num="14" count="3" type="stmt"/>
       </file>
-      <file name="items.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/items.ts">
+      <file name="items.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/items.ts">
         <metrics statements="121" coveredstatements="100" conditionals="55" coveredconditionals="36" methods="19" coveredmethods="19"/>
         <line num="6" count="4" type="stmt"/>
         <line num="7" count="4" type="stmt"/>
@@ -604,7 +603,7 @@
         <line num="337" count="0" type="stmt"/>
         <line num="339" count="1" type="stmt"/>
       </file>
-      <file name="nodes.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/nodes.ts">
+      <file name="nodes.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/nodes.ts">
         <metrics statements="44" coveredstatements="36" conditionals="7" coveredconditionals="2" methods="10" coveredmethods="8"/>
         <line num="6" count="2" type="stmt"/>
         <line num="7" count="2" type="stmt"/>
@@ -651,7 +650,7 @@
         <line num="97" count="1" type="stmt"/>
         <line num="98" count="1" type="stmt"/>
       </file>
-      <file name="organisations.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/organisations.ts">
+      <file name="organisations.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/organisations.ts">
         <metrics statements="33" coveredstatements="33" conditionals="7" coveredconditionals="7" methods="16" coveredmethods="16"/>
         <line num="6" count="3" type="stmt"/>
         <line num="7" count="3" type="stmt"/>
@@ -687,7 +686,7 @@
         <line num="70" count="1" type="stmt"/>
         <line num="71" count="1" type="stmt"/>
       </file>
-      <file name="registrations.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/registrations.ts">
+      <file name="registrations.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/registrations.ts">
         <metrics statements="122" coveredstatements="120" conditionals="33" coveredconditionals="28" methods="22" coveredmethods="20"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -812,8 +811,8 @@
         <line num="343" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="344" count="0" type="stmt"/>
       </file>
-      <file name="sessions.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/sessions.ts">
-        <metrics statements="24" coveredstatements="12" conditionals="6" coveredconditionals="0" methods="10" coveredmethods="2"/>
+      <file name="sessions.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/sessions.ts">
+        <metrics statements="24" coveredstatements="11" conditionals="6" coveredconditionals="0" methods="10" coveredmethods="0"/>
         <line num="2" count="9" type="stmt"/>
         <line num="3" count="9" type="stmt"/>
         <line num="4" count="9" type="stmt"/>
@@ -833,13 +832,13 @@
         <line num="35" count="0" type="stmt"/>
         <line num="37" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="41" count="9" type="stmt"/>
-        <line num="42" count="1" type="cond" truecount="0" falsecount="1"/>
+        <line num="42" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="43" count="0" type="stmt"/>
         <line num="47" count="9" type="stmt"/>
         <line num="48" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="49" count="0" type="stmt"/>
       </file>
-      <file name="statistics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/statistics.ts">
+      <file name="statistics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/statistics.ts">
         <metrics statements="25" coveredstatements="25" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -867,7 +866,7 @@
         <line num="34" count="4" type="stmt"/>
         <line num="35" count="1" type="stmt"/>
       </file>
-      <file name="users.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/core/users.ts">
+      <file name="users.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/core/users.ts">
         <metrics statements="30" coveredstatements="24" conditionals="16" coveredconditionals="9" methods="5" coveredmethods="5"/>
         <line num="6" count="4" type="stmt"/>
         <line num="7" count="4" type="stmt"/>
@@ -902,8 +901,8 @@
       </file>
     </package>
     <package name="src.microservices">
-      <metrics statements="191" coveredstatements="68" conditionals="25" coveredconditionals="2" methods="68" coveredmethods="15"/>
-      <file name="commServer.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/microservices/commServer.ts">
+      <metrics statements="194" coveredstatements="69" conditionals="25" coveredconditionals="2" methods="69" coveredmethods="15"/>
+      <file name="commServer.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/microservices/commServer.ts">
         <metrics statements="72" coveredstatements="21" conditionals="9" coveredconditionals="1" methods="36" coveredmethods="8"/>
         <line num="1" count="7" type="stmt"/>
         <line num="4" count="7" type="stmt"/>
@@ -978,8 +977,8 @@
         <line num="135" count="3" type="cond" truecount="1" falsecount="0"/>
         <line num="136" count="3" type="stmt"/>
       </file>
-      <file name="redisConnector.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/microservices/redisConnector.ts">
-        <metrics statements="34" coveredstatements="23" conditionals="7" coveredconditionals="1" methods="13" coveredmethods="3"/>
+      <file name="redisConnector.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/microservices/redisConnector.ts">
+        <metrics statements="37" coveredstatements="24" conditionals="7" coveredconditionals="1" methods="14" coveredmethods="3"/>
         <line num="6" count="15" type="stmt"/>
         <line num="7" count="15" type="stmt"/>
         <line num="8" count="15" type="stmt"/>
@@ -1013,9 +1012,12 @@
         <line num="120" count="0" type="stmt"/>
         <line num="130" count="16" type="stmt"/>
         <line num="131" count="0" type="stmt"/>
-        <line num="133" count="15" type="stmt"/>
+        <line num="132" count="0" type="stmt"/>
+        <line num="139" count="16" type="stmt"/>
+        <line num="140" count="0" type="stmt"/>
+        <line num="146" count="15" type="stmt"/>
       </file>
-      <file name="slackBot.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/microservices/slackBot.ts">
+      <file name="slackBot.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/microservices/slackBot.ts">
         <metrics statements="14" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
         <line num="1" count="4" type="stmt"/>
         <line num="3" count="4" type="stmt"/>
@@ -1032,7 +1034,7 @@
         <line num="37" count="4" type="stmt"/>
         <line num="38" count="2" type="stmt"/>
       </file>
-      <file name="xmppClient.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/microservices/xmppClient.ts">
+      <file name="xmppClient.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/microservices/xmppClient.ts">
         <metrics statements="71" coveredstatements="12" conditionals="9" coveredconditionals="0" methods="15" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -1109,7 +1111,7 @@
     </package>
     <package name="src.persistance.account">
       <metrics statements="71" coveredstatements="37" conditionals="19" coveredconditionals="0" methods="11" coveredmethods="0"/>
-      <file name="methods.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/account/methods.ts">
+      <file name="methods.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/account/methods.ts">
         <metrics statements="15" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="5" count="7" type="stmt"/>
@@ -1127,13 +1129,13 @@
         <line num="21" count="0" type="stmt"/>
         <line num="22" count="0" type="stmt"/>
       </file>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/account/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/account/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
         <line num="5" count="7" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/account/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/account/schema.ts">
         <metrics statements="20" coveredstatements="20" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
@@ -1156,7 +1158,7 @@
         <line num="39" count="7" type="stmt"/>
         <line num="42" count="7" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/account/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/account/statics.ts">
         <metrics statements="33" coveredstatements="10" conditionals="19" coveredconditionals="0" methods="8" coveredmethods="0"/>
         <line num="2" count="7" type="stmt"/>
         <line num="3" count="7" type="stmt"/>
@@ -1194,14 +1196,14 @@
       </file>
     </package>
     <package name="src.persistance.audit">
-      <metrics statements="99" coveredstatements="27" conditionals="76" coveredconditionals="0" methods="4" coveredmethods="0"/>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/audit/model.ts">
+      <metrics statements="103" coveredstatements="27" conditionals="78" coveredconditionals="0" methods="4" coveredmethods="0"/>
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/audit/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
         <line num="5" count="6" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/audit/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/audit/schema.ts">
         <metrics statements="15" coveredstatements="15" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="3" count="6" type="stmt"/>
@@ -1219,8 +1221,8 @@
         <line num="41" count="6" type="stmt"/>
         <line num="44" count="6" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/audit/statics.ts">
-        <metrics statements="81" coveredstatements="9" conditionals="76" coveredconditionals="0" methods="4" coveredmethods="0"/>
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/audit/statics.ts">
+        <metrics statements="85" coveredstatements="9" conditionals="78" coveredconditionals="0" methods="4" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="3" count="6" type="stmt"/>
         <line num="4" count="6" type="stmt"/>
@@ -1248,7 +1250,7 @@
         <line num="49" count="0" type="stmt"/>
         <line num="53" count="6" type="stmt"/>
         <line num="56" count="0" type="stmt"/>
-        <line num="57" count="0" type="cond" truecount="0" falsecount="26"/>
+        <line num="57" count="0" type="cond" truecount="0" falsecount="28"/>
         <line num="60" count="0" type="stmt"/>
         <line num="61" count="0" type="stmt"/>
         <line num="63" count="0" type="stmt"/>
@@ -1302,17 +1304,21 @@
         <line num="141" count="0" type="stmt"/>
         <line num="142" count="0" type="stmt"/>
         <line num="144" count="0" type="stmt"/>
+        <line num="145" count="0" type="stmt"/>
+        <line num="147" count="0" type="stmt"/>
+        <line num="148" count="0" type="stmt"/>
+        <line num="150" count="0" type="stmt"/>
       </file>
     </package>
     <package name="src.persistance.community">
       <metrics statements="99" coveredstatements="46" conditionals="48" coveredconditionals="2" methods="15" coveredmethods="1"/>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/community/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/community/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
         <line num="5" count="3" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/community/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/community/schema.ts">
         <metrics statements="23" coveredstatements="23" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
@@ -1338,7 +1344,7 @@
         <line num="41" count="3" type="stmt"/>
         <line num="45" count="3" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/community/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/community/statics.ts">
         <metrics statements="70" coveredstatements="17" conditionals="46" coveredconditionals="0" methods="14" coveredmethods="0"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
@@ -1411,7 +1417,7 @@
         <line num="397" count="0" type="stmt"/>
         <line num="399" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/community/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/community/types.ts">
         <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="5" count="5" type="cond" truecount="2" falsecount="0"/>
         <line num="6" count="5" type="stmt"/>
@@ -1420,7 +1426,7 @@
     </package>
     <package name="src.persistance.contract">
       <metrics statements="164" coveredstatements="75" conditionals="64" coveredconditionals="4" methods="26" coveredmethods="2"/>
-      <file name="methods.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/contract/methods.ts">
+      <file name="methods.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/contract/methods.ts">
         <metrics statements="17" coveredstatements="4" conditionals="6" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="3" count="6" type="stmt"/>
@@ -1440,13 +1446,13 @@
         <line num="22" count="0" type="stmt"/>
         <line num="24" count="0" type="stmt"/>
       </file>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/contract/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/contract/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
         <line num="5" count="6" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/contract/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/contract/schema.ts">
         <metrics statements="36" coveredstatements="36" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
@@ -1485,7 +1491,7 @@
         <line num="89" count="6" type="stmt"/>
         <line num="92" count="6" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/contract/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/contract/statics.ts">
         <metrics statements="101" coveredstatements="25" conditionals="54" coveredconditionals="0" methods="21" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
@@ -1589,7 +1595,7 @@
         <line num="622" count="6" type="stmt"/>
         <line num="624" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/contract/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/contract/types.ts">
         <metrics statements="7" coveredstatements="7" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
         <line num="5" count="8" type="cond" truecount="2" falsecount="0"/>
         <line num="6" count="8" type="stmt"/>
@@ -1602,13 +1608,13 @@
     </package>
     <package name="src.persistance.invitation">
       <metrics statements="49" coveredstatements="31" conditionals="18" coveredconditionals="4" methods="8" coveredmethods="2"/>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/invitation/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/invitation/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
         <line num="5" count="4" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/invitation/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/invitation/schema.ts">
         <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -1624,7 +1630,7 @@
         <line num="32" count="4" type="stmt"/>
         <line num="35" count="4" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/invitation/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/invitation/statics.ts">
         <metrics statements="26" coveredstatements="8" conditionals="14" coveredconditionals="0" methods="6" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -1653,7 +1659,7 @@
         <line num="57" count="0" type="stmt"/>
         <line num="59" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/invitation/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/invitation/types.ts">
         <metrics statements="7" coveredstatements="7" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
         <line num="4" count="7" type="cond" truecount="2" falsecount="0"/>
         <line num="5" count="7" type="stmt"/>
@@ -1666,7 +1672,7 @@
     </package>
     <package name="src.persistance.item">
       <metrics statements="136" coveredstatements="74" conditionals="54" coveredconditionals="8" methods="21" coveredmethods="4"/>
-      <file name="methods.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/item/methods.ts">
+      <file name="methods.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/item/methods.ts">
         <metrics statements="19" coveredstatements="3" conditionals="14" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="3" count="6" type="stmt"/>
@@ -1688,13 +1694,13 @@
         <line num="21" count="0" type="stmt"/>
         <line num="22" count="0" type="stmt"/>
       </file>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/item/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/item/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
         <line num="5" count="6" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/item/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/item/schema.ts">
         <metrics statements="29" coveredstatements="29" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
@@ -1726,7 +1732,7 @@
         <line num="70" count="6" type="stmt"/>
         <line num="73" count="6" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/item/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/item/statics.ts">
         <metrics statements="64" coveredstatements="18" conditionals="32" coveredconditionals="0" methods="15" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="12" count="6" type="stmt"/>
@@ -1793,7 +1799,7 @@
         <line num="298" count="0" type="stmt"/>
         <line num="300" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/item/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/item/types.ts">
         <metrics statements="21" coveredstatements="21" conditionals="8" coveredconditionals="8" methods="4" coveredmethods="4"/>
         <line num="4" count="31" type="cond" truecount="2" falsecount="0"/>
         <line num="5" count="31" type="stmt"/>
@@ -1820,7 +1826,7 @@
     </package>
     <package name="src.persistance.node">
       <metrics statements="131" coveredstatements="58" conditionals="49" coveredconditionals="4" methods="18" coveredmethods="2"/>
-      <file name="methods.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/node/methods.ts">
+      <file name="methods.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/node/methods.ts">
         <metrics statements="18" coveredstatements="3" conditionals="8" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="3" count="6" type="stmt"/>
@@ -1841,13 +1847,13 @@
         <line num="25" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
       </file>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/node/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/node/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
         <line num="5" count="6" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/node/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/node/schema.ts">
         <metrics statements="26" coveredstatements="26" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
@@ -1876,7 +1882,7 @@
         <line num="55" count="6" type="stmt"/>
         <line num="58" count="6" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/node/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/node/statics.ts">
         <metrics statements="77" coveredstatements="19" conditionals="37" coveredconditionals="0" methods="14" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
@@ -1956,7 +1962,7 @@
         <line num="182" count="0" type="stmt"/>
         <line num="184" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/node/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/node/types.ts">
         <metrics statements="7" coveredstatements="7" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
         <line num="5" count="11" type="cond" truecount="2" falsecount="0"/>
         <line num="6" count="11" type="stmt"/>
@@ -1969,13 +1975,13 @@
     </package>
     <package name="src.persistance.notification">
       <metrics statements="59" coveredstatements="35" conditionals="17" coveredconditionals="2" methods="8" coveredmethods="1"/>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/notification/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/notification/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
         <line num="5" count="6" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/notification/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/notification/schema.ts">
         <metrics statements="16" coveredstatements="16" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
@@ -1994,7 +2000,7 @@
         <line num="35" count="6" type="stmt"/>
         <line num="40" count="6" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/notification/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/notification/statics.ts">
         <metrics statements="34" coveredstatements="10" conditionals="15" coveredconditionals="0" methods="7" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="2" count="6" type="stmt"/>
@@ -2031,7 +2037,7 @@
         <line num="74" count="0" type="stmt"/>
         <line num="76" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/notification/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/notification/types.ts">
         <metrics statements="6" coveredstatements="6" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="30" count="8" type="cond" truecount="2" falsecount="0"/>
         <line num="31" count="8" type="stmt"/>
@@ -2043,7 +2049,7 @@
     </package>
     <package name="src.persistance.organisation">
       <metrics statements="188" coveredstatements="79" conditionals="73" coveredconditionals="4" methods="28" coveredmethods="2"/>
-      <file name="methods.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/organisation/methods.ts">
+      <file name="methods.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/organisation/methods.ts">
         <metrics statements="26" coveredstatements="4" conditionals="12" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
@@ -2072,13 +2078,13 @@
         <line num="28" count="0" type="stmt"/>
         <line num="29" count="0" type="stmt"/>
       </file>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/organisation/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/organisation/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
         <line num="5" count="7" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/organisation/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/organisation/schema.ts">
         <metrics statements="35" coveredstatements="35" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
@@ -2116,7 +2122,7 @@
         <line num="91" count="7" type="stmt"/>
         <line num="94" count="7" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/organisation/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/organisation/statics.ts">
         <metrics statements="114" coveredstatements="27" conditionals="57" coveredconditionals="0" methods="24" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
@@ -2233,7 +2239,7 @@
         <line num="383" count="0" type="stmt"/>
         <line num="385" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/organisation/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/organisation/types.ts">
         <metrics statements="10" coveredstatements="10" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
         <line num="4" count="14" type="cond" truecount="2" falsecount="0"/>
         <line num="5" count="14" type="stmt"/>
@@ -2249,20 +2255,20 @@
     </package>
     <package name="src.persistance.registration">
       <metrics statements="74" coveredstatements="43" conditionals="25" coveredconditionals="4" methods="10" coveredmethods="2"/>
-      <file name="methods.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/registration/methods.ts">
+      <file name="methods.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/registration/methods.ts">
         <metrics statements="4" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
         <line num="3" count="4" type="stmt"/>
         <line num="4" count="0" type="stmt"/>
         <line num="5" count="0" type="stmt"/>
         <line num="6" count="0" type="stmt"/>
       </file>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/registration/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/registration/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
         <line num="5" count="4" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/registration/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/registration/schema.ts">
         <metrics statements="19" coveredstatements="19" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -2284,7 +2290,7 @@
         <line num="42" count="4" type="stmt"/>
         <line num="45" count="4" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/registration/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/registration/statics.ts">
         <metrics statements="38" coveredstatements="10" conditionals="21" coveredconditionals="0" methods="7" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -2325,7 +2331,7 @@
         <line num="85" count="0" type="stmt"/>
         <line num="88" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/registration/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/registration/types.ts">
         <metrics statements="10" coveredstatements="10" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
         <line num="4" count="6" type="cond" truecount="2" falsecount="0"/>
         <line num="5" count="6" type="stmt"/>
@@ -2341,13 +2347,13 @@
     </package>
     <package name="src.persistance.statistics">
       <metrics statements="26" coveredstatements="16" conditionals="6" coveredconditionals="0" methods="3" coveredmethods="0"/>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/statistics/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/statistics/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="5" count="4" type="stmt"/>
         <line num="6" count="4" type="stmt"/>
         <line num="9" count="4" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/statistics/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/statistics/schema.ts">
         <metrics statements="8" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -2358,7 +2364,7 @@
         <line num="21" count="4" type="stmt"/>
         <line num="26" count="4" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/statistics/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/statistics/statics.ts">
         <metrics statements="15" coveredstatements="5" conditionals="6" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -2379,7 +2385,7 @@
     </package>
     <package name="src.persistance.user">
       <metrics statements="123" coveredstatements="60" conditionals="46" coveredconditionals="4" methods="17" coveredmethods="2"/>
-      <file name="methods.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/user/methods.ts">
+      <file name="methods.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/user/methods.ts">
         <metrics statements="30" coveredstatements="6" conditionals="16" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
@@ -2412,13 +2418,13 @@
         <line num="34" count="0" type="stmt"/>
         <line num="35" count="0" type="stmt"/>
       </file>
-      <file name="model.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/user/model.ts">
+      <file name="model.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/user/model.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
         <line num="5" count="7" type="stmt"/>
       </file>
-      <file name="schema.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/user/schema.ts">
+      <file name="schema.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/user/schema.ts">
         <metrics statements="29" coveredstatements="29" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
@@ -2450,7 +2456,7 @@
         <line num="63" count="7" type="stmt"/>
         <line num="66" count="7" type="stmt"/>
       </file>
-      <file name="statics.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/user/statics.ts">
+      <file name="statics.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/user/statics.ts">
         <metrics statements="54" coveredstatements="15" conditionals="26" coveredconditionals="0" methods="12" coveredmethods="0"/>
         <line num="2" count="7" type="stmt"/>
         <line num="3" count="7" type="stmt"/>
@@ -2507,7 +2513,7 @@
         <line num="175" count="0" type="stmt"/>
         <line num="177" count="0" type="stmt"/>
       </file>
-      <file name="types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/persistance/user/types.ts">
+      <file name="types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/persistance/user/types.ts">
         <metrics statements="7" coveredstatements="7" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
         <line num="6" count="7" type="cond" truecount="2" falsecount="0"/>
         <line num="7" count="7" type="stmt"/>
@@ -2519,15 +2525,15 @@
       </file>
     </package>
     <package name="src.types">
-      <metrics statements="77" coveredstatements="77" conditionals="16" coveredconditionals="16" methods="8" coveredmethods="8"/>
-      <file name="locals-types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/types/locals-types.ts">
+      <metrics statements="79" coveredstatements="79" conditionals="16" coveredconditionals="16" methods="8" coveredmethods="8"/>
+      <file name="locals-types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/types/locals-types.ts">
         <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="7" count="6" type="cond" truecount="2" falsecount="0"/>
         <line num="8" count="6" type="stmt"/>
         <line num="9" count="6" type="stmt"/>
       </file>
-      <file name="misc-types.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/types/misc-types.ts">
-        <metrics statements="65" coveredstatements="65" conditionals="12" coveredconditionals="12" methods="6" coveredmethods="6"/>
+      <file name="misc-types.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/types/misc-types.ts">
+        <metrics statements="67" coveredstatements="67" conditionals="12" coveredconditionals="12" methods="6" coveredmethods="6"/>
         <line num="25" count="14" type="cond" truecount="2" falsecount="0"/>
         <line num="26" count="14" type="stmt"/>
         <line num="27" count="14" type="stmt"/>
@@ -2593,8 +2599,10 @@
         <line num="104" count="14" type="stmt"/>
         <line num="105" count="14" type="stmt"/>
         <line num="106" count="14" type="stmt"/>
+        <line num="107" count="14" type="stmt"/>
+        <line num="108" count="14" type="stmt"/>
       </file>
-      <file name="roles.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/types/roles.ts">
+      <file name="roles.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/types/roles.ts">
         <metrics statements="9" coveredstatements="9" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="11" count="17" type="cond" truecount="2" falsecount="0"/>
         <line num="12" count="17" type="stmt"/>
@@ -2609,26 +2617,26 @@
     </package>
     <package name="src.utils">
       <metrics statements="126" coveredstatements="111" conditionals="29" coveredconditionals="19" methods="16" coveredmethods="10"/>
-      <file name="error-handler.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/utils/error-handler.ts">
+      <file name="error-handler.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/utils/error-handler.ts">
         <metrics statements="26" coveredstatements="26" conditionals="15" coveredconditionals="15" methods="4" coveredmethods="4"/>
-        <line num="5" count="60" type="stmt"/>
-        <line num="6" count="60" type="stmt"/>
-        <line num="8" count="60" type="cond" truecount="2" falsecount="0"/>
-        <line num="9" count="60" type="stmt"/>
-        <line num="10" count="60" type="stmt"/>
-        <line num="11" count="60" type="stmt"/>
-        <line num="12" count="60" type="stmt"/>
-        <line num="13" count="60" type="stmt"/>
-        <line num="14" count="60" type="stmt"/>
-        <line num="15" count="60" type="stmt"/>
-        <line num="23" count="60" type="stmt"/>
+        <line num="5" count="61" type="stmt"/>
+        <line num="6" count="61" type="stmt"/>
+        <line num="8" count="61" type="cond" truecount="2" falsecount="0"/>
+        <line num="9" count="61" type="stmt"/>
+        <line num="10" count="61" type="stmt"/>
+        <line num="11" count="61" type="stmt"/>
+        <line num="12" count="61" type="stmt"/>
+        <line num="13" count="61" type="stmt"/>
+        <line num="14" count="61" type="stmt"/>
+        <line num="15" count="61" type="stmt"/>
+        <line num="23" count="61" type="stmt"/>
         <line num="28" count="26" type="cond" truecount="1" falsecount="0"/>
         <line num="29" count="24" type="stmt"/>
         <line num="30" count="24" type="stmt"/>
         <line num="31" count="24" type="cond" truecount="4" falsecount="0"/>
         <line num="32" count="24" type="cond" truecount="4" falsecount="0"/>
-        <line num="34" count="60" type="stmt"/>
-        <line num="36" count="60" type="stmt"/>
+        <line num="34" count="61" type="stmt"/>
+        <line num="36" count="61" type="stmt"/>
         <line num="37" count="27" type="cond" truecount="2" falsecount="0"/>
         <line num="38" count="16" type="stmt"/>
         <line num="39" count="11" type="cond" truecount="2" falsecount="0"/>
@@ -2638,72 +2646,72 @@
         <line num="48" count="2" type="stmt"/>
         <line num="49" count="2" type="stmt"/>
       </file>
-      <file name="http-status-codes.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/utils/http-status-codes.ts">
+      <file name="http-status-codes.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/utils/http-status-codes.ts">
         <metrics statements="62" coveredstatements="62" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
-        <line num="1" count="60" type="cond" truecount="2" falsecount="0"/>
-        <line num="9" count="60" type="stmt"/>
-        <line num="14" count="60" type="stmt"/>
-        <line num="21" count="60" type="stmt"/>
-        <line num="29" count="60" type="stmt"/>
-        <line num="34" count="60" type="stmt"/>
-        <line num="40" count="60" type="stmt"/>
-        <line num="47" count="60" type="stmt"/>
-        <line num="52" count="60" type="stmt"/>
-        <line num="58" count="60" type="stmt"/>
-        <line num="65" count="60" type="stmt"/>
-        <line num="71" count="60" type="stmt"/>
-        <line num="77" count="60" type="stmt"/>
-        <line num="83" count="60" type="stmt"/>
-        <line num="90" count="60" type="stmt"/>
-        <line num="95" count="60" type="stmt"/>
-        <line num="105" count="60" type="stmt"/>
-        <line num="113" count="60" type="stmt"/>
-        <line num="119" count="60" type="stmt"/>
-        <line num="126" count="60" type="stmt"/>
-        <line num="131" count="60" type="stmt"/>
-        <line num="139" count="60" type="stmt"/>
-        <line num="146" count="60" type="stmt"/>
-        <line num="152" count="60" type="stmt"/>
-        <line num="160" count="60" type="stmt"/>
-        <line num="167" count="60" type="stmt"/>
-        <line num="173" count="60" type="stmt"/>
-        <line num="179" count="60" type="stmt"/>
-        <line num="185" count="60" type="stmt"/>
-        <line num="190" count="60" type="stmt"/>
-        <line num="195" count="60" type="stmt"/>
-        <line num="202" count="60" type="stmt"/>
-        <line num="208" count="60" type="stmt"/>
-        <line num="217" count="60" type="stmt"/>
-        <line num="222" count="60" type="stmt"/>
-        <line num="227" count="60" type="stmt"/>
-        <line num="232" count="60" type="stmt"/>
-        <line num="239" count="60" type="stmt"/>
-        <line num="245" count="60" type="stmt"/>
-        <line num="252" count="60" type="stmt"/>
-        <line num="257" count="60" type="stmt"/>
-        <line num="264" count="60" type="stmt"/>
-        <line num="269" count="60" type="stmt"/>
-        <line num="274" count="60" type="stmt"/>
-        <line num="279" count="60" type="stmt"/>
-        <line num="284" count="60" type="stmt"/>
-        <line num="289" count="60" type="stmt"/>
-        <line num="297" count="60" type="stmt"/>
-        <line num="302" count="60" type="stmt"/>
-        <line num="308" count="60" type="stmt"/>
-        <line num="314" count="60" type="stmt"/>
-        <line num="319" count="60" type="stmt"/>
-        <line num="325" count="60" type="stmt"/>
-        <line num="330" count="60" type="stmt"/>
-        <line num="336" count="60" type="stmt"/>
-        <line num="341" count="60" type="stmt"/>
-        <line num="346" count="60" type="stmt"/>
-        <line num="351" count="60" type="stmt"/>
-        <line num="356" count="60" type="stmt"/>
-        <line num="361" count="60" type="stmt"/>
-        <line num="366" count="60" type="stmt"/>
-        <line num="373" count="60" type="stmt"/>
+        <line num="1" count="61" type="cond" truecount="2" falsecount="0"/>
+        <line num="9" count="61" type="stmt"/>
+        <line num="14" count="61" type="stmt"/>
+        <line num="21" count="61" type="stmt"/>
+        <line num="29" count="61" type="stmt"/>
+        <line num="34" count="61" type="stmt"/>
+        <line num="40" count="61" type="stmt"/>
+        <line num="47" count="61" type="stmt"/>
+        <line num="52" count="61" type="stmt"/>
+        <line num="58" count="61" type="stmt"/>
+        <line num="65" count="61" type="stmt"/>
+        <line num="71" count="61" type="stmt"/>
+        <line num="77" count="61" type="stmt"/>
+        <line num="83" count="61" type="stmt"/>
+        <line num="90" count="61" type="stmt"/>
+        <line num="95" count="61" type="stmt"/>
+        <line num="105" count="61" type="stmt"/>
+        <line num="113" count="61" type="stmt"/>
+        <line num="119" count="61" type="stmt"/>
+        <line num="126" count="61" type="stmt"/>
+        <line num="131" count="61" type="stmt"/>
+        <line num="139" count="61" type="stmt"/>
+        <line num="146" count="61" type="stmt"/>
+        <line num="152" count="61" type="stmt"/>
+        <line num="160" count="61" type="stmt"/>
+        <line num="167" count="61" type="stmt"/>
+        <line num="173" count="61" type="stmt"/>
+        <line num="179" count="61" type="stmt"/>
+        <line num="185" count="61" type="stmt"/>
+        <line num="190" count="61" type="stmt"/>
+        <line num="195" count="61" type="stmt"/>
+        <line num="202" count="61" type="stmt"/>
+        <line num="208" count="61" type="stmt"/>
+        <line num="217" count="61" type="stmt"/>
+        <line num="222" count="61" type="stmt"/>
+        <line num="227" count="61" type="stmt"/>
+        <line num="232" count="61" type="stmt"/>
+        <line num="239" count="61" type="stmt"/>
+        <line num="245" count="61" type="stmt"/>
+        <line num="252" count="61" type="stmt"/>
+        <line num="257" count="61" type="stmt"/>
+        <line num="264" count="61" type="stmt"/>
+        <line num="269" count="61" type="stmt"/>
+        <line num="274" count="61" type="stmt"/>
+        <line num="279" count="61" type="stmt"/>
+        <line num="284" count="61" type="stmt"/>
+        <line num="289" count="61" type="stmt"/>
+        <line num="297" count="61" type="stmt"/>
+        <line num="302" count="61" type="stmt"/>
+        <line num="308" count="61" type="stmt"/>
+        <line num="314" count="61" type="stmt"/>
+        <line num="319" count="61" type="stmt"/>
+        <line num="325" count="61" type="stmt"/>
+        <line num="330" count="61" type="stmt"/>
+        <line num="336" count="61" type="stmt"/>
+        <line num="341" count="61" type="stmt"/>
+        <line num="346" count="61" type="stmt"/>
+        <line num="351" count="61" type="stmt"/>
+        <line num="356" count="61" type="stmt"/>
+        <line num="361" count="61" type="stmt"/>
+        <line num="366" count="61" type="stmt"/>
+        <line num="373" count="61" type="stmt"/>
       </file>
-      <file name="index.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/utils/index.ts">
+      <file name="index.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/utils/index.ts">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="2"/>
         <line num="1" count="26" type="stmt"/>
         <line num="2" count="26" type="stmt"/>
@@ -2711,25 +2719,25 @@
         <line num="4" count="26" type="stmt"/>
         <line num="6" count="43" type="stmt"/>
       </file>
-      <file name="logger.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/utils/logger.ts">
+      <file name="logger.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/utils/logger.ts">
         <metrics statements="15" coveredstatements="15" conditionals="4" coveredconditionals="2" methods="3" coveredmethods="3"/>
-        <line num="1" count="10" type="stmt"/>
-        <line num="2" count="10" type="stmt"/>
-        <line num="3" count="10" type="stmt"/>
-        <line num="5" count="10" type="stmt"/>
-        <line num="7" count="60" type="stmt"/>
-        <line num="8" count="10" type="stmt"/>
-        <line num="9" count="10" type="stmt"/>
-        <line num="11" count="10" type="stmt"/>
-        <line num="14" count="10" type="stmt"/>
-        <line num="15" count="10" type="stmt"/>
-        <line num="17" count="10" type="stmt"/>
-        <line num="20" count="10" type="stmt"/>
-        <line num="51" count="10" type="stmt"/>
+        <line num="1" count="11" type="stmt"/>
+        <line num="2" count="11" type="stmt"/>
+        <line num="3" count="11" type="stmt"/>
+        <line num="5" count="11" type="stmt"/>
+        <line num="7" count="66" type="stmt"/>
+        <line num="8" count="11" type="stmt"/>
+        <line num="9" count="11" type="stmt"/>
+        <line num="11" count="11" type="stmt"/>
+        <line num="14" count="11" type="stmt"/>
+        <line num="15" count="11" type="stmt"/>
+        <line num="17" count="11" type="stmt"/>
+        <line num="20" count="11" type="stmt"/>
+        <line num="51" count="11" type="stmt"/>
         <line num="61" count="6" type="cond" truecount="1" falsecount="1"/>
         <line num="65" count="6" type="cond" truecount="1" falsecount="1"/>
       </file>
-      <file name="obj-utils.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/utils/obj-utils.ts">
+      <file name="obj-utils.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/utils/obj-utils.ts">
         <metrics statements="5" coveredstatements="1" conditionals="1" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="2" count="26" type="stmt"/>
         <line num="4" count="0" type="stmt"/>
@@ -2737,7 +2745,7 @@
         <line num="6" count="0" type="stmt"/>
         <line num="9" count="0" type="stmt"/>
       </file>
-      <file name="response-builder.ts" path="/Users/peter/Documents/bavenir/AURORAL/auroral_nm/src/utils/response-builder.ts">
+      <file name="response-builder.ts" path="/Users/jorgemac/Documents/projects/bAvenir/auroral/auroral_nm/src/utils/response-builder.ts">
         <metrics statements="13" coveredstatements="2" conditionals="7" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="2" count="26" type="stmt"/>
         <line num="6" count="0" type="cond" truecount="0" falsecount="1"/>

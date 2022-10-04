@@ -5,6 +5,8 @@ import { AccountModel } from '../../src/persistance/account/model'
 import { IAccountDocument } from '../../src/persistance/account/types'
 import { errorHandler } from '../../src/utils/error-handler'
 
+jest.mock('../../src/core/sessions')
+
 describe('Authentication server', () => {
     it('Hash password and verify hash', async () => {
         const spy = jest.spyOn(auth, 'hashPassword')

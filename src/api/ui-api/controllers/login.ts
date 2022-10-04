@@ -237,7 +237,7 @@ export const logout: logoutController = async (_req, res) => {
         const { decoded } = res.locals 
         try {
                 logger.debug('Logging out: ' + decoded.uid)
-                tokenBlacklist.addToBlacklist(decoded.uid, res.locals.token)
+                await tokenBlacklist.addToBlacklist(decoded.uid, res.locals.token)
                 const myUser = await UserModel._getUser(decoded.uid)
                 // Logout audit
                 await AuditModel._createAudit({
