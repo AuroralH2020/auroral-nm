@@ -97,7 +97,9 @@ export interface IRegistrationModel extends Model<IRegistrationDocument> {
         this: IRegistrationModel
     ) => Promise<IRegistration[]>
     _getAllCompanyTypeRegistration: (
-        this: IRegistrationModel
+        this: IRegistrationModel,
+        offset: number,
+        limit: number
     ) => Promise<IRegistration[]>
     _getDoc: (
         this: IRegistrationModel,

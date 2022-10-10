@@ -39,9 +39,11 @@ export async function getAllRegistration(
 }
 
 export async function getAllCompanyTypeRegistration(
-  this: IRegistrationModel
+  this: IRegistrationModel, offset: number, limit: number
 ): Promise<IRegistration[]> {
-  const record = await this.find({ type: RegistrationType.COMPANY }).lean().exec()
+  const record = await this.find({ type: RegistrationType.COMPANY }).sort({ 'created': -1 }).skip(offset)
+  .limit(limit)
+  .exec()
   if (record) {
     return record
   } else {

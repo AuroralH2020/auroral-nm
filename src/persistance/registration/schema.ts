@@ -10,7 +10,6 @@ const statusEnum = Object.values(RegistrationStatus)
 const typesEnum = Object.values(RegistrationType)
 const roles = Object.values(RolesEnum)
 
-
 const RegistrationSchema = new Schema<IRegistrationDocument, IRegistrationModel>({
     registrationId: { type: String, unique: true, required: true, index: true },
     invitationId: String,

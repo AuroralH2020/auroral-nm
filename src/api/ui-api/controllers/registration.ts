@@ -45,11 +45,12 @@ export const getAllRegistrations: getRegistrationsController = async (_req, res)
 	}
 }
 
-type getCompanyRegistrationsController = expressTypes.Controller<{}, {}, {}, IRegistration[], localsTypes.ILocals>
+type getCompanyRegistrationsController = expressTypes.Controller<{}, {}, { offset: number }, IRegistration[], localsTypes.ILocals>
  
-export const getAllCompanyRegistrations: getCompanyRegistrationsController = async (_req, res) => {
+export const getAllCompanyRegistrations: getCompanyRegistrationsController = async (req, res) => {
 	try {
-    const data = await RegistrationModel._getAllCompanyTypeRegistration()
+    const offset = req.query.offset ? Number(req.query.offset) : 0
+    const data = await RegistrationModel._getAllCompanyTypeRegistration(offset, 24)
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
