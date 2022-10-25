@@ -244,7 +244,7 @@ export async function getAllCompanyItems(
   // get from mongo
   const record = await this.aggregate([
     { $match: { cid: cid, status: ItemStatus.ENABLED } },
-    { $project: { oid: 1, cid: 1, _id: 0, name: 1 } },
+    { $project: { oid: 1, cid: 1, _id: 0, name: 1, agid: 1 } },
   ]).exec()
   if (record) {
     return record
