@@ -29,6 +29,7 @@ import { AuditModel } from '../persistance/audit/model'
 import { IAuditLocals } from '../types/locals-types'
 import { OrganisationStatus } from '../persistance/organisation/types'
 import { xmpp } from '../microservices/xmppClient'
+import { dlt } from '../microservices/dltConnector'
 
 // Functions
 
@@ -98,6 +99,8 @@ export const createOne = async (cid: string, uid: string, termsAndConditions: st
         const contractData: IContractCreate = { termsAndConditions, organisations: [cid], pendingOrganisations: organisations, description }
         // Create contract
         const contract = await ContractModel._createContract(contractData)
+        // Create contract in DLT
+        await dlt.createContract(myOrg.cid, contract)
         // Add contract to first organisation
         await OrganisationModel._addContract(cid, contract.ctid)
 
@@ -173,6 +176,9 @@ export const removeOrgFromContract = async (ctid: string, cid: string, uid: stri
     // Remove org from contract
     await ContractModel._removeOrganisationFromContract(ctid, cid)
     await OrganisationModel._removeContract(cid, ctid)
+    // DLT update
+    await dlt.dissolveContract(cid, ctid)
+
     const myUser = await UserModel._getUser(uid)
     const myOrg = await OrganisationModel._getOrganisation(cid)
     // Audits
@@ -224,6 +230,8 @@ export const rejectContractRequest = async (ctid: string, cid: string, uid: stri
     }
     // Remove org from contract
     await ContractModel._removePendingOrganisationFromContract(ctid, cid)
+    // DLT update
+    await dlt.rejectContract(cid, ctid)
     // Update contract status
     const contractDoc = await ContractModel._getDoc(ctid)
     await contractDoc._updateStatus()
@@ -278,6 +286,8 @@ export const acceptContractRequest = async (ctid: string, cid: string, uid: stri
     }
     // Add org to contract
     await ContractModel._orgAcceptsContract(ctid, cid)
+     // DLT update
+     await dlt.acceptContract(cid, ctid)
     // Update conract status
     const contract = await ContractModel._getDoc(ctid)
     await contract._updateStatus()
@@ -343,6 +353,8 @@ export const addItem = async (ctid: string, oid: string, rw: boolean, enabled: b
         // Add item to contract
         const contractItem : ContractItemType = { enabled, rw, type: item.type, oid, cid: item.cid, uid: item.uid, userMail: user.email }
         await ContractModel._addItem(ctid, contractItem)
+        // DLT update
+        await dlt.addContractItem(user.cid, ctid, contractItem)
         // Add contract to item
         await ItemModel._addContract(oid, ctid)
         if (enabled) {
@@ -385,6 +397,8 @@ export const editItem = async (ctid: string, oid: string, data: IContractItemUpd
         }
         // Edit item 
         await ContractModel._editItem(ctid, oid, data)
+        // DLT update
+        await dlt.updateContractItem(item.cid, ctid, { ...data, oid })
         // Item after updates
         const itemNew = await ContractModel._getItem(ctid, oid)
         // Send XMPP notification
@@ -425,6 +439,8 @@ export const removeItems = async (ctid: string, oids: string[], cid: string): Pr
         await Promise.all(oids.map(async (oid): Promise<void> => {
             try {
                 await ItemModel._removeContract(oid, ctid)
+                // DLT update
+                await dlt.deleteContractItem(cid, ctid, oid)
             } catch  {
                 logger.error('One item was not removed: ' + oid)
             }

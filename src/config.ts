@@ -26,6 +26,10 @@ export const Config = {
 		URL: process.env.CS_URL!, 
 		SECRET_KEY: process.env.CS_SECRET_KEY!
 	},
+	DLT: {
+		URL: process.env.DLT_URL!,
+		ENABLED: process.env.DLT_ENABLED === 'true' ? true : false
+	},
 	XMPP_CLIENT: {
 		URL: process.env.XMPP_CLIENT_URL!,
 		PASSWORD: process.env.XMPP_PASSWORD || 'changeme',
