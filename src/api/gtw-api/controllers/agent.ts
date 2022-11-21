@@ -28,7 +28,7 @@ export const deleteAgent: deleteAgentController = async (req, res) => {
 	try {
     if (decoded) {
       // Validate that authorised to remove node
-      const myAgid = decoded.iss
+      const myAgid = decoded.mail
       if (agid !== myAgid) {
         throw new Error('You are not authorized to remove this agent ' + agid)
       }
@@ -54,7 +54,7 @@ export const getAgentItems: getAgentItemsController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     if (decoded) {
-      const myAgid = decoded.iss
+      const myAgid = decoded.id
       if (agid !== myAgid) {
         throw new Error('You are not authorized to access this agent ' + agid)
       }
@@ -78,11 +78,11 @@ export const getPartner: getPartnerController = async (req, res) => {
   const { decoded } = res.locals
   try {
     if (decoded) {
-      const myCid = (await NodeModel._getNode(decoded.iss)).cid
+      const myCid = (await NodeModel._getNode(decoded.id)).cid
       const knows = (await OrganisationModel._getOrganisation(myCid)).knows
       if (!([...knows, myCid]).includes(cid)) {
-        logger.warn('GTW ' + decoded.iss + ' not allowed to get partner data for ' + cid)
-        logger.debug('GTW ' + decoded.iss + ' knows: ' + [...knows, myCid].toString())
+        logger.warn('GTW ' + decoded.id + ' not allowed to get partner data for ' + cid)
+        logger.debug('GTW ' + decoded.id + ' knows: ' + [...knows, myCid].toString())
         return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'You are not allowed to access this partner')
       }
       const org = await OrganisationModel._getOrganisation(cid)
@@ -105,7 +105,7 @@ export const getPartners: getPartnersController = async (_req, res) => {
   try {
     if (decoded) {
       // get data from Mongo
-      const cid = (await NodeModel._getNode(decoded.iss)).cid
+      const cid = (await NodeModel._getNode(decoded.id)).cid
       const knows = (await OrganisationModel._getOrganisation(cid)).knows
       return responseBuilder(HttpStatusCode.OK, res, null, knows)
     } else {
@@ -163,7 +163,7 @@ export const getRelationship: getAgentRelationship = async (req, res) => {
         // test id reqid is oid
         reqNodeCid = (await ItemModel._getItem(reqid)).cid
       }
-      const myNodeCid = (await NodeModel._getNode(decoded.iss)).cid
+      const myNodeCid = (await NodeModel._getNode(decoded.id)).cid
       const myOrg = await OrganisationModel._getOrganisation(myNodeCid)
       let relation = RelationshipType.OTHER
       // Search if my company node 
@@ -192,7 +192,7 @@ export const getPrivacy: getAgentPrivacy = async (_req, res) => {
   const { decoded } = res.locals
 	try {
     if (decoded) {
-      const myNode = (await NodeModel._getNode(decoded.iss))
+      const myNode = (await NodeModel._getNode(decoded.id))
       const answer = await ItemModel._getItemsPrivacy(myNode.hasItems)
       return responseBuilder(HttpStatusCode.OK, res, null, answer)
     } else {
@@ -213,8 +213,8 @@ export const getContractedItemsByCid: getContractedItemsByCidCtrl = async (req, 
   const { cid } = req.params
   try {
     if (decoded) {
-      const myAgid = decoded.iss
-      const node = await NodeModel._getNode(decoded.iss)
+      const myAgid = decoded.id
+      const node = await NodeModel._getNode(decoded.id)
       const commonContract = await ContractModel._getCommonPrivateContracts(cid, node.cid)
       if (commonContract.length === 0) {
         // any contract between these companies

@@ -68,7 +68,7 @@ export const removeUser: removeUserController = async (req, res) => {
         const  decoded  = res.locals.decoded
         
         try {
-                if (uid === decoded.uid) {
+                if (uid === decoded.id) {
                         throw new MyError('Users cannot delete their accounts', HttpStatusCode.FORBIDDEN)
                 }
 
@@ -87,7 +87,7 @@ export const removeUser: removeUserController = async (req, res) => {
                         throw new MyError('User is setted up as default owner in some node', HttpStatusCode.FORBIDDEN)
                 }
    
-                const adminUser = await UserModel._getUser(decoded.uid)
+                const adminUser = await UserModel._getUser(decoded.id)
                 const company = await OrganisationModel._getOrganisation(adminUser.cid)
 
                 // Audit
@@ -128,7 +128,7 @@ type updateUserController = expressTypes.Controller<{ uid: string }, IUserUpdate
 export const updateUser: updateUserController = async (req, res) => {
         const { uid } = req.params
         const payload = req.body
-        const my_uid = res.locals.decoded.uid
+        const my_uid = res.locals.decoded.id
         try {
                 // INFO: ADMIN is allowed to update everything, user is allowed to update only himself (except roles)
                 const userDoc = await UserModel._getDoc(uid)
@@ -176,7 +176,7 @@ export const updateUserPassword: updateUserPwdController = async (req, res) => {
         const { uid } = req.params
         const { newPwd, oldPwd } = req.body
         try {
-                if (uid !== res.locals.decoded.uid) {
+                if (uid !== res.locals.decoded.id) {
                         throw new MyError('You can only update your own password', HttpStatusCode.FORBIDDEN)
                 }
                 if (!newPwd || !oldPwd) {

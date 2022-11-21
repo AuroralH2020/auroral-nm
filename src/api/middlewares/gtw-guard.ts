@@ -4,6 +4,7 @@ Using JWT and asynchronous key encryption
 Used as gateway authentication method
 */
 import * as jwt from 'jsonwebtoken'
+import { JWTDecodedToken } from '../../types/jwt-types'
 import { NodeModel } from '../../persistance/node/model'
 import { Controller } from '../../types/express-types'
 import { ILocalsGtw } from '../../types/locals-types'
@@ -39,7 +40,7 @@ function getInfo(x: string) {
   let info: Buffer | string = x.substring(i, j)
   info = Buffer.from(info, 'base64')
   info = info.toString()
-  return JSON.parse(info) as gtwToken
+  return JSON.parse(info) as JWTDecodedToken
 }
 
 // Public function
@@ -54,7 +55,7 @@ export const guard = () => {
         const info = getInfo(token)
         NodeModel._getKey(info.iss).then(
           (publicKey) => {
-              return validate(token, publicKey) as Promise<gtwToken>
+              return validate(token, publicKey) as Promise<JWTDecodedToken>
             }
           ).then(
             (decoded) => {

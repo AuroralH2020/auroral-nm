@@ -71,11 +71,11 @@ export const createNode: postNodeController = async (req, res) => {
     } catch (error) {
       logger.warn('Node ' + agid + ' can not be added to community')
     }
-    const myUser = await UserModel._getUser(decoded.uid)
+    const myUser = await UserModel._getUser(decoded.id)
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
-      actor: { id: decoded.uid, name: myUser.name },
+      actor: { id: decoded.id, name: myUser.name },
       target: { id: agid, name: name }, 
       type: EventType.nodeCreated,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
@@ -104,7 +104,7 @@ export const updateNode: putNodeController = async (req, res) => {
     
     // Notification
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
-    const myUserName = (await UserModel._getUser(decoded.uid)).name
+    const myUserName = (await UserModel._getUser(decoded.id)).name
     let eventType = EventType.nodeUpdated
     if ('key' in data) {
       eventType = EventType.nodeUpdatedKey
@@ -119,7 +119,7 @@ export const updateNode: putNodeController = async (req, res) => {
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
-      actor: { id: decoded.uid, name: myUserName },
+      actor: { id: decoded.id, name: myUserName },
       target: { id: agid, name: node.name },
       type: eventType,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
@@ -140,7 +140,7 @@ export const removeNode: removeNodeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     // Validate that agid belongs to organisation by passing optional CID param to _getNode
-    const myUser = await UserModel._getUser(decoded.uid)
+    const myUser = await UserModel._getUser(decoded.id)
     const myNode = await NodeModel._getNode(agid)
     if (myUser.cid !== myNode.cid) {
       throw new MyError('You are not allowed to remove this node', HttpStatusCode.FORBIDDEN)
@@ -150,7 +150,7 @@ export const removeNode: removeNodeController = async (req, res) => {
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
-      actor: { id: decoded.uid, name: myUser.name },
+      actor: { id: decoded.id, name: myUser.name },
       target: { id: agid, name: myNode.name }, 
       type: EventType.nodeRemoved,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
@@ -184,7 +184,7 @@ export const removeKey: removeKeyController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     await NodeModel._removeKey(agid)
-    const myUser = await UserModel._getUser(decoded.uid)
+    const myUser = await UserModel._getUser(decoded.id)
     const myNode = await NodeModel._getNode(agid)
 
     if (myUser.cid !== myNode.cid) {
@@ -193,7 +193,7 @@ export const removeKey: removeKeyController = async (req, res) => {
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
-      actor: { id: decoded.uid, name: myUser.name },
+      actor: { id: decoded.id, name: myUser.name },
       target: { id: agid, name: myNode.name },
       type: EventType.nodeUpdatedKey,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
@@ -255,10 +255,10 @@ export const updateDefaultOwner: updateDefaultItemOwnerController = async (req, 
     }
     
     // Audit
-    const myUser = await UserModel._getUser(decoded.uid)
+    const myUser = await UserModel._getUser(decoded.id)
     await AuditModel._createAudit({
       ...res.locals.audit,
-      actor: { id: decoded.uid, name: myUser.name },
+      actor: { id: decoded.id, name: myUser.name },
       target: { id: agid, name: myNode.name },
       type: EventType.nodeUpdated,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }

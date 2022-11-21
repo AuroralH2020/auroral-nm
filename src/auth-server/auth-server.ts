@@ -96,7 +96,8 @@ export const signMailToken = async (username: string, purpose: string, idInLink?
         algorithm  
     )
 }
-
+// TBD
+// username -> id (GTW/UI)
 export const signAppToken = async (username: string, ip: string, started_at?: number): Promise<{ token: string, refreshToken: string}> => {
     const user = await AccountModel._getAccount(username)
     const { secret, algorithm } = getSecretAndAlg()

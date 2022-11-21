@@ -138,11 +138,11 @@ export const updateOne: UpdateOneController = async (req, res) => {
   const data = req.body
   const { decoded } = res.locals
 	try {
-    await ItemService.updateOne(oid, data, decoded.uid)
+    await ItemService.updateOne(oid, data, decoded.id)
     // Send notification to company
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
     const myItemName = (await ItemModel._getItem(oid)).name
-    const myUserName = (await UserModel._getUser(decoded.uid)).name
+    const myUserName = (await UserModel._getUser(decoded.id)).name
     let eventType = EventType.itemUpdatedByUser
     if (data.status) { 
       if (data.status === ItemStatus.DISABLED) {
@@ -163,7 +163,7 @@ export const updateOne: UpdateOneController = async (req, res) => {
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
-      actor: { id: decoded.uid, name: myUserName },
+      actor: { id: decoded.id, name: myUserName },
       target: { id: oid, name: myItemName },
       type: eventType,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
@@ -184,8 +184,8 @@ export const removeOne: RemoveOneController = async (req, res) => {
 	try {
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
     const myItemName = (await ItemModel._getItem(oid)).name
-    const myUserName = (await UserModel._getUser(decoded.uid)).name
-    await ItemService.removeOne(oid, decoded.uid)
+    const myUserName = (await UserModel._getUser(decoded.id)).name
+    await ItemService.removeOne(oid, decoded.id)
     // Notification
     await NotificationModel._createNotification({
       owner: decoded.org,
@@ -197,7 +197,7 @@ export const removeOne: RemoveOneController = async (req, res) => {
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
-      actor: { id: decoded.uid, name: myUserName },
+      actor: { id: decoded.id, name: myUserName },
       target: { id: oid, name: myItemName },
       type: EventType.itemRemoved,
       labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }

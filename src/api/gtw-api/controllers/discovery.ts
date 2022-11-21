@@ -21,7 +21,7 @@ export const getCommunities: getCommunitiesController = async (_req, res) => {
 	const { decoded } = res.locals
 	try {
 		if (decoded) {
-			const communities = await CommunityModel._getCommunitiesByAgid(decoded.iss)
+			const communities = await CommunityModel._getCommunitiesByAgid(decoded.id)
 			return responseBuilder(HttpStatusCode.OK, res, null, communities)
 		} else {
 			logger.error('Gateway unauthorized access attempt')
@@ -44,7 +44,7 @@ export const getNodesInOrganisation: getNodesInOrgController = async (req, res) 
 			logger.error('Gateway unauthorized access attempt')
 			return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Gateway unauthorized access attempt')
 		}
-		const myCid = (await NodeModel._getNode(decoded.iss)).cid
+		const myCid = (await NodeModel._getNode(decoded.id)).cid
 		const myOrg = await OrganisationModel._getOrganisation(myCid)
 		if (!cid || cid === myCid) {
 			// Requesting my own nodes
@@ -65,7 +65,7 @@ export const getNodesInOrganisation: getNodesInOrgController = async (req, res) 
 							nodes.push({ cid: org.cid, company: org.name, agid: node })
 						}
 						// test if my node is part of that 
-						if (node === decoded.iss) {
+						if (node === decoded.id) {
 							nodeInCommunity = true
 						}
 					})
@@ -99,7 +99,7 @@ export const getNodesInCommunity: getNodesInCommunityController = async (req, re
 			let nodeInCommunity = false
 			community.organisations.forEach((org) => {
 				org.nodes.forEach((node) => {
-					if (node === decoded.iss) {
+					if (node === decoded.id) {
 						nodeInCommunity = true
 					}
 					nodes.push({ company: org.name, cid: org.cid, agid: node })
@@ -126,7 +126,7 @@ export const getItemsInOrganisation: getItemsInOrganisationController = async (_
 	const { decoded } = res.locals
 	try {
 		if (decoded) {
-			const myCid = (await NodeModel._getNode(decoded.iss)).cid
+			const myCid = (await NodeModel._getNode(decoded.id)).cid
 			const organisation = await OrganisationModel._getOrganisation(myCid)
 			const items =  (await ItemModel._getAllCompanyItems(myCid)).map((item) => {
 				return { ...item, company: organisation.name }
@@ -156,7 +156,7 @@ export const getItemsInContract: getItemsInContractController = async (req, res)
 			if (!ctid) {
 				return responseBuilder(HttpStatusCode.BAD_REQUEST, res, 'ctid not provided')
 			}
-			const myCid = (await NodeModel._getNode(decoded.iss)).cid
+			const myCid = (await NodeModel._getNode(decoded.id)).cid
 			const contract = await ContractModel._getContract(ctid)
 			
 			if (!contract.organisations.includes(myCid)) {

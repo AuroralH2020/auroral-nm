@@ -54,7 +54,7 @@ export const jwt = (roles?: RolesEnum[]) => {
                 res.locals.decoded = decoded
                 res.locals.token = token
                 // Verify session
-                getSession(decoded.uid).then(
+                getSession(decoded.id).then(
                     async (session) => {
                         if (Config.SESSIONS.ENABLED === false) {
                             return next()
@@ -67,13 +67,13 @@ export const jwt = (roles?: RolesEnum[]) => {
                             //     return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Strange activity detected, IP changed during session life, possible use of VPN or tampering attempt')
                             // }
                             // Blacklisted token check
-                            if (await tokenBlacklist.checkInBlacklist(decoded.uid, token)) {
+                            if (await tokenBlacklist.checkInBlacklist(decoded.id, token)) {
                                 return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Token is blacklisted')
                             }
                             return next()
                         } else {
                             logger.error('Session expired')
-                            return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, decoded.uid + ': Session expired')
+                            return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, decoded.id + ': Session expired')
                         }
                     }
                 ).catch(() => {

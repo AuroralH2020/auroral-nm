@@ -43,7 +43,7 @@ export const createExternalUser: createExternalUserController = async (req, res)
             }
             // tweak to allow including all user items
             if (ACL.oid.includes('all')) {
-                const myUserDoc = await UserModel._getDoc(decoded.uid)
+                const myUserDoc = await UserModel._getDoc(decoded.id)
                 ACL.oid = myUserDoc.hasItems
             }
             for (const oid of ACL.oid) {
@@ -54,7 +54,7 @@ export const createExternalUser: createExternalUserController = async (req, res)
                 if (item.cid !== decoded.org) {
                     throw new MyError('Item does not belong to your org', HttpStatusCode.FORBIDDEN)
                 }
-                if (item.uid !== decoded.uid) {
+                if (item.uid !== decoded.id) {
                     throw new MyError('Item does not belong to your user', HttpStatusCode.FORBIDDEN)
                 }
             }

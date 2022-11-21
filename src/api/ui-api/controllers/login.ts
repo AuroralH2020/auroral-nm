@@ -17,6 +17,20 @@ import { EventType, ResultStatusType } from '../../../types/misc-types'
 
 // Controllers
 
+type tokenValidationCtrl = expressTypes.Controller<{}, {}, {}, null, localsTypes.ILocals>
+
+export const tokenValidation: tokenValidationCtrl = async (req, res) => {
+        try {
+        console.log('tokenValidation')
+        // TBD
+        return responseBuilder(HttpStatusCode.OK, res, 'Token is valid')
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return responseBuilder(error.status, res, error.message)
+	}
+}        
+
 type authController = expressTypes.Controller<{}, { username: string, password: string }, {}, any, localsTypes.ILocals>
  
 export const authenticate: authController = async (req, res) => {
@@ -84,10 +98,10 @@ export const processRecoverPwd: processRecoverPwdController = async (req, res) =
 	}
         try {
                 const decoded = await verifyToken(token)
-                const username = decoded.iss
+                const username = decoded.mail
                 // Validate if secret in token has not expired
                 await checkTempSecret(username, decoded.sub)
-                if (decoded.aud !== 'pwdrecovery') {
+                if (!decoded.aud.includes('pwdrecovery')) {
                         throw new Error('Invalid token type')
                 } else {
                         const hash = await hashPassword(password)
@@ -114,8 +128,8 @@ export const refreshToken: refreshTokenController = async (req, res) => {
 	}
         try {
                 const original = await verifyToken(myRefreshToken)
-                if (original.aud === 'refresh' && original.uid === decoded.uid) {
-                        const tokens = await signAppToken(decoded.iss, res.locals.origin.originIp, decoded.iat)
+                if (original.aud.includes('refresh') && original.id === decoded.id) {
+                        const tokens = await signAppToken(decoded.id, res.locals.origin.originIp, decoded.iat)
                         return responseBuilder(HttpStatusCode.OK, res, null, tokens)
                 } else {
                         logger.warn('Refresh token not valid')
@@ -159,10 +173,10 @@ export const processPasswordless: processPasswordlessController = async (req, re
                 // get token object from JWT
                 const tokenObject = await verifyToken(token)
                 // Check if secret is valid (throws error if not )
-                await checkTempSecret(tokenObject.iss, tokenObject.sub)
+                await checkTempSecret(tokenObject.id, tokenObject.sub)
                 logger.debug('Passwordless login validated')
                 // generate app token
-                const tokens = await signAppToken(tokenObject.iss, res.locals.origin.originIp)
+                const tokens = await signAppToken(tokenObject.id, res.locals.origin.originIp)
                 return responseBuilder(HttpStatusCode.OK, res, null, tokens)
         } catch (err) {
                 const error = errorHandler(err)
@@ -178,7 +192,7 @@ export const rememberCookie: rememberCookieController = async (_req, res) => {
         try {
                 const secret = generateSecret()
                 const secretHash = await hashPassword(secret)
-                const sessionId = (await SessionModel._createSession({ uid: decoded.uid, secretHash, originIp: res.locals.origin.originIp })).sessionId
+                const sessionId = (await SessionModel._createSession({ uid: decoded.id, secretHash, originIp: res.locals.origin.originIp })).sessionId
                return responseBuilder(HttpStatusCode.OK, res, null, sessionId + ':' + secret)
         } catch (err) {
                 const error = errorHandler(err)
@@ -222,7 +236,7 @@ export const rememberDeleteToken: rememberDeleteTokenController = async (req, re
                 // split to get sessionId and secret
                 // remove session by ID
                 SessionModel._deleteSession(sessionId)
-                tokenBlacklist.addToBlacklist(decoded.uid, res.locals.token)
+                tokenBlacklist.addToBlacklist(decoded.id, res.locals.token)
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
@@ -236,15 +250,15 @@ type logoutController =  expressTypes.Controller<{}, {}, {}, string, localsTypes
 export const logout: logoutController = async (_req, res) => {
         const { decoded } = res.locals 
         try {
-                logger.debug('Logging out: ' + decoded.uid)
-                await tokenBlacklist.addToBlacklist(decoded.uid, res.locals.token)
-                const myUser = await UserModel._getUser(decoded.uid)
+                logger.debug('Logging out: ' + decoded.id)
+                await tokenBlacklist.addToBlacklist(decoded.id, res.locals.token)
+                const myUser = await UserModel._getUser(decoded.id)
                 // Logout audit
                 await AuditModel._createAudit({
                         ...res.locals.audit,
                         cid: myUser.cid,
-                        actor: { id: decoded.uid, name: myUser.name },
-                        target: { id: decoded.uid, name: myUser.name }, 
+                        actor: { id: decoded.id, name: myUser.name },
+                        target: { id: decoded.id, name: myUser.name }, 
                         type: EventType.userLoggedOut,
                         labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
                       })

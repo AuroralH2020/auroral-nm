@@ -69,7 +69,7 @@ export const acceptContract: acceptContractController = async (req, res) => {
     const { ctid } = req.params
     const { decoded } = res.locals
     try {
-        await ContractService.acceptContractRequest(ctid, decoded.org, decoded.uid,res.locals.audit)
+        await ContractService.acceptContractRequest(ctid, decoded.org, decoded.id,res.locals.audit)
         return responseBuilder(HttpStatusCode.OK, res, null)
     } catch (err) {
         const error = errorHandler(err)
@@ -84,7 +84,7 @@ export const rejectContract: rejectContractController = async (req, res) => {
     const { ctid } = req.params
     const { decoded } = res.locals
     try {
-        await ContractService.rejectContractRequest(ctid, decoded.org, decoded.uid, res.locals.audit)
+        await ContractService.rejectContractRequest(ctid, decoded.org, decoded.id, res.locals.audit)
         return responseBuilder(HttpStatusCode.OK, res, null)
     } catch (err) {
         const error = errorHandler(err)
@@ -178,7 +178,7 @@ export const createContract: postContractController = async (req, res) => {
     const { organisations, termsAndConditions, description } = req.body
     const { decoded } = res.locals
     try {
-        await ContractService.createOne(decoded.org, decoded.uid, termsAndConditions, organisations, res.locals.audit, description)
+        await ContractService.createOne(decoded.org, decoded.id, termsAndConditions, organisations, res.locals.audit, description)
         return responseBuilder(HttpStatusCode.OK, res, null, null)
     } catch (err) {
         const error = errorHandler(err)
@@ -194,7 +194,7 @@ export const removeOrgFromContract: removeOrgFromContractCtrl = async (req, res)
     const { decoded } = res.locals
     try {
         // call service. There is everything handled
-        await ContractService.removeOrgFromContract(ctid,decoded.org,decoded.uid, res.locals.audit)
+        await ContractService.removeOrgFromContract(ctid,decoded.org,decoded.id, res.locals.audit)
         return responseBuilder(HttpStatusCode.OK, res, null, null)
     } catch (err) {
         const error = errorHandler(err)
@@ -219,7 +219,7 @@ export const addItem: addItemController = async (req, res) => {
         if (!contract.organisations.includes(item.cid)) {
             throw new MyError('Item can not be part of this contract', HttpStatusCode.BAD_REQUEST)
         }
-        if (item.uid === decoded.uid) {
+        if (item.uid === decoded.id) {
             // owner is inserting item
             const toEnable = enabled === undefined ? true : enabled
             await ContractService.addItem(ctid, oid, rw, toEnable)

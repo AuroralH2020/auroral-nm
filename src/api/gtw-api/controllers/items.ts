@@ -55,7 +55,7 @@ export const registration: registrationController = async (req, res) => {
     if (!decoded) {
         logger.warn('Gateway anonymous access, it will be forbidden in production...')
     }
-    const agid = decoded ? decoded.iss : req.body.agid
+    const agid = decoded ? decoded.id : req.body.agid
     const node = await NodeModel._getNode(agid)
 
     const itemsToActivate: { oid:string, data:  IItemUpdate, uid: string }[] = []
@@ -148,7 +148,7 @@ export const deleteItems: deleteItemsController = async (req, res) => {
       if (!decoded) {
         logger.warn({ msg: 'Gateway anonymous access, it will be forbidden in production...', id: res.locals.reqId })
       }
-      const agid = decoded ? decoded.iss : req.body.agid
+      const agid = decoded ? decoded.id : req.body.agid
 
       const items : registrationRemoveResponse[] =  await Promise.all(oids.map(async (it) => {      
         try {
@@ -205,7 +205,7 @@ export const updateItem: updateItemController = async (req, res) => {
       if (!decoded) {
         logger.warn('Gateway anonymous access, it will be forbidden in production...')
       }
-      const reqAgid = decoded ? decoded.iss : agid
+      const reqAgid = decoded ? decoded.id : agid
       const node = await NodeModel._getNode(reqAgid)
       // Async updating of items
       await Promise.all(items.map(async (it): Promise<boolean> => {

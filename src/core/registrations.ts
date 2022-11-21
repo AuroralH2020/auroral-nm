@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { MyError } from '../utils/error-handler'
 import { HttpStatusCode } from '../utils/http-status-codes'
 import { logger } from '../utils/logger'
-import { Config } from '../config'
 // Import types
 import { RolesEnum } from '../types/roles'
 import { localsTypes } from '../types/index'
@@ -96,7 +95,7 @@ export const registerInvitedUserOrOrganisation = async (data: IRegistrationPost,
 
 export const registerAfterVerification = async (status: RegistrationStatus, token: string, locals: localsTypes.ILocals): Promise<void> => {
     const decoded = await verifyToken(token)
-    const registrationId = decoded.iss
+    const registrationId = decoded.mail
     // Retrieve the registration object
     const registrationObject = await RegistrationModel._getDoc(registrationId)
     // Validate if secret in token has not expired (email === username)
@@ -105,7 +104,7 @@ export const registerAfterVerification = async (status: RegistrationStatus, toke
     if (registrationObject.status === RegistrationStatus.VERIFIED) {
       throw new Error('Registration was already verified')
     }
-    if (decoded.aud !== 'validate') {
+    if (!decoded.aud.includes('validate')) {
       throw new Error('Invalid token type')
     } else {
       // Update status to verified
