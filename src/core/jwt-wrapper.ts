@@ -6,12 +6,12 @@
 
 import { verifyToken, decodeToken } from '../auth-server/auth-server'
 import { RolesEnum } from '../types/roles'
-import { JWTAURORALToken, JWTGatewayToken } from '../types/jwt-types'
+import { JWTAURORALToken, JWTGatewayToken, JWTMailToken } from '../types/jwt-types'
 import { MyError } from '../utils/error-handler'
 import { HttpStatusCode } from '../utils/http-status-codes'
 
 export const AuroralToken = {
-    verify: async (rawToken: string, _ip: string): Promise<JWTAURORALToken> => {
+    verify: async (rawToken: string): Promise<JWTAURORALToken> => {
         return verifyToken(rawToken) as unknown as Promise<JWTAURORALToken> 
     },
     decode: (rawToken: string): JWTAURORALToken => {
@@ -40,3 +40,11 @@ export const NodeToken = {
     }
 }
 
+export const MailToken = {
+    verify: (token: string): Promise<JWTMailToken> => {
+          return verifyToken(token) as unknown as Promise<JWTMailToken> 
+      },
+    decode: (rawToken: string): Promise<JWTMailToken> => {
+        return decodeToken(rawToken) as unknown as Promise<JWTMailToken> 
+    }
+}

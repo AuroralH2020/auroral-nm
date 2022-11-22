@@ -25,7 +25,8 @@ import { UserModel } from '../persistance/user/model'
 import { RegistrationModel } from '../persistance/registration/model'
 import { OrganisationModel } from '../persistance/organisation/model'
 import { cs } from '../microservices/commServer'
-import { checkTempSecret, hashPassword, signMailToken, verifyToken } from '../auth-server/auth-server'
+import { checkTempSecret, hashPassword, signMailToken } from '../auth-server/auth-server'
+import { MailToken } from './jwt-wrapper'
 import { notifyDevOpsOfNewRegistration, rejectRegistration, verificationMail } from '../auth-server/mailer'
 
 /**
@@ -94,17 +95,17 @@ export const registerInvitedUserOrOrganisation = async (data: IRegistrationPost,
 }
 
 export const registerAfterVerification = async (status: RegistrationStatus, token: string, locals: localsTypes.ILocals): Promise<void> => {
-    const decoded = await verifyToken(token)
-    const registrationId = decoded.mail
+    const decoded = await MailToken.verify(token)
+    const registrationId = decoded.sub
     // Retrieve the registration object
     const registrationObject = await RegistrationModel._getDoc(registrationId)
     // Validate if secret in token has not expired (email === username)
-    await checkTempSecret(registrationObject.email, decoded.sub)
+    await checkTempSecret(registrationObject.email, decoded.secret)
     // Check if registration is already validated
     if (registrationObject.status === RegistrationStatus.VERIFIED) {
       throw new Error('Registration was already verified')
     }
-    if (!decoded.aud.includes('validate')) {
+    if (!decoded.purpose.includes('validate')) {
       throw new Error('Invalid token type')
     } else {
       // Update status to verified

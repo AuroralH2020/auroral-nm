@@ -7,6 +7,7 @@ import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
 import { comparePassword, generateSecret, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword, verifyHash, AuroralUserType } from '../../../auth-server/auth-server'
+import { MailToken, AuroralToken } from '../../../core/jwt-wrapper'
 import { passwordlessLogin, recoverPassword } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
 import { SessionModel } from '../../../persistance/sessions/model'
@@ -83,11 +84,11 @@ export const processRecoverPwd: processRecoverPwdController = async (req, res) =
                 return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null)
 	}
         try {
-                const decoded = await verifyToken(token) // @TBD need to do it with the WRAPPER!!!
-                const username = decoded.mail
+                const decoded = await MailToken.verify(token)
+                const username = decoded.sub
                 // Validate if secret in token has not expired
-                await checkTempSecret(username, decoded.sub)
-                if (!decoded.aud.includes('pwdrecovery')) {
+                await checkTempSecret(username, decoded.secret)
+                if (!decoded.purpose.includes('pwdrecovery')) {
                         throw new Error('Invalid token type')
                 } else {
                         const hash = await hashPassword(password)
@@ -113,9 +114,9 @@ export const refreshToken: refreshTokenController = async (req, res) => {
                 return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Missing token')
 	}
         try {
-                const original = await verifyToken(myRefreshToken)
-                if (original.aud.includes('refresh') && original.id === decoded.id) {
-                        const tokens = await signAppToken(decoded.id, res.locals.origin.originIp, decoded.iat)
+                const original = await AuroralToken.verify(myRefreshToken)
+                if (original.purpose.includes('refresh') && original.sub === decoded.sub) {
+                        const tokens = await signAppToken(decoded.sub, res.locals.origin.originIp, AuroralUserType.UI, decoded.iat)
                         return responseBuilder(HttpStatusCode.OK, res, null, tokens)
                 } else {
                         logger.warn('Refresh token not valid')
@@ -157,12 +158,12 @@ export const processPasswordless: processPasswordlessController = async (req, re
         const { token } = req.params
         try {
                 // get token object from JWT
-                const tokenObject = await verifyToken(token)
+                const original = await MailToken.verify(token)
                 // Check if secret is valid (throws error if not )
-                await checkTempSecret(tokenObject.id, tokenObject.sub)
+                await checkTempSecret(original.sub, original.secret)
                 logger.debug('Passwordless login validated')
                 // generate app token
-                const tokens = await signAppToken(tokenObject.id, res.locals.origin.originIp)
+                const tokens = await signAppToken(original.sub, res.locals.origin.originIp, AuroralUserType.UI)
                 return responseBuilder(HttpStatusCode.OK, res, null, tokens)
         } catch (err) {
                 const error = errorHandler(err)
@@ -178,7 +179,7 @@ export const rememberCookie: rememberCookieController = async (_req, res) => {
         try {
                 const secret = generateSecret()
                 const secretHash = await hashPassword(secret)
-                const sessionId = (await SessionModel._createSession({ uid: decoded.id, secretHash, originIp: res.locals.origin.originIp })).sessionId
+                const sessionId = (await SessionModel._createSession({ uid: decoded.sub, secretHash, originIp: res.locals.origin.originIp })).sessionId
                return responseBuilder(HttpStatusCode.OK, res, null, sessionId + ':' + secret)
         } catch (err) {
                 const error = errorHandler(err)
@@ -203,7 +204,7 @@ export const rememberGetToken: rememberGetTokenController = async (req, res) => 
                 }
                 // look for username and get token
                 const username = (await UserModel._getUser(session.uid)).email
-                const token = await signAppToken(username, res.locals.origin.originIp)
+                const token = await signAppToken(username, res.locals.origin.originIp, AuroralUserType.UI)
 
                 return responseBuilder(HttpStatusCode.OK, res, null, token)
         } catch (err) {
@@ -222,7 +223,7 @@ export const rememberDeleteToken: rememberDeleteTokenController = async (req, re
                 // split to get sessionId and secret
                 // remove session by ID
                 SessionModel._deleteSession(sessionId)
-                tokenBlacklist.addToBlacklist(decoded.id, res.locals.token)
+                tokenBlacklist.addToBlacklist(decoded.sub, res.locals.token)
                 return responseBuilder(HttpStatusCode.OK, res, null, null)
         } catch (err) {
                 const error = errorHandler(err)
@@ -236,15 +237,15 @@ type logoutController =  expressTypes.Controller<{}, {}, {}, string, localsTypes
 export const logout: logoutController = async (_req, res) => {
         const { decoded } = res.locals 
         try {
-                logger.debug('Logging out: ' + decoded.id)
-                await tokenBlacklist.addToBlacklist(decoded.id, res.locals.token)
-                const myUser = await UserModel._getUser(decoded.id)
+                logger.debug('Logging out: ' + decoded.sub)
+                await tokenBlacklist.addToBlacklist(decoded.sub, res.locals.token)
+                const myUser = await UserModel._getUser(decoded.sub)
                 // Logout audit
                 await AuditModel._createAudit({
                         ...res.locals.audit,
                         cid: myUser.cid,
-                        actor: { id: decoded.id, name: myUser.name },
-                        target: { id: decoded.id, name: myUser.name }, 
+                        actor: { id: decoded.sub, name: myUser.name },
+                        target: { id: decoded.sub, name: myUser.name }, 
                         type: EventType.userLoggedOut,
                         labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
                       })
