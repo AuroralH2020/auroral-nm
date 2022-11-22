@@ -18,7 +18,7 @@ type handshakeController = expressTypes.Controller<{}, {}, {}, string, localsTyp
 export const handshake: handshakeController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
-    const data = decoded ? `Gateway ${decoded.id} authenticated` : 'Gateway connected as anonymous, restrictions might apply'
+    const data = decoded ? `Gateway ${decoded.agid} authenticated` : 'Gateway connected as anonymous, restrictions might apply'
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
@@ -35,7 +35,7 @@ export const sendCounters: sendCountersController = async (req, res) => {
   const { records } = req.body
 	try {
     if (decoded) {
-      const agid = decoded.id
+      const agid = decoded.agid
       const cid = (await NodeModel._getNode(agid)).cid
       // Async creation of records
       records.forEach(async (it) => { 
@@ -65,7 +65,7 @@ export const getCounters: getCountersController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
     if (decoded) {
-      const agid = decoded.id
+      const agid = decoded.agid
       // TBD: Parse query params
       // TBD: Get records ( aggregated records )
       // TBD: Define return type of the controller

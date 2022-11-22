@@ -4,7 +4,8 @@ Using JWT and asynchronous key encryption
 Used as gateway authentication method
 */
 import * as jwt from 'jsonwebtoken'
-import { JWTDecodedToken } from '../../types/jwt-types'
+import { JWTGatewayToken } from '../../types/jwt-types'
+import { NodeToken } from '../../core/jwt-wrapper'
 import { NodeModel } from '../../persistance/node/model'
 import { Controller } from '../../types/express-types'
 import { ILocalsGtw } from '../../types/locals-types'
@@ -19,20 +20,6 @@ type gtwToken = {
     aud: string
 }
 
-function validate(token: string, pubkey: string | null) {
-  return new Promise((resolve, reject) => {
-    if (!pubkey) {
-      throw new Error('Missing public key for node')
-    }
-    jwt.verify(token, pubkey, { audience: 'NM' }, (err, decoded) => {
-        if (err) {
-            reject(err)
-        }
-      resolve(decoded)
-    })
-  })
-}
-
 // Extract agid info from the original token
 function getInfo(x: string) {
   const i = x.indexOf('.')
@@ -40,7 +27,7 @@ function getInfo(x: string) {
   let info: Buffer | string = x.substring(i, j)
   info = Buffer.from(info, 'base64')
   info = info.toString()
-  return JSON.parse(info) as JWTDecodedToken
+  return JSON.parse(info) as JWTGatewayToken
 }
 
 // Public function
@@ -53,13 +40,14 @@ export const guard = () => {
     if (auth && auth.startsWith('Bearer ')) {
         const token = auth.slice(7, auth.length)
         const info = getInfo(token)
-        NodeModel._getKey(info.iss).then(
+        const agid = info.iss ? info.iss : info.sub // LEGACY purposes: ISS should be replaced by SUB and then used to identify origin
+        NodeModel._getKey(agid).then(
           (publicKey) => {
-              return validate(token, publicKey) as Promise<JWTDecodedToken>
+              return NodeToken.verify(token, publicKey)
             }
           ).then(
             (decoded) => {
-                res.locals.decoded = decoded
+                res.locals.decoded = { ...decoded, agid: info.iss ? info.iss : info.sub }
                 res.locals.token = token
                 next()
             }

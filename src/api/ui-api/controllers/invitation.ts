@@ -59,7 +59,7 @@ export const postInvitation: postInvitationController = async (req, res) => {
                                 sentBy: {
                                         cid: myOrg.cid,
                                         organisation: myOrg.name,
-                                        uid: decoded.id,
+                                        uid: decoded.sub,
                                         email: decoded.mail
                                 }
                         })

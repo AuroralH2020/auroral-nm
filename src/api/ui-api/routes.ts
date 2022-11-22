@@ -42,7 +42,10 @@ const UiRouter = Router()
 
 UiRouter
 // AUTH
+// @UPD routes??
+// @UPD put prefix auth!!
 .post('/login/authenticate', addOrigin(Interfaces.UI), createAudit(SourceType.USER), loginCtrl.authenticate)
+// .post(token_introspect)
 .post('/login/refresh', addOrigin(Interfaces.UI), jwt(), loginCtrl.refreshToken)
 .post('/login/recovery', addOrigin(Interfaces.UI), loginCtrl.sendRecoverPwdMail)
 .put('/login/recovery/:token', addOrigin(Interfaces.UI), validateBody(passwordSchema), loginCtrl.processRecoverPwd)

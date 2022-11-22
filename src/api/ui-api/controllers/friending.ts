@@ -27,7 +27,7 @@ export const processFriendRequest: processFriendRequestController = async (req, 
   const friendCid = req.params.cid // Requested organisation info
 	try {
     const myCid = decoded.org
-    const myUid = decoded.id
+    const myUid = decoded.sub
     await OrganisationModel._addOutgoingFriendReq(myCid, friendCid)
     await OrganisationModel._addIncomingFriendReq(friendCid, myCid)
     // Create notification
@@ -53,7 +53,7 @@ export const processFriendRequest: processFriendRequestController = async (req, 
     // // Audit
     // await AuditModel._createAudit({
     //   ...res.locals.audit,
-    //   actor: { id: decoded.id, name: actorName },
+    //   actor: { id: decoded.sub, name: actorName },
     //   target: { id: myCid, name: myOrgName },
     //   object: { id: friendCid, name: friendOrgName },
     //   type: EventType.partnershipRequested,
@@ -76,7 +76,7 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
   const friendCid = req.params.cid // Requested organisation info
 	try {
     const myCid = decoded.org
-    const myUid = decoded.id
+    const myUid = decoded.sub
     await OrganisationModel._addFriendship(myCid, friendCid)
     await OrganisationModel._delIncomingFriendReq(myCid, friendCid)
     await OrganisationModel._addFriendship(friendCid, myCid)
@@ -171,7 +171,7 @@ export const rejectFriendRequest: rejectFriendRequestController = async (req, re
   const friendCid = req.params.cid // Requested organisation info
 	try {
     const myCid = decoded.org
-    const myUid = decoded.id
+    const myUid = decoded.sub
     await OrganisationModel._delIncomingFriendReq(myCid, friendCid)
     await OrganisationModel._delOutgoingFriendReq(friendCid, myCid)
     // Create notification
@@ -224,7 +224,7 @@ export const cancelFriendRequest: cancelFriendRequestController = async (req, re
   const friendCid = req.params.cid // Requested organisation info
 	try {
     const myCid = decoded.org
-    const myUid = decoded.id
+    const myUid = decoded.sub
     await OrganisationModel._delIncomingFriendReq(friendCid, myCid)
     await OrganisationModel._delOutgoingFriendReq(myCid, friendCid)
     // Create notification
@@ -277,7 +277,7 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
   const friendCid = req.params.cid // Requested organisation info
 	try {
     const myCid = decoded.org
-    const myUid = decoded.id
+    const myUid = decoded.sub
     const commonPrivateContracts = await ContractModel._getCommonPrivateContracts(myCid, friendCid)
     // There is a private contract
     if (commonPrivateContracts.length > 0)  {
@@ -285,7 +285,7 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
         if (common.contracted) {
           // leave contract
           logger.debug('Removing org from private contract:' + common.ctid)
-         await ContractService.removeOrgFromContract(common.ctid, myCid, decoded.id, res.locals.audit)
+         await ContractService.removeOrgFromContract(common.ctid, myCid, decoded.sub, res.locals.audit)
         } else {
           // reject contract request
           logger.debug('Rejecting private contract request:' + common.ctid)

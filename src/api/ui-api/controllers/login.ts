@@ -6,7 +6,7 @@ import { responseBuilder } from '../../../utils/response-builder'
 import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
-import { comparePassword, generateSecret, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword, verifyHash } from '../../../auth-server/auth-server'
+import { comparePassword, generateSecret, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword, verifyHash, AuroralUserType } from '../../../auth-server/auth-server'
 import { passwordlessLogin, recoverPassword } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
 import { SessionModel } from '../../../persistance/sessions/model'
@@ -16,20 +16,6 @@ import { AuditModel } from '../../../persistance/audit/model'
 import { EventType, ResultStatusType } from '../../../types/misc-types'
 
 // Controllers
-
-type tokenValidationCtrl = expressTypes.Controller<{}, {}, {}, null, localsTypes.ILocals>
-
-export const tokenValidation: tokenValidationCtrl = async (req, res) => {
-        try {
-        console.log('tokenValidation')
-        // TBD
-        return responseBuilder(HttpStatusCode.OK, res, 'Token is valid')
-        } catch (err) {
-                const error = errorHandler(err)
-                logger.error(error.message)
-                return responseBuilder(error.status, res, error.message)
-	}
-}        
 
 type authController = expressTypes.Controller<{}, { username: string, password: string }, {}, any, localsTypes.ILocals>
  
@@ -42,7 +28,7 @@ export const authenticate: authController = async (req, res) => {
 	}
 	try {
                 await comparePassword(username, password)
-                const tokens = await signAppToken(username, res.locals.origin.originIp)
+                const tokens = await signAppToken(username, res.locals.origin.originIp, AuroralUserType.UI)
                 // Audit login
                 const myAccount = await AccountModel._getAccount(username)
                 const myUser = await UserModel._getUser(myAccount.uid)
@@ -97,7 +83,7 @@ export const processRecoverPwd: processRecoverPwdController = async (req, res) =
                 return responseBuilder(HttpStatusCode.BAD_REQUEST, res, null)
 	}
         try {
-                const decoded = await verifyToken(token)
+                const decoded = await verifyToken(token) // @TBD need to do it with the WRAPPER!!!
                 const username = decoded.mail
                 // Validate if secret in token has not expired
                 await checkTempSecret(username, decoded.sub)

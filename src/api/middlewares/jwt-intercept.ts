@@ -1,4 +1,4 @@
-import { Auth } from '../../utils/jwt'
+import { AuroralToken } from '../../core/jwt-wrapper'
 import { Controller } from '../../types/express-types'
 import { responseBuilder } from '../../utils/response-builder'
 import { ILocals } from '../../types/locals-types'
@@ -27,11 +27,11 @@ export const jwt = (roles?: RolesEnum[]) => {
             if (!token) {
                 throw new Error('Unauthorized, missing token')
             }
-            Auth.verify(token, res.locals.origin.originIp).then((decoded) => {
+            AuroralToken.verify(token, res.locals.origin.originIp).then((decoded) => {
                 // When roles are included in the validation of the route
                 // Check that they are present in the token
                 if (roles && roles.length > 0) {
-                    Auth.protect(decoded, roles)
+                    AuroralToken.protect(decoded, roles)
                 }
                 // Serialize roles and add to array
                 const userRoles = decoded.roles.split(',')
@@ -54,7 +54,7 @@ export const jwt = (roles?: RolesEnum[]) => {
                 res.locals.decoded = decoded
                 res.locals.token = token
                 // Verify session
-                getSession(decoded.id).then(
+                getSession(decoded.sub).then(
                     async (session) => {
                         if (Config.SESSIONS.ENABLED === false) {
                             return next()
@@ -67,13 +67,13 @@ export const jwt = (roles?: RolesEnum[]) => {
                             //     return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Strange activity detected, IP changed during session life, possible use of VPN or tampering attempt')
                             // }
                             // Blacklisted token check
-                            if (await tokenBlacklist.checkInBlacklist(decoded.id, token)) {
+                            if (await tokenBlacklist.checkInBlacklist(decoded.sub, token)) {
                                 return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Token is blacklisted')
                             }
                             return next()
                         } else {
                             logger.error('Session expired')
-                            return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, decoded.id + ': Session expired')
+                            return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, decoded.sub + ': Session expired')
                         }
                     }
                 ).catch(() => {
@@ -84,8 +84,8 @@ export const jwt = (roles?: RolesEnum[]) => {
                 // Verify token error block
                 const error = errorHandler(err1)
                 try {
-                    const tokenData = Auth.decode(token) as JsonType
-                    logger.error('uid - ' + tokenData.uid + ' : ' + error.message)
+                    const tokenData = AuroralToken.decode(token)
+                    logger.error('uid - ' + tokenData.sub + ' : ' + error.message)
                     return responseBuilder(error.status, res, error.message)
                 } catch (err) {
                     const finalerror = errorHandler(err)

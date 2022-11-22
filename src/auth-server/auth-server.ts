@@ -42,15 +42,35 @@ if (Config.NODE_ENV === 'test') {
     }
 }
 
-// Token types
-const validTokenTypes = ['authentication', 'refresh', 'validate', 'validatepwd', 'pwdrecovery', 'passwordless']
+// AUDIENCE Claim values
+const audClaims = ['auroral.bavenir.eu', Config.DLT.URL]
 
+// PURPOSE Claim values
+const purposeClaims = ['NM', 'refresh', 'validate', 'validatepwd', 'pwdrecovery', 'passwordless', 'DLT']
+
+// Valid AURORAL users/agents
+export enum AuroralUserType {
+    UI = 'UI',
+    NODE = 'NODE'
+}
+
+/**
+ * Salt and Hash passwords before storing
+ * @param password 
+ * @returns 
+ */
 export const hashPassword = async (password: string) => {
     const saltRounds = 10
     const salt = await crypto.genSalt(saltRounds)
     return crypto.hash(password, salt)
 }
 
+/**
+ * Validate string against hashed password
+ * @param username 
+ * @param password 
+ * @returns 
+ */
 export const comparePassword = async (username: string, password: string): Promise<boolean> => {
     const hash = await AccountModel._getHash(username)
     const isValid = await crypto.compare(password, hash)
@@ -60,45 +80,49 @@ export const comparePassword = async (username: string, password: string): Promi
     return true
 }
 
-export async function signMessage(message: string): Promise<string> {
-    try {
-        logger.debug('Signing message...')
-        return nodejsCrypto.sign(Algorithms.HASH, Buffer.from(message), {
-            key: priv_cert!.toString(),
-            padding: nodejsCrypto.constants.RSA_PKCS1_PSS_PADDING,
-          }).toString('base64')
-    } catch (err) {
-        const error = errorHandler(err)
-        logger.error('Failed to sign...', HttpStatusCode.BAD_REQUEST)
-        throw new MyError(error.message)
-    }
-}
-
-export function getMyPubkey(): string {
-    return pub_cert!.toString()
-}
-
+/**
+ * Generate a signature for sending tokens over mail
+ * Validate special mail requests (Lost password, validate user, passwordless auth...)
+ * @param username 
+ * @param purpose 
+ * @param idInLink 
+ * @returns 
+ */
 export const signMailToken = async (username: string, purpose: string, idInLink?: string): Promise<string> => {
-    if (validTokenTypes.lastIndexOf(purpose) === -1) {
+    if (purposeClaims.lastIndexOf(purpose) === -1) {
         throw new Error('Invalid token type')
     }
     const { secret, algorithm } = getSecretAndAlg()
-    const secretDoc = await AccountModel._getDoc(username)
-    const accountSecret = await secretDoc._updateTempSecret()
+    const accountDoc = await AccountModel._getDoc(username)
+    const accountSecret = await accountDoc._updateTempSecret()
     return signToken(
         {
             exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
-            iss: idInLink ? idInLink : username,
-            aud: purpose,
-            sub: accountSecret
+            iss: 'AURORAL Auth Server',
+            sub: idInLink ? idInLink : username,
+            aud: audClaims[0],
+            purpose,
+            secret: accountSecret
         },
         secret,
         algorithm  
     )
 }
-// TBD
-// username -> id (GTW/UI)
-export const signAppToken = async (username: string, ip: string, started_at?: number): Promise<{ token: string, refreshToken: string}> => {
+
+/**
+ * Sign AURORAL token
+ * Main authentication token
+ * Used for:
+ * * Authentication and authorization in UI
+ * * Grant access to DLT services
+ * * Other services TBD
+ * @TBD Set up specific purpuse claims (NM, DLT)
+ * @param username 
+ * @param ip 
+ * @param started_at 
+ * @returns 
+ */
+export const signAppToken = async (username: string, ip: string, whoami: AuroralUserType, started_at?: number): Promise<{ token: string, refreshToken: string}> => {
     const user = await AccountModel._getAccount(username)
     const { secret, algorithm } = getSecretAndAlg()
     const exp = Math.floor(Date.now() / 1000) + Config.SESSIONS.DURATION
@@ -107,10 +131,12 @@ export const signAppToken = async (username: string, ip: string, started_at?: nu
     await setSession(user.uid, sessionValue)
     const token = await signToken(
         {
-            iss: username,
+            iss: 'AURORAL Auth Server',
+            mail: username,
             org: user.cid,
-            uid: user.uid,
-            aud: validTokenTypes[0],
+            sub: user.uid,
+            purpose: purposeClaims[0],
+            aud: audClaims,
             roles: user.roles.toString(),
             iat,
             exp
@@ -120,10 +146,12 @@ export const signAppToken = async (username: string, ip: string, started_at?: nu
     )
     const refreshToken = await signToken(
         {
-            iss: username,
+            iss: 'AURORAL Auth Server',
+            mail: username,
             org: user.cid,
-            uid: user.uid,
-            aud: validTokenTypes[1],
+            sub: user.uid,
+            purpose: purposeClaims[1],
+            aud: audClaims[0],
             roles: user.roles.toString(),
             exp
         },
@@ -133,10 +161,17 @@ export const signAppToken = async (username: string, ip: string, started_at?: nu
     return { token, refreshToken }
 }
 
-export const verifyToken = async (token: string): Promise<jwtTypes.JWTDecodedToken> => {
+/**
+ * Validate and extract token
+ * @TBD validate audience
+ * @param token 
+ * @returns 
+ */
+export const verifyToken = async (token: string, key?: string) => {
     const { secret, algorithm } = getSecretAndAlg()
+    const secretOrPubKey = key ? key : secret // Case the token was generated in a Node (PubKey of Node is provided)
     return new Promise((resolve, _reject) => {
-        jwt.verify(token, secret, { algorithms: [algorithm] }, (err, decoded) => {
+        jwt.verify(token, secretOrPubKey, { algorithms: [algorithm] }, (err, decoded) => {
             if (err) {
                 if (err.name === 'TokenExpiredError') {
                     throw new MyError(err.message, HttpStatusCode.UNAUTHORIZED)
@@ -147,7 +182,7 @@ export const verifyToken = async (token: string): Promise<jwtTypes.JWTDecodedTok
                     throw new MyError(err.message, HttpStatusCode.INTERNAL_SERVER_ERROR)
                 }
             } else {      
-                resolve(decoded as jwtTypes.JWTDecodedToken)
+                resolve(decoded)
             }
         })
     })
@@ -192,6 +227,27 @@ export const verifyHash = async (secret: string, secretHash: string): Promise<bo
        return false
     }
     return true
+}
+
+// Sign messages sent over XMPP network with the AURORAL Cloud private key
+export async function signMessage(message: string): Promise<string> {
+    try {
+        logger.debug('Signing message...')
+        return nodejsCrypto.sign(Algorithms.HASH, Buffer.from(message), {
+            key: priv_cert!.toString(),
+            padding: nodejsCrypto.constants.RSA_PKCS1_PSS_PADDING,
+          }).toString('base64')
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.error('Failed to sign...', HttpStatusCode.BAD_REQUEST)
+        throw new MyError(error.message)
+    }
+}
+
+// Retrieve AURORAL Cloud pub key
+// Used by Nodes to validate AURORAL Cloud sign messages over XMPP
+export function getMyPubkey(): string {
+    return pub_cert!.toString()
 }
 
 // Private

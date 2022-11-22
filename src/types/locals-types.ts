@@ -1,6 +1,6 @@
 // Types and Ifaces for res.locals
 
-import { JWTDecodedToken } from './jwt-types'
+import { JWTGatewayToken, JWTAURORALToken } from './jwt-types'
 import { RolesEnum } from './roles'
 import { SourceType } from './misc-types'
 
@@ -29,7 +29,7 @@ export type IAuditLocals = {
 
 export type ILocals = {
     origin: IOriginLocals
-    decoded: JWTDecodedToken
+    decoded: JWTAURORALToken
     token: string
     roles: RolesEnum[]
     audit: IAuditLocals
@@ -38,7 +38,7 @@ export type ILocals = {
 
 export type ILocalsGtw = {
     origin: IOriginLocals
-    decoded: JWTDecodedToken | null
+    decoded: JWTGatewayToken | null
     token: string | null
     audit: IAuditLocals
     reqId: string
