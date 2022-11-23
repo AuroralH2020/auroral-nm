@@ -32,7 +32,7 @@ function getInfo(x: string) {
 
 // Public function
 
-type JwtController = Controller<{}, {}, {}, void, ILocalsGtw>
+type JwtGtwController = Controller<{}, {}, {}, void, ILocalsGtw>
 
 export const guard = () => {
   return function (req, res, next) {
@@ -62,5 +62,5 @@ export const guard = () => {
       res.locals.token = null
       next()
     } 
-  } as JwtController
+  } as JwtGtwController
 }

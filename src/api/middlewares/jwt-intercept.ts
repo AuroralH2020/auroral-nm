@@ -27,7 +27,7 @@ export const jwt = (roles?: RolesEnum[]) => {
             if (!token) {
                 throw new Error('Unauthorized, missing token')
             }
-            AuroralToken.verify(token, res.locals.origin.originIp).then((decoded) => {
+            AuroralToken.verify(token).then((decoded) => {
                 // When roles are included in the validation of the route
                 // Check that they are present in the token
                 if (roles && roles.length > 0) {

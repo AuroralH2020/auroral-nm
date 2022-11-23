@@ -3,7 +3,6 @@ import { Router } from 'express'
 // Middlewares
 import { jwt, addOrigin, validateBody, createAudit } from '../middlewares/index'
 // Controllers
-import * as loginCtrl from './controllers/login'
 import * as sessionsCtrl from './controllers/sessions'
 import * as registrationCtrl from './controllers/registration'
 import * as statisticsCtrl from './controllers/statistics'
@@ -28,7 +27,6 @@ import { RolesEnum } from '../../types/roles'
 import {
     updateItemSchema,
     updateOrganisationSchema,
-    passwordSchema,
     registrationSchema,
     registrationStatusSchema,
     updateNodeSchema,
@@ -41,21 +39,6 @@ import {
 const UiRouter = Router()
 
 UiRouter
-// AUTH
-// @UPD routes??
-// @UPD put prefix auth!!
-.post('/login/authenticate', addOrigin(Interfaces.UI), createAudit(SourceType.USER), loginCtrl.authenticate)
-// .post(token_introspect)
-.post('/login/refresh', addOrigin(Interfaces.UI), jwt(), loginCtrl.refreshToken)
-.post('/login/recovery', addOrigin(Interfaces.UI), loginCtrl.sendRecoverPwdMail)
-.put('/login/recovery/:token', addOrigin(Interfaces.UI), validateBody(passwordSchema), loginCtrl.processRecoverPwd)
-.post('/login/passwordless', addOrigin(Interfaces.UI), loginCtrl.requestPasswordless)
-.post('/login/passwordless/:token', addOrigin(Interfaces.UI), loginCtrl.processPasswordless)
-.get('/login/remember', addOrigin(Interfaces.UI), jwt(), loginCtrl.rememberCookie)
-.post('/login/remember', addOrigin(Interfaces.UI), loginCtrl.rememberGetToken)
-.delete('/login/remember/:sessionId', addOrigin(Interfaces.UI), loginCtrl.rememberDeleteToken)
-.get('/logout', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.USER), loginCtrl.logout)
-
 // SESSIONS
 .get('/sessions/all/:cursor', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getAll)
 .get('/sessions/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getOne)

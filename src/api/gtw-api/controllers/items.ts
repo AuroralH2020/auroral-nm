@@ -148,7 +148,7 @@ export const deleteItems: deleteItemsController = async (req, res) => {
       if (!decoded) {
         logger.warn({ msg: 'Gateway anonymous access, it will be forbidden in production...', id: res.locals.reqId })
       }
-      const agid = decoded ? decoded.id : req.body.agid
+      const agid = decoded ? decoded.agid : req.body.agid
 
       const items : registrationRemoveResponse[] =  await Promise.all(oids.map(async (it) => {      
         try {

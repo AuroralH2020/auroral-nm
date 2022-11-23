@@ -11,6 +11,7 @@ import express from 'express'
 import { responseBuilder, HttpStatusCode } from './utils'
 import { UiRouter } from './api/ui-api/routes'
 import { GtwRouter } from './api/gtw-api/routes'
+import { AuthRouter } from './api/auth-api/routes'
 import { accessControl } from './api/middlewares/access-control'
 import { Config } from './config'
 import { logger } from './utils/logger'
@@ -40,6 +41,7 @@ const corsOptions = {
 }
  
 app.use('/api/ui/v1/', cors(corsOptions), UiRouter)
+app.use('/api/auth/v1/', cors(corsOptions), AuthRouter)
 app.use('/api/gtw/v1/', cors(), GtwRouter)
 app.use('/api/external/v1/', cors(), ExternalRouter)
 

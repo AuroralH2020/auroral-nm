@@ -85,7 +85,7 @@ export type JWTMailToken = {
 // AURORAL Cloud Auth Server is only validating them
 export type JWTGatewayToken = {
     iss?: string, // Receive AGID (LEGACY, to be removed and use SUB claim for AGID)
-    aud: string // Only audience claim for gateway is 'NM' (LEGACY - To be updated in future version)
+    aud: string, // Only audience claim for gateway is 'NM' (LEGACY - To be updated in future version)
     // purpose: string // Replaces aud in future versions and aud value changes to 'auroral.bavenir.eu'
     agid: string // Internal use only == sub || iss (To be deprecated)
 } & JWTRegisteredClaims
