@@ -2,10 +2,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { logger } from '../../utils/logger'
 import { Controller } from '../../types/express-types'
 import { responseBuilder } from '../../utils'
-import { ILocals, Interfaces } from '../../types/locals-types'
+import { ILocalsBasic, Interfaces } from '../../types/locals-types'
 import { errorHandler } from '../../utils/error-handler'
 
-type originController = Controller<{}, {}, {}, null, ILocals>
+type originController = Controller<{}, {}, {}, null, ILocalsBasic>
 
 export const addOrigin = (_type: Interfaces) => {
     return function(req, res, next) {

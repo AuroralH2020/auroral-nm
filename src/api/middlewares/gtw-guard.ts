@@ -59,7 +59,7 @@ export const guard = () => {
             )
     } else {
       res.locals.decoded = null
-      res.locals.token = null
+      res.locals.token = 'NA'
       next()
     } 
   } as JwtGtwController

@@ -1,15 +1,15 @@
 import { Controller } from '../../types/express-types'
-import { ILocals } from '../../types/locals-types'
+import { ILocals, ILocalsGtw } from '../../types/locals-types'
 import { SourceType } from '../../types/misc-types'
 
-type auditController = Controller<{}, {}, {}, null, ILocals>
+type auditController = Controller<{}, {}, {}, null, ILocals | ILocalsGtw>
 
 export const createAudit = (_source: SourceType) => {
     return function (_req, res, next) {
         const { decoded } = res.locals
         if (decoded) {
             res.locals.audit = {
-                cid: res.locals.decoded.org,
+                cid: decoded.org,
                 labels: { ip: res.locals.origin?.originIp, origin: res.locals.origin?.interface, source: _source },
                 reqId: res.locals.reqId
             }
