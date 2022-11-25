@@ -178,7 +178,9 @@ export const verifyToken = async (token: string, key?: string) => {
                 } else if (err.name === 'JsonWebTokenError') {
                     throw new MyError(err.message, HttpStatusCode.UNAUTHORIZED)
                 } else {
-                    logger.error(err.message)
+                    logger.error('Error veryfing token')
+                    logger.error(err.name)
+                    // logger.error(err.message)
                     throw new MyError(err.message, HttpStatusCode.INTERNAL_SERVER_ERROR)
                 }
             } else {      

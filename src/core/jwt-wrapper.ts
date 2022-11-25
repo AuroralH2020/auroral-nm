@@ -4,6 +4,7 @@
  * User AURORAL Auth Server
  */
 
+import jwt from 'jsonwebtoken'
 import { verifyToken, decodeToken } from '../auth-server/auth-server'
 import { RolesEnum } from '../types/roles'
 import { JWTAURORALToken, JWTGatewayToken, JWTMailToken } from '../types/jwt-types'
@@ -30,10 +31,17 @@ export const AuroralToken = {
 
 export const NodeToken = {
     verify: (token: string, pubkey: string | null): Promise<JWTGatewayToken> => {
-          if (!pubkey) {
-            throw new Error('Missing public key for node')
-          }
-          return verifyToken(token, pubkey) as unknown as Promise<JWTGatewayToken> 
+        return new Promise((resolve, reject) => {
+            if (!pubkey) {
+              throw new Error('Missing public key for node')
+            }
+            jwt.verify(token, pubkey, (err, decoded) => {
+                if (err) {
+                    reject(err)
+                }
+              resolve(decoded as Promise<JWTGatewayToken>) 
+            })
+          })
       },
     decode: (rawToken: string): Promise<JWTGatewayToken> => {
         return decodeToken(rawToken) as unknown as Promise<JWTGatewayToken> 
