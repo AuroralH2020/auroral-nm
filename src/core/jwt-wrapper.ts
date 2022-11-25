@@ -4,7 +4,6 @@
  * User AURORAL Auth Server
  */
 
-import jwt from 'jsonwebtoken'
 import { verifyToken, decodeToken } from '../auth-server/auth-server'
 import { RolesEnum } from '../types/roles'
 import { JWTAURORALToken, JWTGatewayToken, JWTMailToken } from '../types/jwt-types'

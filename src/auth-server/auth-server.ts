@@ -46,7 +46,7 @@ if (Config.NODE_ENV === 'test') {
 const audClaims = ['auroral.bavenir.eu', Config.DLT.URL]
 
 // PURPOSE Claim values
-const purposeClaims = ['NM', 'refresh', 'validate', 'validatepwd', 'pwdrecovery', 'passwordless', 'DLT']
+const purposeClaims = ['NM', 'refresh', 'validate', 'validatepwd', 'pwdrecovery', 'passwordless', 'DLT_READWRITE', 'DLT_READ']
 
 // Valid AURORAL users/agents
 export enum AuroralUserType {
@@ -135,7 +135,11 @@ export const signAppToken = async (username: string, ip: string, whoami: Auroral
             mail: username,
             org: user.cid,
             sub: user.uid,
-            purpose: purposeClaims[0],
+            purpose: [
+                purposeClaims[0],
+                whoami === AuroralUserType.UI ? 
+                purposeClaims[6] : 
+                purposeClaims[7]].toString(),
             aud: audClaims,
             roles: user.roles.toString(),
             iat,
@@ -179,14 +183,14 @@ export const verifyToken = async (token: string, key?: string) => {
         jwt.verify(token, secret, { algorithms: [algorithm] }, (err, decoded) => {
             if (err) {
                 if (err.name === 'TokenExpiredError') {
-                    throw new MyError(err.message, HttpStatusCode.UNAUTHORIZED)
+                    throw new MyError(err.name, HttpStatusCode.UNAUTHORIZED)
                 } else if (err.name === 'JsonWebTokenError') {
-                    throw new MyError(err.message, HttpStatusCode.UNAUTHORIZED)
+                    throw new MyError(err.name, HttpStatusCode.UNAUTHORIZED)
                 } else {
                     logger.error('Error veryfing token')
                     logger.error(err.name)
                     // logger.error(err.message)
-                    throw new MyError(err.message, HttpStatusCode.INTERNAL_SERVER_ERROR)
+                    throw new MyError(err.name, HttpStatusCode.INTERNAL_SERVER_ERROR)
                 }
             } else {      
                 resolve(decoded)

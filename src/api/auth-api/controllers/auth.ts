@@ -16,6 +16,7 @@ import { tokenBlacklist } from '../../../microservices/tokenBlacklist'
 import { AuditModel } from '../../../persistance/audit/model'
 import { EventType, ResultStatusType } from '../../../types/misc-types'
 
+
 // Controllers
 
 type authController = expressTypes.Controller<{}, { username: string, password: string }, {}, any, localsTypes.ILocals>
@@ -49,6 +50,42 @@ export const authenticate: authController = async (req, res) => {
                 logger.error(error.message)
                 return responseBuilder(error.status, res, error.message)
 	}
+}
+
+type introspectionController = expressTypes.Controller<{}, { token: string }, {}, any, localsTypes.ILocals>
+ 
+export const introspection: introspectionController = async (req, res) => {
+        const { token } = req.body
+        if (!token) {
+                logger.error('Missing token for introspection')
+                return res.status(400).json({
+                        active: false,
+                        error_description: 'Missing token for introspection'
+                })
+        }
+        try {
+                const decoded = await AuroralToken.verify(token)
+                if (await tokenBlacklist.checkInBlacklist(decoded.sub, token)) {
+                        logger.error('Token is blacklisted or inactive')
+                        return res.status(401).json({
+                                active: false,
+                                error_description: 'Token is blacklisted or inactive'
+                        })  
+                }
+                return res.status(200).json({
+                        active: true,
+                        scope: decoded.purpose,
+                        client_id: decoded.sub,
+                        exp: decoded.exp
+                })
+        } catch (err) {
+                const error = errorHandler(err)
+                logger.error(error.message)
+                return res.status(401).json({
+                        active: false,
+                        error_description: 'Error validating token: ' + error.message
+                })       
+         }
 }
 
 type sendRecoverPwdController = expressTypes.Controller<{}, { username: string }, {}, null, localsTypes.ILocals>

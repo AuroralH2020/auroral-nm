@@ -6,7 +6,8 @@ import { SourceType } from './misc-types'
 
 export enum Interfaces {
     UI = 'UI',
-    GATEWAY = 'Gateway'
+    GATEWAY = 'Gateway',
+    EXTERNAL = 'External' // External services
 }
 
 export type IOriginLocals = {

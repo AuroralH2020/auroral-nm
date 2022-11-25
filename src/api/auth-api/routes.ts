@@ -3,7 +3,7 @@ import { Router } from 'express'
 // Middlewares
 import { jwt, addOrigin, validateBody, createAudit } from '../middlewares/index'
 // Controllers
-import * as loginCtrl from './controllers/login'
+import * as loginCtrl from './controllers/auth'
 
 // Types
 import { Interfaces } from '../../types/locals-types'
@@ -20,7 +20,7 @@ AuthRouter
 // @UPD routes??
 .post('/token', addOrigin(Interfaces.UI), createAudit(SourceType.USER), loginCtrl.authenticate)
 .post('/token/refresh', addOrigin(Interfaces.UI), jwt(), loginCtrl.refreshToken)
-// .post('/token/introspect', addOrigin(Interfaces.UI), @TBD)
+.post('/token/introspect', addOrigin(Interfaces.EXTERNAL), loginCtrl.introspection)
 // .post('/token/revoke', addOrigin(Interfaces.UI), jwt(), @TBD)
 .post('/password/recovery', addOrigin(Interfaces.UI), loginCtrl.sendRecoverPwdMail)
 .put('/password/recovery/:token', addOrigin(Interfaces.UI), validateBody(passwordSchema), loginCtrl.processRecoverPwd)
