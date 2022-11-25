@@ -59,7 +59,7 @@ export const introspection: introspectionController = async (req, res) => {
         if (!token) {
                 logger.error('Missing token for introspection')
                 return res.status(400).json({
-                        active: false,
+                        error: 'invalid_request',
                         error_description: 'Missing token for introspection'
                 })
         }
@@ -68,7 +68,7 @@ export const introspection: introspectionController = async (req, res) => {
                 if (await tokenBlacklist.checkInBlacklist(decoded.sub, token)) {
                         logger.error('Token is blacklisted or inactive')
                         return res.status(401).json({
-                                active: false,
+                                error: 'invalid_request',
                                 error_description: 'Token is blacklisted or inactive'
                         })  
                 }
@@ -83,7 +83,7 @@ export const introspection: introspectionController = async (req, res) => {
                 const error = errorHandler(err)
                 logger.error(error.message)
                 return res.status(401).json({
-                        active: false,
+                        error: 'invalid_request',
                         error_description: 'Error validating token: ' + error.message
                 })       
          }
