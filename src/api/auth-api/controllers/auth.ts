@@ -74,8 +74,12 @@ export const introspection: introspectionController = async (req, res) => {
                 }
                 return res.status(200).json({
                         active: true,
-                        scope: decoded.purpose,
-                        client_id: decoded.sub,
+                        iss: decoded.iss,
+                        iat: decoded.iat,
+                        sub: decoded.sub,
+                        typ: 'Bearer',
+                        scope: decoded.purpose.replace(/,/g, ' '), // Replace commas by spaces to be compliant
+                        client_id: 'auroral-nm',
                         username: decoded.mail,
                         exp: decoded.exp
                 })
