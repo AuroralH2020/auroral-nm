@@ -168,10 +168,15 @@ export const signAppToken = async (username: string, ip: string, whoami: Auroral
  * @returns 
  */
 export const verifyToken = async (token: string, key?: string) => {
-    const { secret, algorithm } = getSecretAndAlg()
-    const secretOrPubKey = key ? key : secret // Case the token was generated in a Node (PubKey of Node is provided)
+    let { secret, algorithm } = getSecretAndAlg() 
+    // If request has own key, we default to asymmetric algorithm
+    // Usually this happens with requests from the GTW
+    if (key) {
+        secret = key
+        algorithm = Algorithms.ASYNC
+    }
     return new Promise((resolve, _reject) => {
-        jwt.verify(token, secretOrPubKey, { algorithms: [algorithm] }, (err, decoded) => {
+        jwt.verify(token, secret, { algorithms: [algorithm] }, (err, decoded) => {
             if (err) {
                 if (err.name === 'TokenExpiredError') {
                     throw new MyError(err.message, HttpStatusCode.UNAUTHORIZED)
