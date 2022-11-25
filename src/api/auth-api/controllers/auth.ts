@@ -76,6 +76,7 @@ export const introspection: introspectionController = async (req, res) => {
                         active: true,
                         scope: decoded.purpose,
                         client_id: decoded.sub,
+                        username: decoded.mail,
                         exp: decoded.exp
                 })
         } catch (err) {
