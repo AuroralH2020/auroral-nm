@@ -30,5 +30,4 @@ AuthRouter
 .post('/login/remember', addOrigin(Interfaces.UI), loginCtrl.rememberGetToken)
 .delete('/login/remember/:sessionId', addOrigin(Interfaces.UI), loginCtrl.rememberDeleteToken)
 .get('/logout', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.USER), loginCtrl.logout)
-
 export { AuthRouter }

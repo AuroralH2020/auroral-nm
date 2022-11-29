@@ -14,7 +14,7 @@ import { UserModel } from '../persistance/user/model'
 import { ItemType } from '../persistance/item/types'
 
 // Functions
-export const createOne = async (cid: string, name: string, type: NodeType, password: string): Promise<string> => {
+export const createOne = async (cid: string, name: string, type: NodeType, password: string, pubkey?: string): Promise<string> => {
     try {
         const nodeData: INodeCreatePost = { name, type, cid }
         // Create node
@@ -25,6 +25,10 @@ export const createOne = async (cid: string, name: string, type: NodeType, passw
         await cs.postUser(node.agid, password)
         // Add to organisation group in commServer
         await cs.addUserToGroup(node.agid, cid)
+
+        if (pubkey) {
+            await node._updateNode({ key: pubkey })
+        }
         // Add to nodes group in commServer (Initially public) DEPRECATED
         // await cs.addUserToGroup(node.agid, PUBLIC_NODES)
         return node.agid
