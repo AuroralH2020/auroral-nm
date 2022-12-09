@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
+import { HttpStatusCode } from '../../utils'
+import { MyError } from '../../utils/error-handler'
 import { IExternalUserDocument, IExternalUserModel, IExternalUserCreate, IExternalUser, IExternalUserUi } from './types'
 
 export async function createExternalUser(
@@ -41,7 +43,7 @@ export async function getByKeyid(
   ): Promise<IExternalUser> {
     const record = await this.findOne({ keyid }).exec()
     if (!record) {
-      throw new Error('Error retrieving external user by keyid')
+      throw new MyError('Error retrieving external user by keyid', HttpStatusCode.NOT_FOUND)
     }
     return record
 }
