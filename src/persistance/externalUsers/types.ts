@@ -9,6 +9,7 @@ export interface ACLObject {
 export enum GrantType {
     DATA_ACCESS = 'dataAccess',
     SERVICE_STORE = 'serviceStore',
+    AP_EDIT = 'apEdit',
 }
 export interface IExternalUser {
     keyid: string
