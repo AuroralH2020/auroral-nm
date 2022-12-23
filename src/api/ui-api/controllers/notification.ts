@@ -17,7 +17,7 @@ export const getNotifications: getNotificationsController = async (req, res) => 
 	const { decoded } = res.locals
 	const { pending, limit, offset } = req.query
 	try {
-		const cid = decoded.org
+		const cid = decoded.cid
 		const uid = decoded.sub
 		const data = await NotificationModel._getNotifications([cid, uid], pending === 'true', Number(limit), Number(offset))
 		return responseBuilder(HttpStatusCode.OK, res, null, data)
@@ -34,7 +34,7 @@ type refreshNotificationsController = expressTypes.Controller<{}, {}, {}, { coun
 export const refreshNotifications: refreshNotificationsController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
-	const cid = decoded.org
+	const cid = decoded.cid
 	const uid = decoded.sub
 	const count = (await NotificationModel._getNotifications([cid, uid], true)).length
     return responseBuilder(HttpStatusCode.OK, res, null, { count })
@@ -52,7 +52,7 @@ export const setRead: setReadController = async (req, res) => {
   const { decoded } = res.locals
 	try {
 		const notif = await NotificationModel._getDoc(notificationId)
-		if (notif.owner !== decoded.sub && notif.owner !== decoded.org) { 
+		if (notif.owner !== decoded.sub && notif.owner !== decoded.cid) { 
 			throw new MyError('You are not allowed to set read this notification', HttpStatusCode.FORBIDDEN)
 		}
 		await NotificationModel._setRead(notificationId)

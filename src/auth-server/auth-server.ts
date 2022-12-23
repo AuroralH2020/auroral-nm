@@ -11,6 +11,8 @@ import { errorHandler, MyError } from '../utils/error-handler'
 import { HttpStatusCode } from '../utils'
 import { setSession } from '../core/sessions'
 import { JsonType } from '../types/misc-types'
+import { NodeModel } from '../persistance/node/model'
+import { AuroralUserType } from '../types/jwt-types'
 
 // Algorithms
 enum Algorithms {
@@ -43,16 +45,11 @@ if (Config.NODE_ENV === 'test') {
 }
 
 // AUDIENCE Claim values
-const audClaims = ['auroral.bavenir.eu', Config.DLT.URL]
+const audClaims = ['auroral.bavenir.eu', Config.DLT.AUTH_HOST]
 
 // PURPOSE Claim values
 const purposeClaims = ['NM', 'refresh', 'validate', 'validatepwd', 'pwdrecovery', 'passwordless', 'DLT_READWRITE', 'DLT_READ']
 
-// Valid AURORAL users/agents
-export enum AuroralUserType {
-    UI = 'UI',
-    NODE = 'NODE'
-}
 
 /**
  * Salt and Hash passwords before storing
@@ -122,46 +119,43 @@ export const signMailToken = async (username: string, purpose: string, idInLink?
  * @param started_at 
  * @returns 
  */
-export const signAppToken = async (username: string, ip: string, whoami: AuroralUserType, started_at?: number): Promise<{ token: string, refreshToken: string}> => {
-    const user = await AccountModel._getAccount(username)
+export const signAppToken = async (id: string, whoami: AuroralUserType, ip?: string, started_at?: number): Promise<{ token: string, refreshToken: string}> => {
+    const tokenObject = {
+        iss: 'AURORAL Auth Server',
+        aud: audClaims,
+        iat: started_at ? started_at : Math.floor(Date.now() / 1000), // Session initiated at
+        exp: Math.floor(Date.now() / 1000) + Config.SESSIONS.DURATION
+    } as JsonType
     const { secret, algorithm } = getSecretAndAlg()
-    const exp = Math.floor(Date.now() / 1000) + Config.SESSIONS.DURATION
-    const iat = started_at ? started_at : Math.floor(Date.now() / 1000) // Session initiated at
-    const sessionValue = user.uid + ':' + username + ':' + iat + ':' + ip
-    await setSession(user.uid, sessionValue)
-    const token = await signToken(
-        {
-            iss: 'AURORAL Auth Server',
-            mail: username,
-            org: user.cid,
-            sub: user.uid,
-            purpose: [
+    if (whoami === AuroralUserType.UI) {
+        const user = await AccountModel._getAccount(id)
+        tokenObject.email = id
+        tokenObject.cid = user.cid
+        tokenObject.sub = user.uid
+        tokenObject.origin = AuroralUserType.UI
+        tokenObject.purpose = [
                 purposeClaims[0],
                 whoami === AuroralUserType.UI ? 
                 purposeClaims[6] : 
-                purposeClaims[7]].toString(),
-            aud: audClaims,
-            roles: user.roles.toString(),
-            iat,
-            exp
-        },
-        secret,
-        algorithm  
-    )
-    const refreshToken = await signToken(
-        {
-            iss: 'AURORAL Auth Server',
-            mail: username,
-            org: user.cid,
-            sub: user.uid,
-            purpose: purposeClaims[1],
-            aud: audClaims[0],
-            roles: user.roles.toString(),
-            exp
-        },
-        secret,
-        algorithm  
-    )
+                purposeClaims[7]].toString() 
+        tokenObject.roles = user.roles.toString()
+        // Set session
+        const sessionValue = user.uid + ':' + id + ':' + tokenObject.iat + ':' + ip
+        await setSession(user.uid, sessionValue)
+    } else if (whoami === AuroralUserType.NODE) {
+        const node = await NodeModel._getNode(id)
+        tokenObject.email = `${node.agid}@auroral.eu`
+        tokenObject.cid = node.cid
+        tokenObject.origin = AuroralUserType.NODE
+        tokenObject.sub = node.agid
+        tokenObject.purpose = purposeClaims[7]
+        tokenObject.roles = ''
+    } else {
+        throw new Error('Invalid Auroral user type')
+    }
+    const token = await signToken(tokenObject, secret, algorithm)
+    const refreshToken = await signToken({ ...tokenObject, purpose: purposeClaims[1] }, secret, algorithm)
+
     return { token, refreshToken }
 }
 

@@ -25,7 +25,7 @@ export const getMany: getManyController = async (req, res) => {
   const { type, offset, filter, domain } = req.query
   const { decoded } = res.locals
 	try {
-      const data = await ItemService.getMany(decoded.org, type, offset, filter, domain)
+      const data = await ItemService.getMany(decoded.cid, type, offset, filter, domain)
       return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
@@ -40,8 +40,8 @@ export const getOne: getOneController = async (req, res) => {
   const { oid } = req.params
   const { decoded } = res.locals
 	try {
-    const data = await ItemService.getOne(decoded.org, oid)
-    const contract = await  ContractModel._getCommonPrivateContracts(decoded.org, data.cid)
+    const data = await ItemService.getOne(decoded.cid, oid)
+    const contract = await  ContractModel._getCommonPrivateContracts(decoded.cid, data.cid)
     if (contract.length > 0) {
       // there is common contract
       if (data.hasContracts.includes(contract[0].ctid)) {
@@ -78,10 +78,10 @@ export const getByCompany: getByCompanyController = async (req, res) => {
       status: ItemStatus.ENABLED
     }
     const foreignOrg = (await OrganisationModel._getOrganisation(cid))
-    if (foreignOrg.knows.includes(decoded.org)) {
+    if (foreignOrg.knows.includes(decoded.cid)) {
       // We are friends
       reqParam.$or = [{ accessLevel: ItemPrivacy.FOR_FRIENDS }, { accessLevel: ItemPrivacy.PUBLIC }]
-    } else if (cid === decoded.org) {
+    } else if (cid === decoded.cid) {
       // My org
       reqParam.status = { $ne: ItemStatus.DELETED }
     } else {
@@ -112,10 +112,10 @@ export const getByUser: GetByUserController = async (req, res) => {
       type,
     }
     const foreignOrg = (await OrganisationModel._getOrganisation(reqUser.cid))
-    if (foreignOrg.knows.includes(decoded.org)) {
+    if (foreignOrg.knows.includes(decoded.cid)) {
       // We are friends
       reqParam.$or = [{ accessLevel: ItemPrivacy.FOR_FRIENDS }, { accessLevel: ItemPrivacy.PUBLIC }]
-    } else if (reqUser.cid === decoded.org) {
+    } else if (reqUser.cid === decoded.cid) {
       // My org
       reqParam.status = { $ne: ItemStatus.DELETED }
     } else {
@@ -140,7 +140,7 @@ export const updateOne: UpdateOneController = async (req, res) => {
 	try {
     await ItemService.updateOne(oid, data, decoded.sub)
     // Send notification to company
-    const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
+    const myOrgName = (await OrganisationModel._getOrganisation(decoded.cid)).name
     const myItemName = (await ItemModel._getItem(oid)).name
     const myUserName = (await UserModel._getUser(decoded.sub)).name
     let eventType = EventType.itemUpdatedByUser
@@ -154,8 +154,8 @@ export const updateOne: UpdateOneController = async (req, res) => {
     }
     // Notification
     await NotificationModel._createNotification({
-      owner: decoded.org,
-      actor: { id: decoded.org, name: myOrgName },
+      owner: decoded.cid,
+      actor: { id: decoded.cid, name: myOrgName },
       target: { id: oid, name: myItemName },
       type: eventType,
       status: NotificationStatus.INFO
@@ -182,14 +182,14 @@ export const removeOne: RemoveOneController = async (req, res) => {
   const { oid } = req.params
   const { decoded } = res.locals
 	try {
-    const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
+    const myOrgName = (await OrganisationModel._getOrganisation(decoded.cid)).name
     const myItemName = (await ItemModel._getItem(oid)).name
     const myUserName = (await UserModel._getUser(decoded.sub)).name
     await ItemService.removeOne(oid, decoded.sub)
     // Notification
     await NotificationModel._createNotification({
-      owner: decoded.org,
-      actor: { id: decoded.org, name: myOrgName },
+      owner: decoded.cid,
+      actor: { id: decoded.cid, name: myOrgName },
       target: { id: oid, name: myItemName },
       type: EventType.itemRemoved,
       status: NotificationStatus.INFO

@@ -41,7 +41,7 @@ export async function getByKeyid(
   ): Promise<IExternalUser> {
     const record = await this.findOne({ keyid }).exec()
     if (!record) {
-      throw new Error('Error retrieving external user by keyid')
+      throw new Error('Error retrieving external user by keyid:' + keyid)
     }
     return record
 }

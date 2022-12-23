@@ -46,7 +46,7 @@ export const globalSearch: globalSearchController = async (req, res) => {
 		let result = [] as SearchResult[]
 
 		// get my organisations (because of knows array)
-		const myOrganisation = await OrganisationModel._getOrganisation(decoded.org) 
+		const myOrganisation = await OrganisationModel._getOrganisation(decoded.cid) 
 		for (const sType of searchType) {
 			const availibleSpace = (requestLimit - result.length) > 0 ? requestLimit - result.length : 0
 

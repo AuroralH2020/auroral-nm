@@ -9,6 +9,9 @@ import { IRecordCreate } from '../../../persistance/record/types'
 import { NodeModel } from '../../../persistance/node/model'
 import { RecordModel } from '../../../persistance/record/model'
 import { errorHandler } from '../../../utils/error-handler'
+import { signAppToken, verifyToken } from '../../../auth-server/auth-server'
+import { AuroralUserType, JWTAURORALToken } from '../../../types/jwt-types'
+import { ensureUserExistsinDLT } from '../../../core/dlt'
 
 // Controllers
 
@@ -18,8 +21,17 @@ type handshakeController = expressTypes.Controller<{}, {}, {}, string, localsTyp
 export const handshake: handshakeController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
-    const data = decoded ? `Gateway ${decoded.agid} authenticated` : 'Gateway connected as anonymous, restrictions might apply'
-    return responseBuilder(HttpStatusCode.OK, res, null, data)
+    // Update -> forbid anonymous access
+    if (!decoded) {
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, 'Gateway unauthorized access attempt')
+    }
+    const token = await signAppToken(decoded.agid, AuroralUserType.NODE)
+    const response = {
+      ...token,
+      exp: ((await verifyToken(token.token)) as unknown as JWTAURORALToken).exp
+    }
+    await ensureUserExistsinDLT(`${decoded.agid}@auroral.node.eu`, decoded.cid, `${decoded.agid}@auroral.node.eu`)
+    return responseBuilder(HttpStatusCode.OK, res, null, JSON.stringify(response))
 	} catch (err) {
     const error = errorHandler(err)
     logger.error(error.message)

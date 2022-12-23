@@ -12,6 +12,7 @@ import { CommunityService, ItemService } from '../core'
 import { errorHandler } from '../utils/error-handler'
 import { UserModel } from '../persistance/user/model'
 import { ItemType } from '../persistance/item/types'
+import { deleteUserFromDlt } from './dlt'
 
 // Functions
 export const createOne = async (cid: string, name: string, type: NodeType, password: string): Promise<string> => {
@@ -88,6 +89,9 @@ export const removeOne = async (agid: string, cid?: string): Promise<void> => {
         await OrganisationModel._removeNodeFromCompany(node.cid, agid)
         // Remove node
         await node._removeNode()
+
+        // Remove from DLT
+        await deleteUserFromDlt(`${agid}@auroral.node.eu`)
         // // Remove from nodes group in commServer (Initially public) DEPRECATED
         // await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
         // Delete node user from CS

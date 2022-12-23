@@ -17,6 +17,7 @@ import { hashPassword, comparePassword } from '../../../auth-server/auth-server'
 import { ResultStatusType, EventType } from '../../../types/misc-types'
 import { UserService } from '../../../core'
 import { RolesEnum } from '../../../types/roles'
+import { deleteUserFromDlt } from '../../../core/dlt'
 
 // Controllers
 
@@ -44,12 +45,12 @@ export const getMany: getManyController = async (req, res) => {
                 const organisation = await OrganisationModel._getOrganisation(cid)
                 let accessLevel: UserVisibility[] = []
                 const users: string[] = organisation.hasUsers
-                if (cid === decoded.org) {
+                if (cid === decoded.cid) {
                         // It is same org
                         accessLevel = Object.values(UserVisibility) as UserVisibility[]
                 } else {
                         const friends = organisation.knows
-                        accessLevel = friends.indexOf(decoded.org) !== -1 ?
+                        accessLevel = friends.indexOf(decoded.cid) !== -1 ?
                                       [UserVisibility.FRIENDS_ONLY, UserVisibility.PUBLIC] :
                                       [UserVisibility.PUBLIC]  
                 }
@@ -75,7 +76,7 @@ export const removeUser: removeUserController = async (req, res) => {
                 // Ger user
                 const userDoc = await UserModel._getDoc(uid)
                 // Test if user belongs to same company
-                if (userDoc.cid !== decoded.org) {
+                if (userDoc.cid !== decoded.cid) {
                         throw new MyError('You are not allowed to remove user from different company', HttpStatusCode.FORBIDDEN)
                 }
                 // Test if user has some items
@@ -101,13 +102,15 @@ export const removeUser: removeUserController = async (req, res) => {
                 })
                  // Notification
                 await NotificationModel._createNotification({
-                        owner: decoded.org,
+                        owner: decoded.cid,
                         actor: { id: adminUser.uid, name: adminUser.name },
                         target: { id: userDoc.uid, name: userDoc.name },
                         type: EventType.userRemoved,
                         status: NotificationStatus.INFO
                 })
 
+                // Remove user in DLT
+                await deleteUserFromDlt(userDoc.email)
                 // remove user in MONGO
                 await AccountModel._deleteAccount(userDoc.email) // Removes user account
                 await userDoc._removeUser() // Marks user as deleted

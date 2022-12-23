@@ -55,14 +55,21 @@ export type JWTRegisteredClaims = {
     iat: number,
 }
 
+// Valid AURORAL users/agents
+export enum AuroralUserType {
+    UI = 'UI',
+    NODE = 'NODE'
+}
+
 // AURORAL defined claims for tokens created for authentication
 // Main token for interaction with the UI and the DLT
 // Used by UI users and Nodes
 export type JWTAURORALToken = {
-    org: string // organisation id - string
+    cid: string // organisation id - string
     roles: string // AURORAL roles for the user - Array as string
-    mail: string // email - string
+    email: string // email - string
     purpose: string // Purpose of the token
+    origin: AuroralUserType  // TBD
 } & JWTRegisteredClaims
 
 // AURORAL defined claims for mail tokens
@@ -86,7 +93,8 @@ export type JWTMailToken = {
 export type JWTGatewayToken = {
     iss?: string, // Receive AGID (LEGACY, to be removed and use SUB claim for AGID)
     aud: string, // Only audience claim for gateway is 'NM' (LEGACY - To be updated in future version)
-    org: string // organisation id - string (@TBD Check that is included or add during GTW code review)
+    cid: string // organisation id - string (@TBD Check that is included or add during GTW code review) ORG -> CID
     // purpose: string // Replaces aud in future versions and aud value changes to 'auroral.bavenir.eu'
     agid: string // Internal use only == sub || iss (To be deprecated)
+    email: string // fake email for DLT, AGID@auroral.eu
 } & JWTRegisteredClaims

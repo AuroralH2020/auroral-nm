@@ -27,8 +27,17 @@ export const Config = {
 		SECRET_KEY: process.env.CS_SECRET_KEY!
 	},
 	DLT: {
-		URL: process.env.DLT_URL!,
-		ENABLED: process.env.DLT_ENABLED === 'true' ? true : false
+		ENABLED: process.env.DLT_ENABLED === 'true' ? true : false,
+		AUTH_HOST: process.env.DLT_AUTH_HOST!,
+		AUTH_PORT: process.env.DLT_AUTH_PORT!,
+		MANAGE_HOST: process.env.DLT_MANAGE_HOST!,
+		MANAGE_PORT: process.env.DLT_MANAGE_PORT!,
+		CONTRACT_HOST: process.env.DLT_CONTRACT_HOST!,
+		CONTRACT_PORT: process.env.DLT_CONTRACT_PORT!,
+		INTROSPECTION: {
+			USER: process.env.DLT_INTROSPECTION_USER! || 'dlt_introspection',
+			PASSWORD: process.env.DLT_INTROSPECTION_PASSWORD! || 'changeme'
+		}
 	},
 	XMPP_CLIENT: {
 		URL: process.env.XMPP_CLIENT_URL!,

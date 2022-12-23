@@ -28,7 +28,7 @@ export const getNode: getNodeController = async (req, res) => {
 	try {
     // Validate that agid belongs to organisation by passing optional CID param to _getNode
     // Get node
-    const data = await NodeModel._getNode(agid, decoded.org)
+    const data = await NodeModel._getNode(agid, decoded.cid)
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
     const error = errorHandler(err)
@@ -42,7 +42,7 @@ type getNodesController = expressTypes.Controller<{}, {}, {}, INodeUI[], localsT
 export const getNodes: getNodesController = async (_req, res) => {
   const { decoded } = res.locals
 	try {
-    const nodes = (await OrganisationModel._getOrganisation(decoded.org)).hasNodes
+    const nodes = (await OrganisationModel._getOrganisation(decoded.cid)).hasNodes
     const data = await NodeModel._getAllNodes(nodes)
     return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {
@@ -59,13 +59,13 @@ export const createNode: postNodeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     // Create node
-    const agid = await NodeService.createOne(decoded.org, name, type, password)
+    const agid = await NodeService.createOne(decoded.cid, name, type, password)
 
     // process adding to communities 
     try {
       if (communities) {
         for (const community of communities) {
-          await CommunityService.addNode(community, decoded.org, agid)
+          await CommunityService.addNode(community, decoded.cid, agid)
         }
       }
     } catch (error) {
@@ -96,22 +96,22 @@ export const updateNode: putNodeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     const node = await NodeModel._getDoc(agid)
-    if (node.cid !== decoded.org) {
+    if (node.cid !== decoded.cid) {
       return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'Node does not belong to your organisation')
     }
     await NodeService.updateOne(agid, data)
     // TBD: Consider updating password too 
     
     // Notification
-    const myOrgName = (await OrganisationModel._getOrganisation(decoded.org)).name
+    const myOrgName = (await OrganisationModel._getOrganisation(decoded.cid)).name
     const myUserName = (await UserModel._getUser(decoded.sub)).name
     let eventType = EventType.nodeUpdated
     if ('key' in data) {
       eventType = EventType.nodeUpdatedKey
     }
     await NotificationModel._createNotification({
-      owner: decoded.org,
-      actor: { id: decoded.org, name: myOrgName },
+      owner: decoded.cid,
+      actor: { id: decoded.cid, name: myOrgName },
       target: { id: agid, name: node.name },
       type: EventType.nodeUpdated,
       status: NotificationStatus.INFO
@@ -146,7 +146,7 @@ export const removeNode: removeNodeController = async (req, res) => {
       throw new MyError('You are not allowed to remove this node', HttpStatusCode.FORBIDDEN)
     }
     // Remove node
-    await NodeService.removeOne(agid, decoded.org)
+    await NodeService.removeOne(agid, decoded.cid)
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,
@@ -215,7 +215,7 @@ export const updateDefaultOwner: updateDefaultItemOwnerController = async (req, 
 	try {
     const myNode = await NodeModel._getNode(agid)
     // check if node belongs to your organisation
-    if (myNode.cid !== decoded.org) {  
+    if (myNode.cid !== decoded.cid) {  
       return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'Node does not belong to your organisation')
     }
     // role check

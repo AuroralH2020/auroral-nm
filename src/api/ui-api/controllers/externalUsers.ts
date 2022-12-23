@@ -30,7 +30,7 @@ export const createExternalUser: createExternalUserController = async (req, res)
             // Only myOrg can be part of the ACL
             ACL.cid.forEach(c => {
                 // Test CIDs are valid
-                if (c !== decoded.org) {
+                if (c !== decoded.cid) {
                     throw new MyError('Invalid CID', HttpStatusCode.FORBIDDEN,)
                 }
             })
@@ -51,7 +51,7 @@ export const createExternalUser: createExternalUserController = async (req, res)
                 if (!item) {
                     throw new MyError('Invalid OID', HttpStatusCode.FORBIDDEN)
                 }
-                if (item.cid !== decoded.org) {
+                if (item.cid !== decoded.cid) {
                     throw new MyError('Item does not belong to your org', HttpStatusCode.FORBIDDEN)
                 }
                 if (item.uid !== decoded.sub) {
@@ -69,7 +69,7 @@ export const createExternalUser: createExternalUserController = async (req, res)
                 if (!node) {
                     throw new MyError('Invalid AGID', HttpStatusCode.FORBIDDEN)
                 }
-                if (node.cid !== decoded.org) {
+                if (node.cid !== decoded.cid) {
                     throw new MyError('Node does not belong under your org', HttpStatusCode.FORBIDDEN)
                 }
             }
@@ -81,7 +81,7 @@ export const createExternalUser: createExternalUserController = async (req, res)
         ACL.agid = [...new Set(ACL.agid)]
         ACL.cid = [...new Set(ACL.cid)]
         // Create external user
-        const externalUser = await ExternalUserModel._createExternalUser({ ACL, name, cid: decoded.org, secretKey: secretKeyHash, grantType })
+        const externalUser = await ExternalUserModel._createExternalUser({ ACL, name, cid: decoded.cid, secretKey: secretKeyHash, grantType })
         return responseBuilder(HttpStatusCode.OK, res, null, { keyid: externalUser.keyid, name: externalUser.name, ACL: externalUser.ACL, secretKey, created: externalUser.created, ttl: externalUser.ttl })
     } catch (err) {
         const error = errorHandler(err)
@@ -98,7 +98,7 @@ export const removeExternalUser: removeExternalUserController = async (req, res)
     try {
         // TODO: Check roles
         const eUser = await ExternalUserModel._getByKeyid(keyid)
-        if (decoded.org !== eUser.cid) {
+        if (decoded.cid !== eUser.cid) {
             throw new MyError('You are not allowed to remove this user', HttpStatusCode.FORBIDDEN)
         }
         await ExternalUserModel._removeExternalUser(keyid)
@@ -115,7 +115,7 @@ type getExternalUserByCidController = expressTypes.Controller<{}, {}, {}, IExter
 export const getExternalUserByCid: getExternalUserByCidController = async (_req, res) => {
     const { decoded } = res.locals
     try {
-        const eUsers = await ExternalUserModel._getExternalUsersByCid(decoded.org)
+        const eUsers = await ExternalUserModel._getExternalUsersByCid(decoded.cid)
         return responseBuilder(HttpStatusCode.OK, res, null, eUsers)
     } catch (err) {
         const error = errorHandler(err)

@@ -9,7 +9,7 @@ export const createAudit = (_source: SourceType) => {
         const { decoded } = res.locals
         if (decoded) {
             res.locals.audit = {
-                cid: decoded.org,
+                cid: decoded.cid,
                 labels: { ip: res.locals.origin?.originIp, origin: res.locals.origin?.interface, source: _source },
                 reqId: res.locals.reqId
             }

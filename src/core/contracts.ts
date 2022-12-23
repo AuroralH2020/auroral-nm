@@ -30,6 +30,7 @@ import { IAuditLocals } from '../types/locals-types'
 import { OrganisationStatus } from '../persistance/organisation/types'
 import { xmpp } from '../microservices/xmppClient'
 import { dlt } from '../microservices/dltConnector'
+import { acceptDLTContract, addDLTContractItem, createDLTContract, rejectDLTContract, removeDLTContract, removeDLTContractItem, updateDLTContractItem } from './dlt'
 
 // Functions
 
@@ -68,25 +69,25 @@ export const getMany = async (args: getContractstOptions): Promise<IContractUI[]
  * @param description 
  * @returns 
  */
-export const createOne = async (cid: string, uid: string, termsAndConditions: string, organisations: string[], audit: IAuditLocals, description?: string): Promise<string> => {
+export const createOne = async (contractDetails: {cid: string, uid: string, termsAndConditions: string, organisations: string[], description?: string}, audit: IAuditLocals, token: string): Promise<string> => {
     try {
         // get my data for notifications and audits
-        const myOrg = await OrganisationModel._getOrganisation(cid)
-        const myUser = await UserModel._getUser(uid)
+        const myOrg = await OrganisationModel._getOrganisation(contractDetails.cid)
+        const myUser = await UserModel._getUser(contractDetails.uid)
 
-        if (organisations.length !== 1) {
+        if (contractDetails.organisations.length !== 1) {
             throw new MyError('Contracts between multiple organisations are not allowed ', HttpStatusCode.BAD_REQUEST)
         }
         // test if user is trying to invite his organisation
-        if (organisations[0] === cid) {
+        if (contractDetails.organisations[0] === contractDetails.cid) {
             throw new MyError('Can not invite own organisation', HttpStatusCode.BAD_REQUEST)
         }
-        const org =  await OrganisationModel._getOrganisation(organisations[0])
+        const org =  await OrganisationModel._getOrganisation(contractDetails.organisations[0])
         // test if org exists
         if (org.status !== OrganisationStatus.ACTIVE) {
             throw new MyError('Invited organisation is not active', HttpStatusCode.BAD_REQUEST)
         }
-        if (!(org.knows).includes(cid)) {
+        if (!(org.knows).includes(contractDetails.cid)) {
             throw new MyError('You have to be friends to send contract request', HttpStatusCode.BAD_REQUEST)
         }
         // Test if same there is already contract with same org
@@ -96,23 +97,23 @@ export const createOne = async (cid: string, uid: string, termsAndConditions: st
             throw new MyError('You already have contract with given organisation', HttpStatusCode.BAD_REQUEST)
         }
         // Create contract
-        const contractData: IContractCreate = { termsAndConditions, organisations: [cid], pendingOrganisations: organisations, description }
+        const contractData: IContractCreate = { termsAndConditions: contractDetails.termsAndConditions, organisations: [contractDetails.cid], pendingOrganisations: contractDetails.organisations, description: contractDetails.description }
         // Create contract
         const contract = await ContractModel._createContract(contractData)
         // Create contract in DLT
-        await dlt.createContract(myOrg.cid, contract)
+        await createDLTContract(token, contract)
         // Add contract to first organisation
-        await OrganisationModel._addContract(cid, contract.ctid)
+        await OrganisationModel._addContract(contractDetails.cid, contract.ctid)
 
         // Create Notifications and fill hasContracts for all organisations
         let contractName = 'contract: ' + myOrg.name
-        for (const x of organisations) {
+        for (const x of contractDetails.organisations) {
             await OrganisationModel._addContractRequest(x, contract.ctid)
             const remoteOrg = await OrganisationModel._getOrganisation(x)
             contractName += ' ' + remoteOrg.name
             await NotificationModel._createNotification({
                 owner: x,
-                actor: { id: cid, name: myOrg.name },
+                actor: { id: contractDetails.cid, name: myOrg.name },
                 target: { id: x, name: remoteOrg.name },
                 object: { id: contract.ctid, name: 'Private contract' },
                 type: EventType.contractRequest,
@@ -122,7 +123,7 @@ export const createOne = async (cid: string, uid: string, termsAndConditions: st
         // Audits
         await AuditModel._createAudit({
             ...audit,
-            actor: { id: cid, name: myUser.name },
+            actor: { id: contractDetails.cid, name: myUser.name },
             target: { id: contract.ctid,  name: 'Private contract' },
             object: { id: myOrg.cid, name: myOrg.name },
             type: EventType.contractCreated,
@@ -166,7 +167,7 @@ export const createOne = async (cid: string, uid: string, termsAndConditions: st
  * @param uid 
  * @param audit 
  */
-export const removeOrgFromContract = async (ctid: string, cid: string, uid: string, audit: IAuditLocals): Promise<void> => {
+export const removeOrgFromContract = async (ctid: string, cid: string, uid: string, audit: IAuditLocals, token: string): Promise<void> => {
     // Get contract organisations
     const contractCids = (await ContractModel._getContract(ctid)).organisations
     // Remove org items from contract
@@ -177,7 +178,7 @@ export const removeOrgFromContract = async (ctid: string, cid: string, uid: stri
     await ContractModel._removeOrganisationFromContract(ctid, cid)
     await OrganisationModel._removeContract(cid, ctid)
     // DLT update
-    await dlt.dissolveContract(cid, ctid)
+    await removeDLTContract(token, ctid)
 
     const myUser = await UserModel._getUser(uid)
     const myOrg = await OrganisationModel._getOrganisation(cid)
@@ -221,7 +222,7 @@ export const removeOrgFromContract = async (ctid: string, cid: string, uid: stri
  * @param uid 
  * @param audit 
  */
-export const rejectContractRequest = async (ctid: string, cid: string, uid: string, audit: IAuditLocals): Promise<void> => {
+export const rejectContractRequest = async (ctid: string, cid: string, uid: string, audit: IAuditLocals, token: string): Promise<void> => {
     // Get contract organisations
     const contractCids = (await ContractModel._getContract(ctid)).organisations
     // Test if rejecting  is possible
@@ -231,7 +232,7 @@ export const rejectContractRequest = async (ctid: string, cid: string, uid: stri
     // Remove org from contract
     await ContractModel._removePendingOrganisationFromContract(ctid, cid)
     // DLT update
-    await dlt.rejectContract(cid, ctid)
+    await rejectDLTContract(token, ctid)
     // Update contract status
     const contractDoc = await ContractModel._getDoc(ctid)
     await contractDoc._updateStatus()
@@ -279,15 +280,15 @@ export const rejectContractRequest = async (ctid: string, cid: string, uid: stri
  * @param uid 
  * @param audit 
  */
-export const acceptContractRequest = async (ctid: string, cid: string, uid: string, audit: IAuditLocals): Promise<void> => {
+export const acceptContractRequest = async (ctid: string, cid: string, uid: string, audit: IAuditLocals, token: string): Promise<void> => {
     // Test if accepting is possible
     if (!(await OrganisationModel._getOrganisation(cid)).hasContractRequests.includes(ctid)) {
         throw new MyError('Can not accept this contract')
     }
     // Add org to contract
     await ContractModel._orgAcceptsContract(ctid, cid)
-     // DLT update
-     await dlt.acceptContract(cid, ctid)
+    // DLT update
+    await acceptDLTContract(token, ctid)
     // Update conract status
     const contract = await ContractModel._getDoc(ctid)
     await contract._updateStatus()
@@ -331,37 +332,37 @@ export const acceptContractRequest = async (ctid: string, cid: string, uid: stri
  * @param rw 
  * @param enabled 
  */
-export const addItem = async (ctid: string, oid: string, rw: boolean, enabled: boolean): Promise<void> => {
+export const addItem = async (newItem: { ctid: string, oid: string, rw: boolean, enabled: boolean }, token: string): Promise<void> => {
     try {
         // Create contract
-        const item = await ItemModel._getItem(oid)
+        const item = await ItemModel._getItem(newItem.oid)
         const user = await UserModel._getUser(item.uid)
-        const contract = await ContractModel._getContract(ctid)
+        const contract = await ContractModel._getContract(newItem.ctid)
         if (item.status !== ItemStatus.ENABLED || item.accessLevel === ItemPrivacy.PRIVATE) {
             throw  new MyError('You have to include only ENABLED and not PRIVATE items', HttpStatusCode.BAD_REQUEST)
         }
-        if (enabled) {
+        if (newItem.enabled) {
             // add to openfire group if enabled == true
-            await cs.addUserToGroup(oid, ctid)
+            await cs.addUserToGroup(newItem.oid, newItem.ctid)
         }
         // test if item is already included in contract
         if ((contract.items).some((it) => {
-            return it.oid === oid
+            return it.oid === newItem.oid
             })) {
             throw  new MyError('Item is already included in contract', HttpStatusCode.BAD_REQUEST)
         }
         // Add item to contract
-        const contractItem : ContractItemType = { enabled, rw, type: item.type, oid, cid: item.cid, uid: item.uid, userMail: user.email }
-        await ContractModel._addItem(ctid, contractItem)
+        const contractItem : ContractItemType = { enabled: newItem.enabled, rw: newItem.rw, type: item.type, oid: newItem.oid, cid: item.cid, uid: item.uid, userMail: user.email }
+        await ContractModel._addItem(newItem.ctid, contractItem)
         // DLT update
-        await dlt.addContractItem(user.cid, ctid, contractItem)
+        await addDLTContractItem(token, newItem.ctid, contractItem)
         // Add contract to item
-        await ItemModel._addContract(oid, ctid)
-        if (enabled) {
+        await ItemModel._addContract(newItem.oid, newItem.ctid)
+        if (newItem.enabled) {
             // Get other organisations in contract
             const foreignOrg = contract.organisations.filter(it => it !== item.cid)
             // Send XMPP notification to node where the item belongs
-            await xmpp.notifyContractItemUpdate(item.agid, { ctid, cid: foreignOrg[0], oid, rw })
+            await xmpp.notifyContractItemUpdate(item.agid, { ctid: newItem.ctid, cid: foreignOrg[0], oid: newItem.oid, rw: newItem.rw })
         }
     } catch (err) {
         const error = errorHandler(err)
@@ -377,7 +378,7 @@ export const addItem = async (ctid: string, oid: string, rw: boolean, enabled: b
  * @param oid 
  * @param data 
  */
-export const editItem = async (ctid: string, oid: string, data: IContractItemUpdate): Promise<void> => {
+export const editItem = async (ctid: string, oid: string, data: IContractItemUpdate, token: string): Promise<void> => {
     try {
         // Get item
         const itemAgid = (await ItemModel._getItem(oid)).agid
@@ -398,7 +399,8 @@ export const editItem = async (ctid: string, oid: string, data: IContractItemUpd
         // Edit item 
         await ContractModel._editItem(ctid, oid, data)
         // DLT update
-        await dlt.updateContractItem(item.cid, ctid, { ...data, oid })
+        // Retrieve item after updates because DLT requires the whole item
+        await updateDLTContractItem(token, ctid, await ContractModel._getItem(ctid, oid))
         // Item after updates
         const itemNew = await ContractModel._getItem(ctid, oid)
         // Send XMPP notification
@@ -426,7 +428,7 @@ export const editItem = async (ctid: string, oid: string, data: IContractItemUpd
  * @param oids 
  * @param cid
  */
-export const removeItems = async (ctid: string, oids: string[], cid: string): Promise<void> => {
+export const removeItems = async (ctid: string, oids: string[], cid: string, token: string): Promise<void> => {
     try {
         // Remove array of items
         const items = await ContractModel._getContractItems(ctid)
@@ -440,7 +442,7 @@ export const removeItems = async (ctid: string, oids: string[], cid: string): Pr
             try {
                 await ItemModel._removeContract(oid, ctid)
                 // DLT update
-                await dlt.deleteContractItem(cid, ctid, oid)
+                await removeDLTContractItem(token, ctid, oid)
             } catch  {
                 logger.error('One item was not removed: ' + oid)
             }

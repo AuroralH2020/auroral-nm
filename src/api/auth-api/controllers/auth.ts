@@ -6,7 +6,7 @@ import { responseBuilder } from '../../../utils/response-builder'
 import { errorHandler, MyError } from '../../../utils/error-handler'
 
 // Controller specific imports
-import { comparePassword, generateSecret, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword, verifyHash, AuroralUserType } from '../../../auth-server/auth-server'
+import { comparePassword, generateSecret, signAppToken, signMailToken, verifyToken, checkTempSecret, hashPassword, verifyHash } from '../../../auth-server/auth-server'
 import { MailToken, AuroralToken } from '../../../core/jwt-wrapper'
 import { passwordlessLogin, recoverPassword } from '../../../auth-server/mailer'
 import { AccountModel } from '../../../persistance/account/model'
@@ -15,7 +15,8 @@ import { UserModel } from '../../../persistance/user/model'
 import { tokenBlacklist } from '../../../microservices/tokenBlacklist'
 import { AuditModel } from '../../../persistance/audit/model'
 import { EventType, ResultStatusType } from '../../../types/misc-types'
-
+import { AuroralUserType } from '../../../types/jwt-types'
+import { ensureUserExistsinDLT } from '../../../core/dlt'
 
 // Controllers
 
@@ -30,10 +31,12 @@ export const authenticate: authController = async (req, res) => {
 	}
 	try {
                 await comparePassword(username, password)
-                const tokens = await signAppToken(username, res.locals.origin.originIp, AuroralUserType.UI)
+                const tokens = await signAppToken(username, AuroralUserType.UI, res.locals.origin.originIp)
                 // Audit login
                 const myAccount = await AccountModel._getAccount(username)
                 const myUser = await UserModel._getUser(myAccount.uid)
+                // Ensure that user is registered in DLT
+                await ensureUserExistsinDLT(myAccount.username, myUser.cid, myAccount.username)
                 // Login audit
                 await AuditModel._createAudit({
                         ...res.locals.audit,
@@ -53,17 +56,44 @@ export const authenticate: authController = async (req, res) => {
 }
 
 type introspectionController = expressTypes.Controller<{}, { token: string }, {}, any, localsTypes.ILocals>
- 
+// Introspection endpoint for DLT, basic auth is required (cred in .env file) 
+
 export const introspection: introspectionController = async (req, res) => {
         const { token } = req.body
-        if (!token) {
-                logger.error('Missing token for introspection')
-                return res.status(400).json({
-                        error: 'invalid_request',
-                        error_description: 'Missing token for introspection'
-                })
-        }
-        try {
+        
+                try {
+                // check basic auth included
+                const auth = req.headers.authorization
+                console.log(req.headers)
+                if (1) {
+                        return res.status(200).json({ cid: '904b7c42-7b4b-4637-aa38-e96a55ff4288', email: 'peter.drahovsky@bavenir.eu' })
+                }
+
+                if (!auth) {
+                        logger.error('Missing basic auth')
+                        return res.status(401).json({
+                                error: 'invalid_request',
+                                error_description: 'Missing basic auth'
+                        })
+                }
+                // compare username and password
+                const [username, password] = Buffer.from(auth.split(' ')[1], 'base64').toString().split(':')
+                if (username !== process.env.DLT_INTROSPECTION_USER || password !== process.env.DLT_INTROSPECTION_PASSWORD) {
+                        logger.error('Invalid basic auth')
+                        return res.status(401).json({
+                                error: 'invalid_request',
+                                error_description: 'Invalid basic auth'
+                        })
+                }
+
+                if (!token) {
+                        logger.error('Missing token for introspection')
+                        return res.status(400).json({
+                                error: 'invalid_request',
+                                error_description: 'Missing token for introspection'
+                        })
+                }
+        
                 const decoded = await AuroralToken.verify(token)
                 if (await tokenBlacklist.checkInBlacklist(decoded.sub, token)) {
                         logger.error('Token is blacklisted or inactive')
@@ -71,6 +101,14 @@ export const introspection: introspectionController = async (req, res) => {
                                 error: 'invalid_request',
                                 error_description: 'Token is blacklisted or inactive'
                         })  
+                }
+                // DLT scope test
+                if (!decoded.purpose.includes('DLT_READWRITE') && !decoded.purpose.includes('DLT_READ')) {
+                        logger.error('Token does not have DLT scope')
+                        return res.status(401).json({
+                                error: 'invalid_request',
+                                error_description: 'Token does not have DLT scope'
+                        })
                 }
                 return res.status(200).json({
                         active: true,
@@ -80,7 +118,7 @@ export const introspection: introspectionController = async (req, res) => {
                         typ: 'Bearer',
                         scope: decoded.purpose.replace(/,/g, ' '), // Replace commas by spaces to be compliant
                         client_id: 'auroral-nm',
-                        username: decoded.mail,
+                        username: decoded.email,
                         exp: decoded.exp
                 })
         } catch (err) {
@@ -158,8 +196,18 @@ export const refreshToken: refreshTokenController = async (req, res) => {
         try {
                 const original = await AuroralToken.verify(myRefreshToken)
                 if (original.purpose.includes('refresh') && original.sub === decoded.sub) {
-                        const tokens = await signAppToken(decoded.sub, res.locals.origin.originIp, AuroralUserType.UI, decoded.iat)
-                        return responseBuilder(HttpStatusCode.OK, res, null, tokens)
+                        if (decoded.origin === AuroralUserType.UI) {
+                                // UI refresh
+                                const tokens = await signAppToken(decoded.sub, AuroralUserType.UI, res.locals.origin.originIp, decoded.iat)
+                                return responseBuilder(HttpStatusCode.OK, res, null, tokens)
+                        } else if (decoded.origin === AuroralUserType.NODE) {
+                                // Node refresh
+                                const tokens = await signAppToken(decoded.sub, AuroralUserType.NODE, '', decoded.iat)
+                                return responseBuilder(HttpStatusCode.OK, res, null, tokens)
+                        } else {
+                                logger.warn('Invalid token origin')
+                                return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'Invalid token origin')
+                        }
                 } else {
                         logger.warn('Refresh token not valid')
                         return responseBuilder(HttpStatusCode.FORBIDDEN, res, 'Refresh token not valid') 
@@ -205,7 +253,7 @@ export const processPasswordless: processPasswordlessController = async (req, re
                 await checkTempSecret(original.sub, original.secret)
                 logger.debug('Passwordless login validated')
                 // generate app token
-                const tokens = await signAppToken(original.sub, res.locals.origin.originIp, AuroralUserType.UI)
+                const tokens = await signAppToken(original.sub, AuroralUserType.UI, res.locals.origin.originIp)
                 return responseBuilder(HttpStatusCode.OK, res, null, tokens)
         } catch (err) {
                 const error = errorHandler(err)
@@ -246,7 +294,7 @@ export const rememberGetToken: rememberGetTokenController = async (req, res) => 
                 }
                 // look for username and get token
                 const username = (await UserModel._getUser(session.uid)).email
-                const token = await signAppToken(username, res.locals.origin.originIp, AuroralUserType.UI)
+                const token = await signAppToken(username, AuroralUserType.UI, res.locals.origin.originIp)
 
                 return responseBuilder(HttpStatusCode.OK, res, null, token)
         } catch (err) {

@@ -3,9 +3,9 @@
  */
 
 // Imports
-import { logger } from 'elastic-apm-node'
 import { cs } from '../microservices/commServer'
 import { errorHandler, MyError } from '../utils/error-handler'
+import { logger } from '../utils/logger'
 import { CommunityModel } from '../persistance/community/model'
 import { CommunityType, ICommunityCreate } from '../persistance/community/types'
 import { NodeModel } from '../persistance/node/model'

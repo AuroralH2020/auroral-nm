@@ -18,17 +18,17 @@ import { CommunityModel } from '../persistance/community/model'
 /**
  * Get Items
  */
- export const remove = async (organisation: IOrganisationDocument, uid: string, audit: IAuditLocals): Promise<void> => {
+ export const remove = async (organisation: IOrganisationDocument, uid: string, audit: IAuditLocals, token: string): Promise<void> => {
     try {
         const cid = organisation.cid
 
         // 1a - Remove contracts
         await Promise.all(organisation.hasContracts.map(async it => {
-            await ContractService.removeOrgFromContract(it, cid, uid, audit)
+            await ContractService.removeOrgFromContract(it, cid, uid, audit, token)
         }))
         // 1b - Remove contract requests
         await Promise.all(organisation.hasContractRequests.map(async it => {
-            await ContractService.rejectContractRequest(it, cid, uid, audit)
+            await ContractService.rejectContractRequest(it, cid, uid, audit, token)
         }))
         // 2a - Remove partnerships
         await Promise.all(organisation.knows.map(async it => {

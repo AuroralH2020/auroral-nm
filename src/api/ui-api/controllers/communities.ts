@@ -34,7 +34,7 @@ export const getCommunities: getCommunitiesController = async (req, res) => {
     const { decoded } = res.locals
     const { type, offset, domain } = req.query
     try {
-        const communities = await CommunityModel._getAllCommunitiesUI(type ? type : CommunityType.COMMUNITY,  offset ? offset : 0, domain, decoded.org)
+        const communities = await CommunityModel._getAllCommunitiesUI(type ? type : CommunityType.COMMUNITY,  offset ? offset : 0, domain, decoded.cid)
         return responseBuilder(HttpStatusCode.OK, res, null, communities)
     } catch (err) {
         const error = errorHandler(err)
@@ -49,7 +49,7 @@ export const createCommunity: postCommunityController = async (req, res) => {
     const { nodes, name, description, domain } = req.body
     const { decoded } = res.locals
     try {
-        const org = await OrganisationModel._getOrganisation(decoded.org)
+        const org = await OrganisationModel._getOrganisation(decoded.cid)
         // test if some nodes are included
         if (!nodes || nodes.length === 0) {
             throw new MyError('Please include at least one node', HttpStatusCode.BAD_REQUEST)
@@ -86,7 +86,7 @@ export const addNodeToCommunity: addNodeToCommunityController = async (req, res)
     const { commId, agid } = req.params
     const { decoded } = res.locals
     try {
-        const org = await OrganisationModel._getOrganisation(decoded.org)
+        const org = await OrganisationModel._getOrganisation(decoded.cid)
         if (!org.hasNodes.includes(agid)) {
             throw new MyError('Node [' + agid + '] is not registered under your company', HttpStatusCode.BAD_REQUEST)
         }
@@ -105,7 +105,7 @@ export const removeNodeFromCommunity: removeNodeFromCommunityController = async 
     const { commId, agid } = req.params
     const { decoded } = res.locals
     try {
-        const org = await OrganisationModel._getOrganisation(decoded.org)
+        const org = await OrganisationModel._getOrganisation(decoded.cid)
         if (!org.hasNodes.includes(agid)) {
             throw new MyError('Node [' + agid + '] is not registered under your company', HttpStatusCode.BAD_REQUEST)
         }

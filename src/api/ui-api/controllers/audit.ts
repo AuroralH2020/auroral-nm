@@ -18,7 +18,7 @@ export const getAudits: getAuditController = async (req, res) => {
     const { days } = req.query
 	const { decoded } = res.locals
 	try {
-		const cid = decoded.org
+		const cid = decoded.cid
 		const data = await AuditModel._getAudits(cid, id, days)
 		return responseBuilder(HttpStatusCode.OK, res, null, data)
 	} catch (err) {

@@ -34,24 +34,24 @@ export const getOne: getOneController = async (req, res) => {
                 const requestsFrom = data.knowsRequestsFrom
                 const requestsTo = data.knowsRequestsTo
                 // Case I am same org that I am requesting
-                if (cid === decoded.org) {
+                if (cid === decoded.cid) {
                         canSendNeighbourRequest = false
                 } else {
                         // Check whether we are neighbors
-                        isNeighbour = myNeighbours.indexOf(decoded.org) !== -1
+                        isNeighbour = myNeighbours.indexOf(decoded.cid) !== -1
 
                         // Check whether authenticated user received or sent neighbour request to requested profile
                         // Check whether authenticated user can be cancelled sent neighbour request to requested profile
-                        canCancelNeighbourRequest = requestsFrom.indexOf(decoded.org) !== -1
+                        canCancelNeighbourRequest = requestsFrom.indexOf(decoded.cid) !== -1
 
                         // Check whether authenticated user can cancel sent request
-                        canAnswerNeighbourRequest = requestsTo.indexOf(decoded.org) !== -1
+                        canAnswerNeighbourRequest = requestsTo.indexOf(decoded.cid) !== -1
                         
                         // If any of the previous is true we cannot send friendship requests
                         canSendNeighbourRequest = !canAnswerNeighbourRequest && !canCancelNeighbourRequest && !isNeighbour
                 }
                 // get common private contract
-                const common = await ContractModel._getCommonPrivateContracts(cid, decoded.org)
+                const common = await ContractModel._getCommonPrivateContracts(cid, decoded.cid)
                 let contract : companiesContracted = {
                         ctid: '',
                         contracted: false,
@@ -141,18 +141,18 @@ type removeOrganisationController = expressTypes.Controller<{}, {}, {}, null, lo
 export const removeOrganisation: removeOrganisationController = async (_req, res) => {
         const decoded = res.locals.decoded
         try {
-                const orgDoc = await OrganisationModel._getDoc(decoded.org)
+                const orgDoc = await OrganisationModel._getDoc(decoded.cid)
                 const orgName = orgDoc.name
                 const userName = (await UserModel._getUser(decoded.sub)).name
 
                 // Remove organisation
-                await OrganisationService.remove(orgDoc, decoded.sub, res.locals.audit)
+                await OrganisationService.remove(orgDoc, decoded.sub, res.locals.audit, res.locals.token)
                  
                 // Audit
                 await AuditModel._createAudit({
                         ...res.locals.audit,
                         actor: { id: decoded.sub, name: userName },
-                        target: { id: decoded.org, name: orgName },
+                        target: { id: decoded.cid, name: orgName },
                         type: EventType.companyRemoved,
                         labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
                 })

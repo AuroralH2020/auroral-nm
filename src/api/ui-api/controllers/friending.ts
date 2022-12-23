@@ -26,7 +26,7 @@ export const processFriendRequest: processFriendRequestController = async (req, 
   const { decoded } = res.locals // Requester organisation ID
   const friendCid = req.params.cid // Requested organisation info
 	try {
-    const myCid = decoded.org
+    const myCid = decoded.cid
     const myUid = decoded.sub
     await OrganisationModel._addOutgoingFriendReq(myCid, friendCid)
     await OrganisationModel._addIncomingFriendReq(friendCid, myCid)
@@ -75,7 +75,7 @@ export const acceptFriendRequest: acceptFriendRequestController = async (req, re
   const { decoded } = res.locals // Requester organisation ID
   const friendCid = req.params.cid // Requested organisation info
 	try {
-    const myCid = decoded.org
+    const myCid = decoded.cid
     const myUid = decoded.sub
     await OrganisationModel._addFriendship(myCid, friendCid)
     await OrganisationModel._delIncomingFriendReq(myCid, friendCid)
@@ -170,7 +170,7 @@ export const rejectFriendRequest: rejectFriendRequestController = async (req, re
   const { decoded } = res.locals // Requester organisation ID
   const friendCid = req.params.cid // Requested organisation info
 	try {
-    const myCid = decoded.org
+    const myCid = decoded.cid
     const myUid = decoded.sub
     await OrganisationModel._delIncomingFriendReq(myCid, friendCid)
     await OrganisationModel._delOutgoingFriendReq(friendCid, myCid)
@@ -223,7 +223,7 @@ export const cancelFriendRequest: cancelFriendRequestController = async (req, re
   const { decoded } = res.locals // Requester organisation ID
   const friendCid = req.params.cid // Requested organisation info
 	try {
-    const myCid = decoded.org
+    const myCid = decoded.cid
     const myUid = decoded.sub
     await OrganisationModel._delIncomingFriendReq(friendCid, myCid)
     await OrganisationModel._delOutgoingFriendReq(myCid, friendCid)
@@ -276,7 +276,7 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
   const { decoded } = res.locals // Requester organisation ID
   const friendCid = req.params.cid // Requested organisation info
 	try {
-    const myCid = decoded.org
+    const myCid = decoded.cid
     const myUid = decoded.sub
     const commonPrivateContracts = await ContractModel._getCommonPrivateContracts(myCid, friendCid)
     // There is a private contract
@@ -285,11 +285,11 @@ export const cancelFriendship: cancelFriendshipController = async (req, res) => 
         if (common.contracted) {
           // leave contract
           logger.debug('Removing org from private contract:' + common.ctid)
-         await ContractService.removeOrgFromContract(common.ctid, myCid, decoded.sub, res.locals.audit)
+         await ContractService.removeOrgFromContract(common.ctid, myCid, decoded.sub, res.locals.audit, res.locals.token)
         } else {
           // reject contract request
           logger.debug('Rejecting private contract request:' + common.ctid)
-          await ContractService.rejectContractRequest(common.ctid, myCid, myUid,res.locals.audit)
+          await ContractService.rejectContractRequest(common.ctid, myCid, myUid,res.locals.audit, res.locals.token)
         }
       }
     }

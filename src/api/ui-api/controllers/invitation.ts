@@ -34,7 +34,7 @@ type getAllInvitationsCtrl = expressTypes.Controller<{}, {}, {}, IInvitation[], 
 export const getAllInvitations: getAllInvitationsCtrl = async (_req, res) => {
         const { decoded } = res.locals
         try {
-                const data = await InvitationModel._getAllInvitations(decoded.org)
+                const data = await InvitationModel._getAllInvitations(decoded.cid)
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
                 const error = errorHandler(err)
@@ -53,14 +53,14 @@ export const postInvitation: postInvitationController = async (req, res) => {
                         throw new Error('Problem decoding token') 
                 } else {
                         // Store invitation
-                        const myOrg = await OrganisationModel._getOrganisation(decoded.org)
+                        const myOrg = await OrganisationModel._getOrganisation(decoded.cid)
                         const newInvitation = await InvitationModel._createInvitation({
                                 ...data,
                                 sentBy: {
                                         cid: myOrg.cid,
                                         organisation: myOrg.name,
                                         uid: decoded.sub,
-                                        email: decoded.mail
+                                        email: decoded.email
                                 }
                         })
                         // Send invitation mail
@@ -85,7 +85,7 @@ export const resendInvitation: resendInvitationController = async (req, res) => 
                 }
                 const inv = await InvitationModel._getInvitation(id)
                 // test if admin from same organisation is trying to resend
-                if (inv.status === InvitationStatus.DONE || inv.sentBy.cid !== decoded.org) {
+                if (inv.status === InvitationStatus.DONE || inv.sentBy.cid !== decoded.cid) {
                         throw new MyError('Not aproved to resend invitation')
                 }
                 // test if lastly updated is more thand before 5 minute
