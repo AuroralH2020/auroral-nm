@@ -236,7 +236,7 @@ export const cancelFriendRequest: cancelFriendRequestController = async (req, re
       owners: [friendCid],
       status: NotificationStatus.WAITING,
       type: EventType.partnershipRequest,
-      target: { id: myCid, name: myOrgName } // Notifications sent by my organisation
+      target: { id: friendCid, name: friendOrgName } // Notifications sent by my organisation
     })
     // Update notification of friendshipRequest --> cancel it
     notificationsToUpdate.forEach(async (it) => {
