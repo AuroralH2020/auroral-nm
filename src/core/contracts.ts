@@ -31,6 +31,8 @@ import { OrganisationStatus } from '../persistance/organisation/types'
 import { xmpp } from '../microservices/xmppClient'
 import { dlt } from '../microservices/dltConnector'
 import { acceptDLTContract, addDLTContractItem, createDLTContract, rejectDLTContract, removeDLTContract, removeDLTContractItem, updateDLTContractItem } from './dlt'
+import { CommunityModel } from '../persistance/community/model'
+import { CommunityService } from '../core'
 
 // Functions
 
@@ -467,6 +469,57 @@ export const removeItems = async (ctid: string, oids: string[], cid: string, tok
         logger.error(error.message)
         throw error
     }
+}
+
+export const getNotDiscoverableNodesInContract = async (ctid: string, cid: string): Promise<{cid: string, nodes: string[]}[]> => {
+    const sharedNodes = []
+    const contract = await ContractModel._getContract(ctid)
+    if (!contract.organisations.includes(cid)) {
+        throw new MyError('You are not part of this contract', HttpStatusCode.FORBIDDEN)
+    }
+    // Nodes owning items in contract 
+    const nodesInContract: string[] = []
+    for (const item of contract.items) {
+        if (item.enabled) {
+            nodesInContract.push((await ItemModel._getItem(item.oid)).agid)
+        }
+    }
+    // Nodes shared in partnership (filter out own cid)
+    for (const remoteOrg of contract.organisations.filter((org) => org !== cid)) {
+        // Check if node is shared in partnership
+        const partnership = await CommunityModel._getPartnershipByCids(cid, remoteOrg)
+        const nodes = partnership.organisations.filter((org) => org.cid === cid)[0].nodes
+        sharedNodes.push({ cid: remoteOrg, nodes })
+    }
+    // Filter out nodes shared in partnership
+    const notSharedNodes = sharedNodes.map(org => {
+        return {
+            cid: org.cid,
+            // Array->Set->Array to remove duplicates
+            nodes: Array.from(new Set(nodesInContract.filter(node => !org.nodes.includes(node))))
+        }
+    }).filter(org => org.nodes.length > 0)
+
+    return notSharedNodes
+}
+
+export const fixNotDiscoverableNodesInContract = async (ctid: string, cid: string): Promise<number> => {
+    const contract = await ContractModel._getContract(ctid)
+    if (!contract.organisations.includes(cid)) {
+        throw new MyError('You are not part of this contract', HttpStatusCode.FORBIDDEN)
+    }
+    const problematicOrgs = await getNotDiscoverableNodesInContract(ctid, cid)
+    let fixedNodes = 0
+    for (const org of problematicOrgs) {
+        // get commid
+        const commid = (await CommunityModel._getPartnershipByCids(cid, org.cid)).commId
+        for (const node of org.nodes) {
+            // add node to community/partnership
+            await CommunityService.addNode(commid, cid, node)
+            fixedNodes += 1
+        }
+    }
+    return fixedNodes
 }
 
 // Private 

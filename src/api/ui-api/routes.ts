@@ -132,6 +132,8 @@ UiRouter
 .put('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OWNER]), validateBody(editItemContractSchema), createAudit(SourceType.CONTRACT), contractsCtrl.editItem)
 .delete('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeItem)
 .delete('/contract/:ctid/items/:cid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeAllCompanyItems)
+.get('/contract/:ctid/nodes/is-discoverable', addOrigin(Interfaces.UI), jwt(), contractsCtrl.checkNodesSharing)
+.put('/contract/:ctid/nodes/make-discoverable',addOrigin(Interfaces.UI), jwt(), contractsCtrl.fixNodeSharing)
 
 // COMMUNITIES
 .get('/communities/', addOrigin(Interfaces.UI), jwt(), communitiesCtrl.getCommunities)

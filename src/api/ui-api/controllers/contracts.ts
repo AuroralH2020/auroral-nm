@@ -19,6 +19,7 @@ import { ContractItemSelect } from '../../../persistance/item/types'
 import { EventType } from '../../../types/misc-types'
 import { NotificationStatus } from '../../../persistance/notification/types'
 import { ItemModel } from '../../../persistance/item/model'
+import { getNotDiscoverableNodesInContract } from '../../../core/contracts'
 
 // Controllers
 
@@ -313,6 +314,36 @@ export const getCompanyItems: getCompanyItemsController = async (req, res) => {
     try {
         const orgItems = await ItemModel._getAllCompanyItemsContractView(decoded.cid ,ctid)
         return responseBuilder(HttpStatusCode.OK, res, null, orgItems)
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.error({ msg: error.message, id: res.locals.reqId })
+        return responseBuilder(error.status, res, error.message)
+    }
+}
+
+type checkNodesSharingController = expressTypes.Controller<{ctid: string}, {}, {}, { cid: string, nodes: string[] } [], localsTypes.ILocals>
+
+export const checkNodesSharing: checkNodesSharingController = async (req, res) => {
+    const { ctid } = req.params
+    const { decoded } = res.locals
+    try {
+        const result =  await getNotDiscoverableNodesInContract(ctid, decoded.cid)
+        return responseBuilder(HttpStatusCode.OK, res, null, result)
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.error({ msg: error.message, id: res.locals.reqId })
+        return responseBuilder(error.status, res, error.message)
+    }
+}
+
+type fixNodeSharingController = expressTypes.Controller<{ ctid: string }, {}, {}, number, localsTypes.ILocals>
+
+export const fixNodeSharing: fixNodeSharingController = async (req, res) => {
+    const { ctid } = req.params
+    const { decoded } = res.locals
+    try {
+        const fixedNodes = await ContractService.fixNotDiscoverableNodesInContract(ctid, decoded.cid)
+        return responseBuilder(HttpStatusCode.OK, res, null, fixedNodes)
     } catch (err) {
         const error = errorHandler(err)
         logger.error({ msg: error.message, id: res.locals.reqId })
