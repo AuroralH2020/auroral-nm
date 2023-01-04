@@ -471,7 +471,7 @@ export const removeItems = async (ctid: string, oids: string[], cid: string, tok
     }
 }
 
-export const getNotDiscoverableNodesInContract = async (ctid: string, cid: string): Promise<{cid: string, nodes: string[]}[]> => {
+export const getNotDiscoverableNodesInContract = async (ctid: string, cid: string): Promise<{cid: string, nodes: string[], name: string}[]> => {
     const sharedNodes = []
     const contract = await ContractModel._getContract(ctid)
     if (!contract.organisations.includes(cid)) {
@@ -488,13 +488,14 @@ export const getNotDiscoverableNodesInContract = async (ctid: string, cid: strin
     for (const remoteOrg of contract.organisations.filter((org) => org !== cid)) {
         // Check if node is shared in partnership
         const partnership = await CommunityModel._getPartnershipByCids(cid, remoteOrg)
-        const nodes = partnership.organisations.filter((org) => org.cid === cid)[0].nodes
-        sharedNodes.push({ cid: remoteOrg, nodes })
+        const remoteOrgObject = partnership.organisations.filter((org) => org.cid === cid)[0]
+        sharedNodes.push({ cid: remoteOrg, nodes: remoteOrgObject.nodes, name: remoteOrgObject.name })
     }
     // Filter out nodes shared in partnership
     const notSharedNodes = sharedNodes.map(org => {
         return {
             cid: org.cid,
+            name: org.name,
             // Array->Set->Array to remove duplicates
             nodes: Array.from(new Set(nodesInContract.filter(node => !org.nodes.includes(node))))
         }
