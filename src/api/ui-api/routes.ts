@@ -151,4 +151,7 @@ UiRouter
 // SEARCH
 .get('/search/global', addOrigin(Interfaces.UI), jwt(), searchCtrl.globalSearch)
 
+// HEALTHCHECK
+.get('/healthcheck', addOrigin(Interfaces.UI), statisticsCtrl.healthcheck)
+
 export { UiRouter }

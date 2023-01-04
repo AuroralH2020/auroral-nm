@@ -321,7 +321,7 @@ export const getCompanyItems: getCompanyItemsController = async (req, res) => {
     }
 }
 
-type checkNodesSharingController = expressTypes.Controller<{ctid: string}, {}, {}, { cid: string, nodes: string[] } [], localsTypes.ILocals>
+type checkNodesSharingController = expressTypes.Controller<{ctid: string}, {}, {}, { cid: string, nodes: string[], name: string } [], localsTypes.ILocals>
 
 export const checkNodesSharing: checkNodesSharingController = async (req, res) => {
     const { ctid } = req.params

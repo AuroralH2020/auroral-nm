@@ -74,3 +74,19 @@ export const sendRecords: sendRecordsController = async (_req, res) => {
 		return responseBuilder(error.status, res, error.message)
 	}
 }
+
+// healthcheck
+
+type healthcheckController = expressTypes.Controller<{}, {}, {}, { status: number }, localsTypes.ILocals>
+
+export const healthcheck: healthcheckController = async (_req, res) => {
+	try {
+		// TBD: add check MongoDB, redis, ...
+		return responseBuilder(HttpStatusCode.OK, res, null, { status: HttpStatusCode.OK })
+	} catch (err)  {
+		const error = errorHandler(err)
+		logger.error(error.message)
+		return responseBuilder(error.status, res, error.message)
+	}
+}
+

@@ -26,6 +26,11 @@ app.set('ip', Config.IP || 'localhost')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
+// Disable x-powered-by
+app.use((_req, res, next) => {
+  res.setHeader('X-Powered-By', 'AURORAL server')
+  next()
+})
 // Trust proxy, accepting only last hop (1)
 app.set('trust proxy', 1)
 
