@@ -32,6 +32,7 @@ ELK_TOKEN='secret_token'
 REDIS_PASSWORD=
 REDIS_HOST=redis://cache-db
 REDIS_PORT=6379
+DLT_ENABLED=false
 DLT_INTROSPECTION_USER=dlt_introspection
 DLT_INTROSPECTION_PASSWORD=changeme
 DLT_AUTH_URL=http://auroralvm.dlt.iti.gr:80/
