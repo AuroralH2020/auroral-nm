@@ -73,15 +73,15 @@ export interface IRegistrationPost {
     email: string,
     occupation: string,
     password: string, // Use to create hash in account
+    type: RegistrationType,
     // Organisation data
-    // companyId: mongo id,
-    cid: string,
     companyName?: string,
     companyLocation?: string,
     businessId?: string,
-    roles: RolesEnum[],
-    status: RegistrationStatus,
-    type: RegistrationType,
+    // NOT USED - backward compatibility with old UI
+    roles?: RolesEnum[],
+    status?: RegistrationStatus,
+    cid?: string,
 }
 
 export interface IRegistrationDocument extends IRegistration, Document {

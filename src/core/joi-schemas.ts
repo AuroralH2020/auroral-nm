@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import { UserVisibility } from '../persistance/user/types'
-import { RegistrationStatus } from '../persistance/registration/types'
+import { RegistrationStatus, RegistrationType } from '../persistance/registration/types'
 import { ItemStatus, ItemPrivacy, ItemDomainType, ItemType } from '../persistance/item/types'
 import { RolesEnum } from '../types/roles'
 
@@ -18,15 +18,16 @@ export const registrationSchema = Joi.object({
       'string.min': '"password" should have a minimum length of 8',
       'any.required': '"password" is a required field'
     }),
+  type: Joi.string().allow(...Object.values(RegistrationType)).required(),
   occupation: Joi.string().required(),
-  companyName: Joi.string().allow(null, ''), // Not required
-  companyLocation: Joi.string().allow(null, ''), // Not required
-  cid: Joi.string().allow(null, ''), // Required for user only
-  roles: Joi.array().items(Joi.valid(...Object.values(RolesEnum))), // Required for user only
+  companyName: Joi.alternatives().conditional('type', { is: RegistrationType.COMPANY, then: Joi.string().required() }),
+  companyLocation: Joi.alternatives().conditional('type', { is: RegistrationType.COMPANY, then: Joi.string().required() }),
   invitationId: Joi.string().allow(null, ''), // Required for Users only
-  status: Joi.string().required(),
   termsAndConditions: Joi.bool().allow(null, ''), // Added in server + validation in UI
-  type: Joi.string().required()
+  // Not used - backward compatibility
+  roles: Joi.array().optional(), // Added in server
+  status: Joi.string().optional(), // Added in server
+  cid: Joi.string().optional(), // Added in server
 })
 
 export const passwordSchema = Joi.object({

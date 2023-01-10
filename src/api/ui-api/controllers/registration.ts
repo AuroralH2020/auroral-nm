@@ -15,6 +15,7 @@ import { RegistrationService } from '../../../core'
 import { RegistrationModel } from '../../../persistance/registration/model'
 import { UserModel } from '../../../persistance/user/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
+import { InvitationModel } from '../../../persistance/invitation/model'
 
 // Controllers
 
@@ -88,18 +89,13 @@ export const postRegistration: postRegistrationController = async (req, res) => 
 type putRegistrationController = expressTypes.Controller<{ token: string }, { status: RegistrationStatus }, {}, null, localsTypes.ILocals>
  
 export const putRegistration: putRegistrationController = async (req, res) => {
-  const { status } = req.body
+  const { status } = req.body // Not used - backward compatibility
   const { token } = req.params
   const locals = res.locals
 	try {
-    // Organisation verified, registering it...
-    if (status === RegistrationStatus.VERIFIED) {
-      await RegistrationService.registerAfterVerification(status, token, locals)
-    // Invalid status received
-    } else {
-      throw new Error('Wrong registration update request with status: ' + status)
-    }  
-    return responseBuilder(HttpStatusCode.OK, res, null, null)
+      // Organisation verified, registering it...
+      await RegistrationService.registerAfterVerification(RegistrationStatus.VERIFIED, token, locals)
+      return responseBuilder(HttpStatusCode.OK, res, null, null)
 	} catch (err) {
     // Update invitation status to FAILED
     // await InvitationModel._setInvitationStatus(registrationObj.invitationId, InvitationStatus.FAILED)

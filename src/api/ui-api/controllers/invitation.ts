@@ -20,7 +20,6 @@ export const getInvitation: getInvitationController = async (req, res) => {
         try {
                 const data = await InvitationModel._getInvitation(id)
                 // Set invitation as used
-                await InvitationModel._setUsedInvitation(id)
                 return responseBuilder(HttpStatusCode.OK, res, null, data)
         } catch (err) {
                 const error = errorHandler(err)

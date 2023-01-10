@@ -70,24 +70,33 @@ export const registerNewOrganisation = async (data: IRegistrationPost): Promise<
  * @param realm 
  */
 export const registerInvitedUserOrOrganisation = async (data: IRegistrationPost, realm?: string): Promise<void> => {
-    if (!data.cid && data.type === RegistrationType.USER) {
-        throw new MyError('New user needs to have a CID assigned', HttpStatusCode.BAD_REQUEST)
-    }
-      const cid = data.cid ? data.cid : uuidv4()
+      // Check if invitation exists
+      const invitation = await InvitationModel._getInvitation(data.invitationId)
+      // Extract roles from invitation or set default (new org)
+      const roles = invitation.roles ? invitation.roles : [RolesEnum.USER]
+      // Extract cid from invitation or create new (new org)
+      const cid = data.type === RegistrationType.USER ? invitation.sentBy.cid : uuidv4()
+      // Status is PENDING - all of them needs to be verified
+      const status = RegistrationStatus.PENDING
+
       // Initialize account
       const hash = await hashPassword(data.password)
       await AccountModel._createAccount({
         username: data.email,
         passwordHash: hash,
         cid,
-        roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN, RolesEnum.INFRAS_OPERATOR, RolesEnum.SYS_INTEGRATOR] : data.roles
+        roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN, RolesEnum.INFRAS_OPERATOR, RolesEnum.SYS_INTEGRATOR] : roles
       })
       // Create registration obj      
       const pendingDoc = await RegistrationModel._createRegistration({
         ...data,
+        status,
+        cid,
+        roles: data.type === RegistrationType.COMPANY ? [RolesEnum.USER, RolesEnum.ADMIN, RolesEnum.INFRAS_OPERATOR, RolesEnum.SYS_INTEGRATOR] : roles,
         registrationId: uuidv4(),
-        cid
       })
+      // mark invitation as used
+      await InvitationModel._setUsedInvitation(data.invitationId)
       // Generate account validation token
       const token = await signMailToken(pendingDoc.email, 'validate', pendingDoc.registrationId)
       // Notify user by mail
