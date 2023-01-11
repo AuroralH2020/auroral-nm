@@ -23,7 +23,7 @@ const app = express()
 // Express configuration
 app.set('port', Config.PORT || 4000)
 app.set('ip', Config.IP || 'localhost')
-app.use(express.json())
+app.use(express.json({ limit: '1mb' }))
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
 // Disable x-powered-by
