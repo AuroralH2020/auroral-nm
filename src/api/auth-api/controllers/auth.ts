@@ -64,10 +64,7 @@ export const introspection: introspectionController = async (req, res) => {
                 try {
                 // check basic auth included
                 const auth = req.headers.authorization
-                console.log(req.headers)
-                if (1) {
-                        return res.status(200).json({ cid: '904b7c42-7b4b-4637-aa38-e96a55ff4288', email: 'peter.drahovsky@bavenir.eu' })
-                }
+                logger.debug('Introspection request from: ' + req.headers['x-real-ip'])
 
                 if (!auth) {
                         logger.error('Missing basic auth')
