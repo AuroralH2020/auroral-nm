@@ -45,6 +45,16 @@ export interface INode {
     created: number
 }
 
+export type INodeExternal = {
+    agid: string, // ID in Auroral
+    name: string, // Name of Node given by User
+    cid: string, // organisation id in Auroral
+    hasKey: boolean, // Has token auth enabled for the node
+    visible: boolean, // True if is it discoverable in the P2P network
+    defaultOwner: DefaultOwnerType,
+    itemsCount: number, // Count of items (hasItems.length())
+}
+
 export interface INodeUI {
     agid: string, // unique Node id
     name: string,

@@ -7,7 +7,8 @@ import { HttpStatusCode, logger, responseBuilder } from '../../../utils'
 import { verifyHash } from '../../../auth-server/auth-server'
 import { NodeService } from '../../../core'
 import { NodeModel } from '../../../persistance/node/model'
-import { INodeCreate } from '../../../persistance/node/types'
+import { INodeCreate, INodeExternal } from '../../../persistance/node/types'
+import { OrganisationModel } from '../../../persistance/organisation/model'
 
 // EXTERAL USER API
 
@@ -114,6 +115,51 @@ export const createNode: createNodeController = async (req, res) => {
         logger.debug({ msg: 'Creating node using EXT api', id: res.locals.reqId })
         const agid = await NodeService.createOne(eUser.ACL.cid[0], node.name, node.type, node.password, node.pubkey)
         return responseBuilder(HttpStatusCode.OK, res, null, { agid })
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.error({ msg: error.message, id: res.locals.reqId })
+        return responseBuilder(error.status, res, error.message)
+    }
+}
+
+type getNodesController = expressTypes.Controller<{},{ keyid: string, secret: string }, {}, INodeExternal[], localsTypes.ILocals>
+
+export const getNodes: getNodesController = async (req, res) => {
+    const { keyid, secret } = req.body
+    try {
+        const eUser = await ExternalUserModel._getByKeyid(keyid)
+        const isValid = await verifyHash(secret, eUser.secretKey)
+        if (!isValid) {
+            throw new MyError('Invalid secret', HttpStatusCode.UNAUTHORIZED)
+        }
+        // Check if grantType is correct
+        if (!eUser.grantType.includes(GrantType.AP_EDIT)) {
+            throw new MyError('You are not allowed to retrieve nodes', HttpStatusCode.FORBIDDEN)
+        }
+        if (eUser.ACL.cid.length < 1) {
+            throw new MyError('Your token is missing cid', HttpStatusCode.FORBIDDEN)
+        }
+        // for each cid in ACL, get all nodes
+        const nodeIds : string[] = []
+        for (const cid of eUser.ACL.cid) {
+            const org = await OrganisationModel._getOrganisation(cid)
+            org.hasNodes.forEach((node) => {
+                nodeIds.push(node)
+            })
+        }
+        const nodes : INodeExternal[]  = await Promise.all(nodeIds.map(async (agid) => {
+            const node = await NodeModel._getNode(agid)
+            return { 
+                agid: node.agid,
+                name: node.name,
+                cid: node.cid,
+                hasKey: node.hasKey,
+                itemsCount: node.itemsCount,
+                visible: node.visible,
+                defaultOwner: node.defaultOwner
+            }
+        }))
+        return responseBuilder(HttpStatusCode.OK, res, null, nodes)
     } catch (err) {
         const error = errorHandler(err)
         logger.error({ msg: error.message, id: res.locals.reqId })

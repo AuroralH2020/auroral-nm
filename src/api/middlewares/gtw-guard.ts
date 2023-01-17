@@ -10,6 +10,7 @@ import { NodeModel } from '../../persistance/node/model'
 import { Controller } from '../../types/express-types'
 import { ILocalsGtw } from '../../types/locals-types'
 import { logger } from '../../utils/logger'
+import { HttpStatusCode, responseBuilder } from '../../utils'
 
 // Private functions
 
@@ -49,11 +50,14 @@ export const guard = () => {
             (decoded) => {
                 res.locals.decoded = { ...decoded, agid: info.iss ? info.iss : info.sub }
                 res.locals.token = token
-                next()
-            }
-          ).catch(
+                NodeModel._getNode(agid).then((node) => {
+                  res.locals.decoded!.cid = node.cid
+                  next()
+                })
+            }).catch(
             (err) => {
-                logger.error(`JWT Validation error: ${err.text}`)
+                logger.error('JWT Validation error from ' + req.ip + ' req url: ' + req.originalUrl + ' ' + JSON.stringify(err))
+                logger.debug(token)
                 next()
               }
             )

@@ -14,7 +14,7 @@ export const createDLTContract = async (token: string, contract: IContract): Pro
         const dlt_contract = {
             contract_id: contract.ctid,
             contract_type: contract.type,
-            orgs: contract.organisations,
+            orgs: [...contract.organisations ,...contract.pendingOrganisations],
             items: contract.items.map((item) => {
                 return {
                     object_id: item.oid,
@@ -61,7 +61,7 @@ export const acceptDLTContract = async (token: string, ctid: string): Promise<vo
         return
     }
     try {
-        await dlt.acceptContract('token', ctid)
+        await dlt.acceptContract(token, ctid)
         return
     } catch (err) {
         const error = errorHandler(err)

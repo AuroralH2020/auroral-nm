@@ -244,7 +244,6 @@ export async function signMessage(message: string): Promise<string> {
           }).toString('base64')
     } catch (err) {
         const error = errorHandler(err)
-        logger.error('Failed to sign...', HttpStatusCode.BAD_REQUEST)
         throw new MyError(error.message)
     }
 }

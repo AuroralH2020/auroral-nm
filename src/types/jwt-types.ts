@@ -93,7 +93,7 @@ export type JWTMailToken = {
 export type JWTGatewayToken = {
     iss?: string, // Receive AGID (LEGACY, to be removed and use SUB claim for AGID)
     aud: string, // Only audience claim for gateway is 'NM' (LEGACY - To be updated in future version)
-    cid: string // organisation id - string (@TBD Check that is included or add during GTW code review) ORG -> CID
+    cid: string // Missing in JWT - added in middleware
     // purpose: string // Replaces aud in future versions and aud value changes to 'auroral.bavenir.eu'
     agid: string // Internal use only == sub || iss (To be deprecated)
     email: string // fake email for DLT, AGID@auroral.eu

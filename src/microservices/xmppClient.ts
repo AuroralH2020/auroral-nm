@@ -33,11 +33,14 @@ export const xmpp = {
             try {
                 const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PRIVACY, '')
                 const bodyMessage: {payload: any, signature?: string} = { payload }
-                try {
-                    const signature = await signMessage(JSON.stringify(payload)) 
-                    bodyMessage.signature = signature
-                } catch (error) { 
-                    // Sending without signature 
+                if (Config.NODE_ENV === 'production') {
+                    try {
+                        const signature = await signMessage(JSON.stringify(payload)) 
+                        bodyMessage.signature = signature
+                    } catch (error) { 
+                        logger.error('Failed to sign xmpp message - sending without signature')
+                        // Sending without signature 
+                    }
                 }
                 await request(agid, 'POST', bodyMessage, ApiHeader)
                 logger.debug('XMPP notif [' + XmppNotificationTypes.PRIVACY + '] sent to: ' + agid)
@@ -52,11 +55,14 @@ export const xmpp = {
             try {
                 const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PARTNERS, '')
                 const bodyMessage: {payload: any, signature?: string} = { payload }
-                try {
-                    const signature = await signMessage(JSON.stringify(payload)) 
-                    bodyMessage.signature = signature
-                } catch (error) { 
-                    // Sending without signature 
+                if (Config.NODE_ENV === 'production') {
+                    try {
+                        const signature = await signMessage(JSON.stringify(payload)) 
+                        bodyMessage.signature = signature
+                    } catch (error) { 
+                        logger.error('Failed to sign xmpp message - sending without signature')
+                        // Sending without signature 
+                    }
                 }
                 await request(agid, 'POST', bodyMessage, ApiHeader)
                 logger.debug('XMPP notif [' + XmppNotificationTypes.PARTNERS + '] sent to: ' + agid)
@@ -70,12 +76,15 @@ export const xmpp = {
         try {
             const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_CREATE, JSON.stringify(body))
             const bodyMessage: {payload: any, signature?: string} = { payload }
+            if (Config.NODE_ENV === 'production') {
                 try {
                     const signature = await signMessage(JSON.stringify(payload)) 
                     bodyMessage.signature = signature
                 } catch (error) { 
+                    logger.error('Failed to sign xmpp message - sending without signature')
                     // Sending without signature 
                 }
+            }
             await request(agid, 'POST', bodyMessage, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_CREATE + '] sent to: ' + agid)
         } catch (err) {
@@ -87,12 +96,15 @@ export const xmpp = {
         try {
             const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_REMOVE, JSON.stringify(body))
             const bodyMessage: {payload: any, signature?: string} = { payload }
+            if (Config.NODE_ENV === 'production') {
                 try {
                     const signature = await signMessage(JSON.stringify(payload)) 
                     bodyMessage.signature = signature
                 } catch (error) { 
+                    logger.error('Failed to sign xmpp message - sending without signature')
                     // Sending without signature 
                 }
+            }
             await request(agid, 'POST', bodyMessage, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_REMOVE + '] sent to: ' + agid)
         } catch (err) {
@@ -104,12 +116,15 @@ export const xmpp = {
         try {
             const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_UPDATE, JSON.stringify(body))
             const bodyMessage: {payload: any, signature?: string} = { payload }
+            if (Config.NODE_ENV === 'production') {
                 try {
                     const signature = await signMessage(JSON.stringify(payload)) 
                     bodyMessage.signature = signature
                 } catch (error) { 
+                    logger.error('Failed to sign xmpp message - sending without signature')
                     // Sending without signature 
                 }
+            }
             await request(agid, 'POST', bodyMessage, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_UPDATE + '] sent to: ' + agid)
         } catch (err) {
@@ -121,12 +136,15 @@ export const xmpp = {
         try {
             const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_REMOVE, JSON.stringify(body))
             const bodyMessage: {payload: any, signature?: string} = { payload }
+            if (Config.NODE_ENV === 'production') {
                 try {
                     const signature = await signMessage(JSON.stringify(payload)) 
                     bodyMessage.signature = signature
                 } catch (error) { 
+                    logger.error('Failed to sign xmpp message - sending without signature')
                     // Sending without signature 
                 }
+            }
             await request(agid, 'POST', bodyMessage, ApiHeader)
             logger.debug('XMPP notif [' + XmppNotificationTypes.CONTRACT_ITEM_REMOVE + '] sent to: ' + agid)
         } catch (err) {

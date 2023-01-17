@@ -354,7 +354,7 @@ export const addItem = async (newItem: { ctid: string, oid: string, rw: boolean,
             throw  new MyError('Item is already included in contract', HttpStatusCode.BAD_REQUEST)
         }
         // Add item to contract
-        const contractItem : ContractItemType = { enabled: newItem.enabled, rw: newItem.rw, type: item.type, oid: newItem.oid, cid: item.cid, uid: item.uid, userMail: user.email }
+        const contractItem : ContractItemType = { enabled: newItem.enabled, rw: newItem.rw ? newItem.rw : false, type: item.type, oid: newItem.oid, cid: item.cid, uid: item.uid, userMail: user.email }
         await ContractModel._addItem(newItem.ctid, contractItem)
         // DLT update
         await addDLTContractItem(token, newItem.ctid, contractItem)
