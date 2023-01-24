@@ -13,7 +13,7 @@ export interface CustomResponseObject<L extends {} = {}> extends Response {
 type ControllerReturnType<T> = ApiResponse<T> | Promise<ApiResponse<T>> | ReturnType<NextFunction>
 
 // For now lets just agree to use the interface, latter we can maybe create factory for controllers or something like that
-export interface Controller<ReqParams = {}, ReqBody = {}, ReqQuery = {}, Result = null, ResLocals = {}> {
+export interface Controller<ReqParams extends {}= {}, ReqBody extends {}= {}, ReqQuery extends {}= {}, Result = null, ResLocals extends {}= {}> {
 	(req: CustomRequestObject<ReqParams, ReqBody, ReqQuery>, res: CustomResponseObject<ResLocals>, next: NextFunction): ControllerReturnType<Result>
 }
 
