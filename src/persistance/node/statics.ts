@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid'
-import { INodeDocument, INodeModel, INodeCreatePost, INodeUI, NodeStatus } from './types'
+import { INodeDocument, INodeModel, INodeCreatePost, INodeUI, NodeStatus, VersionsType, NodeInfoType } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
 import { ItemType } from '../../persistance/item/types'
+import { logger } from '../../utils'
 
 export async function getNode(
   this: INodeModel, agid: string, cid?: string
@@ -152,6 +153,16 @@ export async function removeFromCommunity(
   const record = await this.updateOne({ agid }, { $pull: { hasCommunities: commId } }).exec()
   if (!record.ok) {
     throw new Error('Error adding community to node')
+  }
+}
+
+export async function addNodeInfo(
+  this: INodeModel, agid: string, info: NodeInfoType
+): Promise<void> {
+  const record = await this.updateOne({ agid }, {
+     $set: { info } }).exec()
+  if (!record.ok) {
+    logger.error('Error adding versions to node')
   }
 }
 

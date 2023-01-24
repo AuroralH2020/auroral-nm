@@ -134,6 +134,9 @@ const manageRequest = async (endpoint: string, method: Method, json?: JsonType, 
 }
 
 const contractManageRequest = async (endpoint: string, method: Method, json?: JsonType, headers?: Headers, searchParams?: string) => {
+    // console.log('Endpoint: ' + endpoint)
+    // console.log('Method: ' + method)
+    // console.log('Headers: ' + JSON.stringify(headers))
     const response = await contractApi(endpoint, { method, json, headers, searchParams }) as JsonType
     return response.body
 }

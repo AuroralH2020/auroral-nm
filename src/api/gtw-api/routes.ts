@@ -18,6 +18,7 @@ GtwRouter
 .get('/handshake', addOrigin(Interfaces.GATEWAY), guard(), miscCtrl.handshake)
 .get('/counters', addOrigin(Interfaces.GATEWAY), guard(), miscCtrl.getCounters)
 .post('/counters', addOrigin(Interfaces.GATEWAY), guard(), miscCtrl.sendCounters)
+.post('/info', addOrigin(Interfaces.GATEWAY), guard(), miscCtrl.sendNodeInfo)
 .get('/items/:oid', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.neighbourhood)
 .post('/items/register', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), validateBody(createItemSchema), itemsCtrl.registration)
 .post('/items/remove', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), itemsCtrl.deleteItems)

@@ -25,6 +25,15 @@ export type DefaultOwnerTypeUpdate = {
     Marketplace?: string,
 }
 
+export type VersionsType = {
+    agent: string,
+    gtw: string,
+    wot: string,
+}
+
+export type NodeInfoType =  {
+    versions?: VersionsType,
+}
 export interface INode {
     // context: string
     agid: string, // ID in Auroral
@@ -34,6 +43,7 @@ export interface INode {
     // location: string,
     status: NodeStatus,
     defaultOwner: DefaultOwnerType,
+    info?: NodeInfoType,
     visible: boolean, // True if is it discoverable in the P2P network
     hasItems: string[], // Ids of items under the node
     hasCommunities: string[] // Ids of communities where node is part of
@@ -60,6 +70,7 @@ export interface INodeUI {
     name: string,
     cid: string, // unique organisation id
     type: NodeType,
+    info?: NodeInfoType,
     // location: string,
     status: NodeStatus,
     hasItems: string[],
@@ -137,6 +148,11 @@ export interface INodeModel extends Model<INodeDocument> {
     _removeKey: (
         this: INodeModel,
         agid: string
+    ) => Promise<void>
+    _addNodeInfo: (
+        this: INodeModel,
+        agid: string,
+        info: NodeInfoType
     ) => Promise<void>
     _addDefaultOwner: (
         this: INodeModel,

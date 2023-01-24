@@ -155,6 +155,7 @@ export const getNodes: getNodesController = async (req, res) => {
                 cid: node.cid,
                 hasKey: node.hasKey,
                 itemsCount: node.itemsCount,
+                info: node.info,
                 visible: node.visible,
                 defaultOwner: node.defaultOwner
             }

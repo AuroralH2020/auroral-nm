@@ -12,13 +12,14 @@ import { errorHandler } from '../../../utils/error-handler'
 import { signAppToken, verifyToken } from '../../../auth-server/auth-server'
 import { AuroralUserType, JWTAURORALToken } from '../../../types/jwt-types'
 import { ensureUserExistsinDLT } from '../../../core/dlt'
+import { VersionsType } from '../../../persistance/node/types'
 
 // Controllers
 
 // Validate gateway login
 type handshakeController = expressTypes.Controller<{}, {}, {}, string, localsTypes.ILocalsGtw>
  
-export const handshake: handshakeController = async (_req, res) => {
+export const handshake: handshakeController = async (req, res) => {
   const { decoded } = res.locals
 	try {
     // Update -> forbid anonymous access
@@ -92,6 +93,28 @@ export const getCounters: getCountersController = async (_req, res) => {
     logger.error(error.message)
     return responseBuilder(error.status, res, error.message)
 	}
+}
+
+type getNodeInfoController = expressTypes.Controller<{}, { versions: VersionsType }, {}, null, localsTypes.ILocalsGtw>
+
+export const sendNodeInfo: getNodeInfoController = async (req, res) => {
+  const { decoded } = res.locals
+  const { versions } = req.body
+  try {
+    if (decoded) {
+      const agid = decoded.agid
+      await NodeModel._addNodeInfo(agid, { versions })
+      logger.debug('Gateway with id ' + agid + ' stored its info')
+      return responseBuilder(HttpStatusCode.OK, res, null, null)
+    } else {
+      logger.error('Gateway unauthorized access attempt')
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
+    }
+  } catch (err) {
+    const error = errorHandler(err)
+    logger.error(error.message)
+    return responseBuilder(error.status, res, error.message)
+  }
 }
 
 // Private function

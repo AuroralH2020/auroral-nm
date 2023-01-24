@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count, removeDefaultItemOwner, addDefaultItemOwner, addToCommunity, removeFromCommunity, search } from './statics'
+import { getNode, getDoc, createNode, getAllNodes, addItemToNode, removeItemFromNode, getKey, removeKey, count, removeDefaultItemOwner, addDefaultItemOwner, addToCommunity, removeFromCommunity, search, addNodeInfo } from './statics'
 import { updateNode, removeNode } from './methods'
 import { INodeDocument, INodeModel, NodeType, NodeStatus, DefaultOwnerType } from './types'
 
@@ -15,11 +15,24 @@ const DefaultOwnerSchema = new Schema<DefaultOwnerType>({
     _id: false
 })
 
+const VersionsSchema = new Schema({
+    agent: { type: String, required: false },
+    wot: { type: String, required: false },
+    gtw: { type: String, required: false },
+    _id: false
+})
+
+const NodeInfoSchema = new Schema({
+    versions: { type: VersionsSchema, required: false },
+    _id: false
+})
+
 const NodeSchema = new Schema<INodeDocument, INodeModel>({
     agid: { type: String, index: true, required: true }, // unique Node id
     name: { type: String, required: true }, // fullName
     cid: { type: String, required: true }, // unique organisation id
     status: { type: String, default: NodeStatus.ACTIVE, enum: statuses },
+    info: { type: NodeInfoSchema, default: {} } ,
     visible: { type: Boolean, default: true },
     type: { type: String, required: true, enum: nodeTypes },
     // location: String,
@@ -44,6 +57,7 @@ NodeSchema.statics._removeItemFromNode = removeItemFromNode
 NodeSchema.statics._getKey = getKey
 NodeSchema.statics._removeKey = removeKey
 NodeSchema.statics._count = count
+NodeSchema.statics._addNodeInfo = addNodeInfo
 NodeSchema.statics._addDefaultOwner = addDefaultItemOwner
 NodeSchema.statics._removeDefaultOwner = removeDefaultItemOwner
 NodeSchema.statics._addToCommunity = addToCommunity
