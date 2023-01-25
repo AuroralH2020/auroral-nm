@@ -336,7 +336,7 @@ export const logout: logoutController = async (_req, res) => {
                         type: EventType.userLoggedOut,
                         labels: { ...res.locals.audit.labels, status: ResultStatusType.SUCCESS }
                       })
-               return responseBuilder(HttpStatusCode.OK, res, null, 'Logged out')
+               return responseBuilder(HttpStatusCode.OK, res, null, 'Logged out' as string)
         } catch (err) {
                 const error = errorHandler(err)
                 logger.error(error.message)

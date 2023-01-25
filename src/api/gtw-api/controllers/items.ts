@@ -112,7 +112,7 @@ export const registration: registrationController = async (req, res) => {
   }
 }
 
-type neighbourhoodController = expressTypes.Controller<{ oid: string }, {}, {}, csUserRoster | undefined, localsTypes.ILocalsGtw>
+type neighbourhoodController = expressTypes.Controller<{ oid: string }, {}, {}, csUserRoster, localsTypes.ILocalsGtw>
 
 export const neighbourhood: neighbourhoodController = async (req, res) => {
   const { oid } = req.params

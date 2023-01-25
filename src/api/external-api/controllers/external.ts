@@ -53,7 +53,7 @@ export const pushNodePubkey: pushPubkeyController = async (req, res) => {
         // Push pubkey to MongoDB
         logger.debug({ msg: 'Updating node pubkey using EXT api', id: res.locals.reqId })
         await NodeService.updateOne(agid, { key: pubkey })
-        return responseBuilder(HttpStatusCode.OK, res, null, 'Public key updated')
+        return responseBuilder(HttpStatusCode.OK, res, null, 'Public key updated' as string)
     } catch (err) { 
         const error = errorHandler(err)
         logger.error({ msg: error.message, id: res.locals.reqId })
@@ -85,7 +85,7 @@ export const removeNode: removeNodeController = async (req, res) => {
         logger.debug({ msg: 'Removing node using EXT api', id: res.locals.reqId })
 
         await NodeService.removeOne(agid)
-        return responseBuilder(HttpStatusCode.OK, res, null, 'Node removed')
+        return responseBuilder(HttpStatusCode.OK, res, null, 'Node removed' as string)
     } catch (err) {
         const error = errorHandler(err)
         logger.error({ msg: error.message, id: res.locals.reqId })

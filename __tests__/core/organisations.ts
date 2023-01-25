@@ -94,11 +94,11 @@ describe('organisations', () => {
     const spy = jest.spyOn(organisations, 'remove')
     jest.spyOn(UserModel, '_getDoc').mockResolvedValue({ ...user1, _removeUser: async () => {} } as any as IUserDocument)
     jest.spyOn(CommunityModel, '_getPartnershipByCids').mockResolvedValue({ commId: '123' } as any as ICommunity)
-    await organisations.remove({ ...org1, _removeOrganisation: async () => {} } as any as IOrganisationDocument, 'uid', {} as IAuditLocals)
+    await organisations.remove({ ...org1, _removeOrganisation: async () => {} } as any as IOrganisationDocument, 'uid', {} as IAuditLocals,'token')
     await expect(organisations.remove({ ...org1,
      _removeOrganisation: async () => {
         throw new MyError('MOCK',  500)
-      } } as any as IOrganisationDocument, 'uid', {} as IAuditLocals)).rejects.toThrow()
+      } } as any as IOrganisationDocument, 'uid', {} as IAuditLocals,'token')).rejects.toThrow()
     expect(spy).toHaveBeenCalledTimes(2)
   })
 })

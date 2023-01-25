@@ -97,7 +97,7 @@ describe('Contracts', () => {
       jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValue({ ...org1, cid: 'cid2' })
       jest.spyOn(ContractModel, '_createContract').mockResolvedValue(contract1)
       jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
-      await contracts.createOne('cid1', 'uid','terms',['cid2'],{} as any as IAuditLocals)
+      await contracts.createOne({ cid: 'cid1', uid: 'uid',termsAndConditions: 'terms',organisations: ['cid2'] },{} as any as IAuditLocals, 'token')
       expect(spy).toHaveBeenCalledTimes(1)
   })
   it('createOne toFail', async () => {
@@ -105,10 +105,10 @@ describe('Contracts', () => {
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValueOnce(org1)
     jest.spyOn(ContractModel, '_createContract').mockResolvedValue(contract1)
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
-    await expect(contracts.createOne('cid1', 'uid','terms',[],{} as any as IAuditLocals)).rejects.toMatchObject({ status: 400 })
-    await expect(contracts.createOne('cid1', 'uid','terms',['cid1'],{} as any as IAuditLocals)).rejects.toMatchObject({ status: 400 })
+    await expect(contracts.createOne({ cid: 'cid1', uid: 'uid',termsAndConditions: 'terms',organisations: [] },{} as any as IAuditLocals, 'token')).rejects.toMatchObject({ status: 400 })
+    await expect(contracts.createOne({ cid: 'cid1', uid: 'uid',termsAndConditions: 'terms',organisations: ['cid1'] },{} as any as IAuditLocals, 'token')).rejects.toMatchObject({ status: 400 })
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValueOnce({ ...org1, status: OrganisationStatus.DELETED })
-    await expect(contracts.createOne('cid1', 'uid','terms',['cid1'],{} as any as IAuditLocals)).rejects.toMatchObject({ status: 400 })
+    await expect(contracts.createOne({ cid: 'cid1', uid: 'uid',termsAndConditions: 'terms',organisations: ['cid1'] },{} as any as IAuditLocals, 'token')).rejects.toMatchObject({ status: 400 })
     expect(spy).toHaveBeenCalledTimes(3)
   })
   it('updateOne', async () => {
@@ -121,7 +121,7 @@ describe('Contracts', () => {
     await contracts.updateOne('ctid', {})
     expect(spy).toHaveBeenCalledTimes(1)
 })
-  it('updateOne fail', async () => {
+it('updateOne fail', async () => {
     const spy = jest.spyOn(contracts, 'updateOne')
     jest.spyOn(ContractModel, '_createContract').mockResolvedValue(contract1)
     jest.spyOn(ContractModel, '_getDoc').mockResolvedValue({ _updateContract: async () => {
@@ -138,7 +138,7 @@ describe('Contracts', () => {
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValue({ ...org1, cid: 'cid2' })
     jest.spyOn(ContractModel, '_getDoc').mockResolvedValue({ ...contract1, _updateContract: async () => { } } as any as IContractDocument)
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
-    await contracts.removeOrgFromContract('ctid', 'cid', 'uid', {} as any as IAuditLocals)
+    await contracts.removeOrgFromContract('ctid', 'cid', 'uid', {} as any as IAuditLocals, 'token')
     expect(spy).toHaveBeenCalledTimes(1)
 })
   it('removeOrgFromContract - testAfterRemoving', async () => {
@@ -150,7 +150,7 @@ describe('Contracts', () => {
     jest.spyOn(ContractModel, '_getDoc').mockResolvedValue({ ...contract1, organisations: [], pendingOrganisations: [], _updateContract: async () => { }, _removeContract: async () => {} } as any as IContractDocument)
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(cs, 'getGroup').mockResolvedValue({ members: ['asd'] } as any as csGroup)
-    await contracts.removeOrgFromContract('ctid', 'cid', 'uid', {} as any as IAuditLocals)
+    await contracts.removeOrgFromContract('ctid', 'cid', 'uid', {} as any as IAuditLocals, 'token')
     expect(spy).toHaveBeenCalledTimes(1)
   })
   it('rejectContractRequest ', async () => {
@@ -162,11 +162,12 @@ describe('Contracts', () => {
     jest.spyOn(ContractModel, '_getContract').mockResolvedValue({ ...contract1, organisations: ['cid1'], pendingOrganisations: [], _updateStatus: async () => { } } as any as IContractDocument)
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(NotificationModel, '_findNotifications').mockResolvedValue(['123'])
-    await contracts.rejectContractRequest('ctid', 'cid', 'uid', {} as any as IAuditLocals)
+    await contracts.rejectContractRequest('ctid', 'cid', 'uid', {} as any as IAuditLocals, 'token')
     expect(spy).toHaveBeenCalledTimes(1)
   })
   it('rejectContractRequest - testAfterRemoving', async () => {
     const spy = jest.spyOn(contracts, 'rejectContractRequest')
+    jest.spyOn(cs, 'getGroup').mockResolvedValue({ members: ['asd'] } as any as csGroup)
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValueOnce({ ...org1, hasContractRequests: ['ctid'] })
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValue({ ...org1, cid: 'cid2' })
     jest.spyOn(ContractModel, '_getDoc').mockResolvedValueOnce({ ...contract1, organisations: ['cid1'], pendingOrganisations: ['cid2'], _updateStatus: async () => { } } as any as IContractDocument)
@@ -174,7 +175,7 @@ describe('Contracts', () => {
     jest.spyOn(ContractModel, '_getContract').mockResolvedValue({ ...contract1, organisations: [], pendingOrganisations: [], _removeContract: async () => { } } as any as IContractDocument)
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(NotificationModel, '_findNotifications').mockResolvedValue(['123'])
-    await contracts.rejectContractRequest('ctid', 'cid', 'uid', {} as any as IAuditLocals)
+    await contracts.rejectContractRequest('ctid', 'cid', 'uid', {} as any as IAuditLocals, 'token')
     expect(spy).toHaveBeenCalledTimes(1)
   })
   it('acceptContractRequest', async () => {
@@ -185,7 +186,7 @@ describe('Contracts', () => {
     jest.spyOn(ContractModel, '_getDoc').mockResolvedValue({ ...contract1, hasContractRequests: ['cid'], _updateStatus: async () => { } } as any as IContractDocument)
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(NotificationModel, '_findNotifications').mockResolvedValue(['123'])
-    await contracts.acceptContractRequest('ctid', 'cid', 'uid', {} as any as IAuditLocals)
+    await contracts.acceptContractRequest('ctid', 'cid', 'uid', {} as any as IAuditLocals, 'token')
     expect(spy).toHaveBeenCalledTimes(1)
   })
   it('addItem', async () => {
@@ -193,7 +194,7 @@ describe('Contracts', () => {
     jest.spyOn(ItemModel, '_getItem').mockResolvedValue(item1)
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(ContractModel, '_getContract').mockResolvedValue(contract1)
-    await contracts.addItem('ctid', 'oid', true, true)
+    await contracts.addItem({ ctid: 'ctid', oid: 'oid', rw: true, enabled: true }, 'token')
     expect(spy).toHaveBeenCalledTimes(1)
   })
   it('addItem fail', async () => {
@@ -201,9 +202,9 @@ describe('Contracts', () => {
     jest.spyOn(ItemModel, '_getItem').mockResolvedValue({ ...item1, status: ItemStatus.DISABLED })
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(ContractModel, '_getContract').mockResolvedValue({ ...contract1, items: [{ oid: 'oid', enabled: true, rw: true, uid: '123' } as any as ContractItemType] })
-    await expect(contracts.addItem('ctid', 'oid2', true, true)).rejects.toMatchObject({ status: 400 })
+    await expect(contracts.addItem({ ctid: 'ctid', oid: 'oid2',enabled: true, rw: true }, 'token')).rejects.toMatchObject({ status: 400 })
     jest.spyOn(ItemModel, '_getItem').mockResolvedValue({ ...item1 })
-    await expect(contracts.addItem('ctid', 'oid', true, true)).rejects.toMatchObject({ status: 400 })
+    await expect(contracts.addItem({ ctid: 'ctid', oid: 'oid', enabled: true, rw: true }, 'token')).rejects.toMatchObject({ status: 400 })
     expect(spy).toHaveBeenCalledTimes(2)
   })
   it('editItem', async () => {
@@ -212,7 +213,7 @@ describe('Contracts', () => {
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(ContractModel, '_getContract').mockResolvedValue({ ...contract1, items: [{ oid: 'oid', enabled: true, rw: true, uid: '123' } as any as ContractItemType] })
     jest.spyOn(ContractModel, '_getItem').mockResolvedValue({ oid: 'oid', enabled: true, rw: true, uid: '123' } as any as ContractItemType)
-    await contracts.editItem('ctid', 'oid', { rw: false, enabled: false })
+    await contracts.editItem('ctid', 'oid', { rw: true }, 'token')
     expect(spy).toHaveBeenCalledTimes(1)
   })
   it('editItem fail', async () => {
@@ -221,7 +222,7 @@ describe('Contracts', () => {
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
     jest.spyOn(ContractModel, '_getContract').mockResolvedValue({ ...contract1, items: [{ oid: 'oid', enabled: true, rw: true, uid: '123' } as any as ContractItemType] })
     jest.spyOn(ContractModel, '_getItem').mockResolvedValue({ oid: 'oid', enabled: true, rw: true, uid: '123' } as any as ContractItemType)
-    await expect(contracts.editItem('ctid', 'oid', { rw: false, enabled: false })).rejects.toMatchObject({ status: 500 })
+    await expect(contracts.editItem('ctid', 'oid', { rw: false, enabled: false }, 'token')).rejects.toMatchObject({ status: 500 })
 
     expect(spy).toHaveBeenCalledTimes(1)
   })
@@ -232,7 +233,7 @@ describe('Contracts', () => {
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValue({ ...org1, hasNodes: ['agid1'] })
     jest.spyOn(ContractModel, '_getContract').mockResolvedValue({ ...contract1, items: [{ oid: 'oid', enabled: true, rw: true, uid: '123' } as any as ContractItemType] })
     jest.spyOn(ContractModel, '_getContractItems').mockResolvedValue(['oid'])
-    await contracts.removeItems('ctid', ['oid'], 'cid')
+    await contracts.removeItems('ctid', ['oid'], 'cid', 'token')
     expect(spy).toHaveBeenCalledTimes(1)
   })
   it('removeItems fail', async () => {
@@ -242,7 +243,7 @@ describe('Contracts', () => {
     jest.spyOn(OrganisationModel, '_getOrganisation').mockResolvedValue({ ...org1, hasNodes: ['agid1'] })
     jest.spyOn(ContractModel, '_getContract').mockResolvedValue({ ...contract1, items: [{ oid: 'oid', enabled: true, rw: true, uid: '123' } as any as ContractItemType] })
     jest.spyOn(ContractModel, '_getContractItems').mockResolvedValue(['oid'])
-    await expect(contracts.removeItems('ctid', ['not'], 'cid')).rejects.toMatchObject({ status: 400 })
+    await expect(contracts.removeItems('ctid', ['not'], 'cid', 'token')).rejects.toMatchObject({ status: 400 })
 
     expect(spy).toHaveBeenCalledTimes(1)
   })

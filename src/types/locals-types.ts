@@ -28,18 +28,18 @@ export type IAuditLocals = {
     labels: IAuditsLabelsLocals
 }
 
-export interface ILocalsBasic {
+export type ILocalsBasic = Record<string, any> | {
     origin: IOriginLocals
     token: string
     audit: IAuditLocals
     reqId: string
 }
 
-export interface ILocalsGtw extends ILocalsBasic {
+export type ILocalsGtw = Record<string, any> | ILocalsBasic & {
     decoded: JWTGatewayToken | null
 }
 
-export interface ILocals extends ILocalsBasic {
+export type ILocals = Record<string, any> | ILocalsBasic &  {
     roles: RolesEnum[]
     decoded: JWTAURORALToken
 }

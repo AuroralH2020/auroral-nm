@@ -24,7 +24,7 @@ export const handshake: handshakeController = async (req, res) => {
 	try {
     // Update -> forbid anonymous access
     if (!decoded) {
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, 'Gateway unauthorized access attempt')
+      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, 'Gateway unauthorized access attempt' as string)
     }
     const token = await signAppToken(decoded.agid, AuroralUserType.NODE)
     const response = {
