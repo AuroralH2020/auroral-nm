@@ -90,8 +90,8 @@ export const introspection: introspectionController = async (req, res) => {
                                 error_description: 'Missing token for introspection'
                         })
                 }
-        
-                const decoded = await AuroralToken.verify(token)
+                // Check if token starts with 'Bearer'
+                const decoded =  token.startsWith('Bearer') ? await AuroralToken.verify(token.substring(7)) : await AuroralToken.verify(token)
                 if (await tokenBlacklist.checkInBlacklist(decoded.sub, token)) {
                         logger.error('Token is blacklisted or inactive')
                         return res.status(401).json({
