@@ -174,10 +174,19 @@ export async function search(
       '$match': {
         'cid': cid,
         'status': { '$ne': NodeStatus.DELETED },
-        'name': {
-          '$regex': text,
-          '$options': 'i'
-        }
+        '$or': [
+          {
+            'name': {
+              '$regex': text,
+              '$options': 'i'
+            }
+          }, {
+            'agid': {
+              '$regex': text,
+              '$options': 'i'
+            }
+          }
+        ]
       }
     }, {
       '$project': {

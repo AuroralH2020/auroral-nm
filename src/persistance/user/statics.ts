@@ -141,24 +141,38 @@ export async function search(
     const record = await this.aggregate([
       {
         '$match': {
-          '$or': [
+          '$and': [
             {
-              'cid': cid
-            }, 
-            {
-              'cid': {
-                '$in': knows
-              },
-              'accessLevel': {
-                '$ne': 0
-              }
+              '$or': [
+                {
+                  'cid': cid
+                }, 
+                {
+                  'cid': {
+                    '$in': knows
+                  },
+                  'accessLevel': {
+                    '$ne': 0
+                  }
+                }
+              ],
+            }, {
+              '$or': [
+                {
+                  'name': {
+                    '$regex': text,
+                    '$options': 'i'
+                  }
+                }, {
+                  'uid': {
+                    '$regex': text,
+                    '$options': 'i'
+                  }
+                }
+              ]
             }
           ],
-          'status': { '$ne': UserStatus.DELETED },
-          'name': {
-            '$regex': text,
-            '$options': 'i'
-          }
+          'status': { '$ne': UserStatus.DELETED },         
         }
       },
       {

@@ -280,10 +280,19 @@ export async function search(
         }
       }, {
         '$match': {
-          'name': {
-            '$regex': text,
-            '$options': 'i'
-          }
+          '$or': [
+            {
+              'name': {
+                '$regex': text,
+                '$options': 'i'
+              }
+            }, {
+              'oid': {
+                '$regex': text,
+                '$options': 'i'
+              }
+            }
+          ]
         }
       }, {
         '$project': {
