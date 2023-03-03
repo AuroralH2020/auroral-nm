@@ -45,7 +45,7 @@ UiRouter
 .delete('/sessions/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.delOne)
 
 // API KEYS
-.post('/api-keys', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN, RolesEnum.DEV_OWNER, RolesEnum.SERV_PROVIDER, RolesEnum.SYS_INTEGRATOR]), externalUsersCtrl.createExternalUser)
+.post('/api-keys', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN, RolesEnum.SYS_INTEGRATOR]), externalUsersCtrl.createExternalUser)
 .get('/api-keys', addOrigin(Interfaces.UI), jwt(), externalUsersCtrl.getExternalUserByCid)
 .delete('/api-keys/:keyid', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), externalUsersCtrl.removeExternalUser)
 
