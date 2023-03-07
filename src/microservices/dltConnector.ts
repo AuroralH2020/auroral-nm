@@ -107,22 +107,22 @@ export const dlt = {
         }
     },
     // User management
-    getUserByMail: async (mail: string): Promise<SmartContractUserType | null> => {
+    getUserByMail: async (token: string, mail: string): Promise<SmartContractUserType | null> => {
         try {
-            const response = await manageRequest('users/' + mail, 'GET', undefined, BasicApiHeader) as unknown as SmartContractUserType
+            const response = await manageRequest('users/' + mail, 'GET', undefined, { ...BasicApiHeader, Authorization: 'Bearer ' + token }) as unknown as SmartContractUserType
             return response
         } catch {
             return null
         }
     },
-    createUser: async (user: { username: string, email: string, password: string, attributes: { cid: string } }): Promise<void> => {
-        await manageRequest('users', 'POST', user, BasicApiHeader)
+    createUser: async (token: string, user: { username: string, email: string, password: string, attributes: { cid: string } }): Promise<void> => {
+        await manageRequest('users', 'POST', user, { ...BasicApiHeader, Authorization: 'Bearer ' + token })
     },
-    acceptUser: async (mail: string): Promise<void> => {
-        await manageRequest('users/' + mail, 'PATCH', {}, BasicApiHeader)
+    acceptUser: async (token: string, mail: string): Promise<void> => {
+        await manageRequest('users/' + mail, 'PATCH', {}, { ...BasicApiHeader, Authorization: 'Bearer ' + token })
     },
-    deleteUser: async (mail: string): Promise<void> => {
-        await manageRequest('users/' + mail, 'DELETE', {}, BasicApiHeader)
+    deleteUser: async (token: string, mail: string): Promise<void> => {
+        await manageRequest('users/' + mail, 'DELETE', {}, { ...BasicApiHeader, Authorization: 'Bearer ' + token })
     }
 
 }

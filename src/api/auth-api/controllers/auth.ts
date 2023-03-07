@@ -36,7 +36,7 @@ export const authenticate: authController = async (req, res) => {
                 const myAccount = await AccountModel._getAccount(username)
                 const myUser = await UserModel._getUser(myAccount.uid)
                 // Ensure that user is registered in DLT
-                await ensureUserExistsinDLT(myAccount.username, myUser.cid, myAccount.username)
+                await ensureUserExistsinDLT(myAccount.username, myUser.cid, myAccount.username, tokens.token)
                 // Login audit
                 await AuditModel._createAudit({
                         ...res.locals.audit,

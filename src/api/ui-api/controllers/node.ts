@@ -146,7 +146,7 @@ export const removeNode: removeNodeController = async (req, res) => {
       throw new MyError('You are not allowed to remove this node', HttpStatusCode.FORBIDDEN)
     }
     // Remove node
-    await NodeService.removeOne(agid, decoded.cid)
+    await NodeService.removeOne(agid, res.locals.token,  decoded.cid)
     // Audit
     await AuditModel._createAudit({
       ...res.locals.audit,

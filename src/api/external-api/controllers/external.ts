@@ -4,11 +4,12 @@ import { ExternalUserModel } from '../../../persistance/externalUsers/model'
 import { ACLObject, GrantType } from '../../../persistance/externalUsers/types'
 import { expressTypes, localsTypes } from '../../../types/index'
 import { HttpStatusCode, logger, responseBuilder } from '../../../utils'
-import { verifyHash } from '../../../auth-server/auth-server'
+import { signAppToken, verifyHash } from '../../../auth-server/auth-server'
 import { NodeService } from '../../../core'
 import { NodeModel } from '../../../persistance/node/model'
 import { INodeCreate, INodeExternal } from '../../../persistance/node/types'
 import { OrganisationModel } from '../../../persistance/organisation/model'
+import { AuroralUserType } from '../../../types/jwt-types'
 
 // EXTERAL USER API
 
@@ -83,8 +84,8 @@ export const removeNode: removeNodeController = async (req, res) => {
         }
         // Remove node from MongoDB
         logger.debug({ msg: 'Removing node using EXT api', id: res.locals.reqId })
-
-        await NodeService.removeOne(agid)
+        const token = await signAppToken(agid, AuroralUserType.NODE)
+        await NodeService.removeOne(agid, token.token)
         return responseBuilder(HttpStatusCode.OK, res, null, 'Node removed' as string)
     } catch (err) {
         const error = errorHandler(err)

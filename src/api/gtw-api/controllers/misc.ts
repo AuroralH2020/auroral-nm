@@ -31,7 +31,7 @@ export const handshake: handshakeController = async (req, res) => {
       ...token,
       exp: ((await verifyToken(token.token)) as unknown as JWTAURORALToken).exp
     }
-    await ensureUserExistsinDLT(`${decoded.agid}@node.auroral.eu`, decoded.cid, `${decoded.agid}@node.auroral.eu`)
+    await ensureUserExistsinDLT(`${decoded.agid}@node.auroral.eu`, decoded.cid, `${decoded.agid}@node.auroral.eu`, token.token)
     return responseBuilder(HttpStatusCode.OK, res, null, JSON.stringify(response))
 	} catch (err) {
     const error = errorHandler(err)

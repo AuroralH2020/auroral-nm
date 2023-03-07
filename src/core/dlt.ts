@@ -119,19 +119,21 @@ export const removeDLTContractItem = async (token: string, ctid: string, oid: st
 
 // User management
 
-export const ensureUserExistsinDLT = async (username: string, cid: string, email: string): Promise<void> => {
+export const ensureUserExistsinDLT = async (username: string, cid: string, email: string, token: string): Promise<void> => {
     if (!Config.DLT.ENABLED) {
         return
     }
     try {
-        const registeredUser = await dlt.getUserByMail(email)
+        const registeredUser = await dlt.getUserByMail(token, email)
+        // console.log(JSON.stringify(registeredUser))
         if (!registeredUser) {
             // user does not exist
-            await dlt.createUser({ username: username, email: email, password: generateSecret(), attributes: { cid } })
-            await dlt.acceptUser(email)
+            logger.debug('DLT user does not exist, creating: ' + email)
+            await dlt.createUser(token, { username: username, email: email, password: generateSecret(), attributes: { cid } })
+            await dlt.acceptUser(token, email)
         } else if (!registeredUser.enabled) {
             // user not accepted yet
-            await dlt.acceptUser(email)
+            await dlt.acceptUser(token, email)
         }
         logger.debug('DLT user validation successful: ' + email)
     } catch (err) {
@@ -140,12 +142,12 @@ export const ensureUserExistsinDLT = async (username: string, cid: string, email
     }
 }
 
-export const deleteUserFromDlt = async (email: string): Promise<void> => {
+export const deleteUserFromDlt = async (email: string, token: string): Promise<void> => {
     if (!Config.DLT.ENABLED) {
         return
     }
     try {
-        await dlt.deleteUser(email)
+        await dlt.deleteUser(token, email)
     } catch (err) {
         // Only log error, do not throw
         const error = errorHandler(err)

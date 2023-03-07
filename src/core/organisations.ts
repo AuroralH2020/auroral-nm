@@ -52,7 +52,7 @@ import { CommunityModel } from '../persistance/community/model'
 
         // 3 - Remove nodes and items
         await Promise.all(organisation.hasNodes.map(async it => {
-                await removeOne(it, cid)
+                await removeOne(it, token, cid)
             })
         )
 

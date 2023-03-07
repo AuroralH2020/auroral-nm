@@ -63,7 +63,7 @@ export const updateOne = async (agid: string, data: INodeUpdate): Promise<void> 
  * @param agid 
  * @param cid Optional: If present _getDoc will validate if agid belongs to organisation
  */
-export const removeOne = async (agid: string, cid?: string): Promise<void> => {
+export const removeOne = async (agid: string,token: string, cid?: string): Promise<void> => {
     try {
         // Get Node
         const node = await NodeModel._getDoc(agid, cid)
@@ -95,7 +95,7 @@ export const removeOne = async (agid: string, cid?: string): Promise<void> => {
         await node._removeNode()
 
         // Remove from DLT
-        await deleteUserFromDlt(`${agid}@auroral.node.eu`)
+        await deleteUserFromDlt(`${agid}@node.auroral.eu`, token)
         // // Remove from nodes group in commServer (Initially public) DEPRECATED
         // await cs.deleteUserFromGroup(node.agid, PUBLIC_NODES)
         // Delete node user from CS

@@ -110,7 +110,7 @@ export const removeUser: removeUserController = async (req, res) => {
                 })
 
                 // Remove user in DLT
-                await deleteUserFromDlt(userDoc.email)
+                await deleteUserFromDlt(userDoc.email, res.locals.token)
                 // remove user in MONGO
                 await AccountModel._deleteAccount(userDoc.email) // Removes user account
                 await userDoc._removeUser() // Marks user as deleted

@@ -20,32 +20,31 @@ import { getMyPubkey } from '../../../auth-server/auth-server'
 
 // Controllers
 
-type deleteAgentController = expressTypes.Controller<{ agid: string }, {}, {}, null, localsTypes.ILocalsGtw>
+// type deleteAgentController = expressTypes.Controller<{ agid: string }, {}, {}, null, localsTypes.ILocalsGtw>
  
-export const deleteAgent: deleteAgentController = async (req, res) => {
-  const { agid } = req.params
-  const { decoded } = res.locals
-	try {
-    if (decoded) {
-      // Validate that authorised to remove node
-      const myAgid = decoded.agid
-      if (agid !== myAgid) {
-        throw new Error('You are not authorized to remove this agent ' + agid)
-      }
-      // Remove node
-      await NodeService.removeOne(agid)
-      logger.info('Gateway with id ' + agid + ' was removed')
-      return responseBuilder(HttpStatusCode.OK, res, null, null)
-    } else {
-      logger.error('Gateway unauthorized access attempt')
-      return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
-    }
-	} catch (err) {
-    const error = errorHandler(err)
-		logger.error(error.message)
-		return responseBuilder(error.status, res, error.message)
-	}
-}
+// export const deleteAgent: deleteAgentController = async (req, res) => {
+//   const { agid } = req.params
+//   const { decoded } = res.locals
+// 	try {
+//     if (decoded) {
+//       // Validate that authorised to remove node
+//       const myAgid = decoded.agid
+//       if (agid !== myAgid) {
+//         throw new Error('You are not authorized to remove this agent ' + agid)
+//       }
+//       // Remove node
+//       logger.info('Gateway with id ' + agid + ' was removed')
+//       return responseBuilder(HttpStatusCode.OK, res, null, null)
+//     } else {
+//       logger.error('Gateway unauthorized access attempt')
+//       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
+//     }
+// 	} catch (err) {
+//     const error = errorHandler(err)
+// 		logger.error(error.message)
+// 		return responseBuilder(error.status, res, error.message)
+// 	}
+// }
 
 type getAgentItemsController = expressTypes.Controller<{ agid: string }, {}, {}, string[], localsTypes.ILocalsGtw>
  

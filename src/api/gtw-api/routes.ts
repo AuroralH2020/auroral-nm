@@ -24,7 +24,7 @@ GtwRouter
 .post('/items/remove', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), itemsCtrl.deleteItems)
 .put('/items/modify', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.ITEM), validateBody(updateItemGtwSchema), itemsCtrl.updateItem) // Update item
 .get('/items/agid/:oid', addOrigin(Interfaces.GATEWAY), guard(), itemsCtrl.getAgidByOid) // Get AGID by OID
-.delete('/agent/:agid', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.NODE), agentCtrl.deleteAgent)
+// .delete('/agent/:agid', addOrigin(Interfaces.GATEWAY), guard(), createAudit(SourceType.NODE), agentCtrl.deleteAgent)
 .get('/agent/:agid/items', addOrigin(Interfaces.GATEWAY), guard(),createAudit(SourceType.NODE), agentCtrl.getAgentItems) // change to post if depends on update or use query
 .get('/agent/privacy', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getPrivacy) 
 .get('/agent/cid/:reqid', addOrigin(Interfaces.GATEWAY), guard(), agentCtrl.getCid) 
