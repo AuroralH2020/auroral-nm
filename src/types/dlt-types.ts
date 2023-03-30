@@ -14,8 +14,11 @@ export type SmartContractItemType = {
 export type SmartContractType = {
     contract_id: string
     contract_type: ContractType
+    contract_status: string
     orgs: string[]
     items: SmartContractItemType[]
+    last_updated: string
+    created: string
 }
 
 export type SmartContractUserType = {

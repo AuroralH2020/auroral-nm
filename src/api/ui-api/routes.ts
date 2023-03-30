@@ -120,6 +120,7 @@ UiRouter
 // CONTRACTS
 .get('/contracts/', addOrigin(Interfaces.UI), jwt(), contractsCtrl.getContracts)
 .get('/contract/:ctid', addOrigin(Interfaces.UI), jwt(), contractsCtrl.getContract)
+.get('/contract/dltcheck/:ctid', addOrigin(Interfaces.UI), jwt(), contractsCtrl.checkContractDlt)
 .post('/contract/', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.createContract)
 .put('/contract/:ctid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), validateBody(editContractSchema), createAudit(SourceType.CONTRACT), contractsCtrl.editContract)
 .delete('/contract/:ctid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.removeOrgFromContract)

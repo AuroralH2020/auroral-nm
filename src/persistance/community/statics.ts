@@ -33,7 +33,8 @@ export async function getCommunityUI(
         'description': 1, 
         'domain': 1,
         'organisations': 1, 
-        'type': 1
+        'type': 1,
+        'created': 1
       }
     }
   ]).exec()

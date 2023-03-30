@@ -9,6 +9,7 @@ import { NotificationModel } from '../../../persistance/notification/model'
 import { ContractModel } from '../../../persistance/contract/model'
 import { ContractService } from '../../../core'
 import {
+    ContractComparisonType,
     ContractItemType,
     ContractStatus,
     ContractType,
@@ -16,10 +17,11 @@ import {
     IContractUpdate
 } from '../../../persistance/contract/types'
 import { ContractItemSelect } from '../../../persistance/item/types'
-import { EventType } from '../../../types/misc-types'
+import { EventType, JsonType } from '../../../types/misc-types'
 import { NotificationStatus } from '../../../persistance/notification/types'
 import { ItemModel } from '../../../persistance/item/model'
 import { getNotDiscoverableNodesInContract } from '../../../core/contracts'
+import { dlt } from '../../../microservices/dltConnector'
 
 // Controllers
 
@@ -36,6 +38,66 @@ export const getContract: getContractController = async (req, res) => {
             throw new MyError('You are not allowed to view this contract', HttpStatusCode.BAD_REQUEST)
         }
         return responseBuilder(HttpStatusCode.OK, res, null, contract)
+    } catch (err) {
+        const error = errorHandler(err)
+        logger.error({ msg: error.message, id: res.locals.reqId })
+        return responseBuilder(error.status, res, error.message)
+    }
+}
+
+type getContractDltController = expressTypes.Controller<{ ctid: string }, {}, {}, ContractComparisonType, localsTypes.ILocals>
+
+export const checkContractDlt: getContractDltController = async (req, res) => {
+    const { ctid } = req.params
+    const { decoded } = res.locals
+    try {
+        // Get contract from DB
+        const localContract = await ContractModel._getContract(ctid)
+        // Test if org participates
+        if (!((localContract.organisations).includes(decoded.cid)) && !((localContract.pendingOrganisations).includes(decoded.cid))) {
+            throw new MyError('You are not allowed to view this contract', HttpStatusCode.BAD_REQUEST)
+        }
+        
+        // Compare
+        const comparison : ContractComparisonType = {
+            ctid,
+            checks: {
+                contractInDlt: false,
+                orgsMatch: false,
+                itemsMatch: false
+            },
+            dlt: undefined,
+            mongo: { 
+                orgs: localContract.organisations, 
+                status: localContract.status, 
+                items: localContract.items.map(item => item.oid),
+                created: localContract.created,
+                lastUpdated: localContract.lastUpdated
+            }
+         }
+        // check if contract is in DLT
+        const dltContract = await dlt.getContractById(res.locals.token, ctid)
+        // check if contract is in DLT
+        if (dltContract) {
+            comparison.dlt = { 
+                orgs: dltContract.orgs, 
+                status: dltContract.contract_status,
+                items: dltContract.items.map(item => item.object_id),
+                created: Date.parse(dltContract.created),
+                lastUpdated: Date.parse(dltContract.last_updated)
+            }
+            // checks
+            comparison.checks.contractInDlt = true
+            comparison.checks.orgsMatch = comparison.mongo.orgs.sort() !== comparison.dlt.orgs.sort()
+            comparison.checks.itemsMatch = comparison.mongo.items.sort() !== comparison.dlt.items.sort()
+        } else {
+            logger.warn('Contract is not in DLT')
+            // it is not in DLT - set all checks to false
+            comparison.checks.contractInDlt = false
+            comparison.checks.orgsMatch = false
+            comparison.checks.itemsMatch = false
+        }
+        return responseBuilder(HttpStatusCode.OK, res, null, comparison)
     } catch (err) {
         const error = errorHandler(err)
         logger.error({ msg: error.message, id: res.locals.reqId })

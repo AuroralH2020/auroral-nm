@@ -47,9 +47,32 @@ export interface IContractUI extends IContract {
     ctid: string, // Auroral Id
     organisationsWithName: { cid: string, name: string }[], // CIDs of joined organisations  -> organisations pending deleted
     pendingOrganisationsWithName: { cid: string, name: string }[], // CIDs of pending organisations
+    created: number,
     itemsNumber: number, // Items shared under contract
 }
 
+export type ContractComparisonType = {
+    ctid: string,
+    checks: {
+        contractInDlt: boolean,
+        orgsMatch: boolean,
+        itemsMatch: boolean,
+    },
+    mongo: {
+        items: string[],
+        orgs: string[],
+        status: string,
+        created: number,
+        lastUpdated: number
+    },
+    dlt: {
+        items: string[],
+        orgs: string[],
+        status: string,
+        created: number,
+        lastUpdated: number
+    } | undefined
+}
 export interface IContractUpdate {
     description?: string
 }

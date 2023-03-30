@@ -82,6 +82,16 @@ export const dlt = {
             logger.error('DLT contract not rejected: ' + error.message)              
         }
     },
+    getContractById: async (token: string, ctid: string): Promise<SmartContractType | null> => {
+        try {
+            const response =  await contractManageRequest(`contract/${ctid}`, 'GET', undefined, { ...BasicApiHeader, Authorization: 'Bearer ' + token })
+            return response
+        } catch (err) {
+            const error = errorHandler(err)
+            logger.error('DLT contract not found: ' + error.message)
+            return null
+        }
+    },
     addContractItem: async (token: string, ctid: string, item: SmartContractItemType): Promise<void> => {
         try {
             await contractManageRequest('item/add/' + ctid, 'POST', item, { ...BasicApiHeader, Authorization: 'Bearer ' + token })
