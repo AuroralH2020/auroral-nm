@@ -152,7 +152,7 @@ export async function removeFromCommunity(
 ): Promise<void> {
   const record = await this.updateOne({ agid }, { $pull: { hasCommunities: commId } }).exec()
   if (!record.ok) {
-    throw new Error('Error adding community to node')
+    throw new Error('Error removing community from node')
   }
 }
 

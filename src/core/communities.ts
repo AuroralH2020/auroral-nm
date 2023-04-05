@@ -11,6 +11,7 @@ import { CommunityType, ICommunityCreate } from '../persistance/community/types'
 import { NodeModel } from '../persistance/node/model'
 import { OrganisationModel } from '../persistance/organisation/model'
 import { HttpStatusCode } from '../utils'
+import { sendDevNotification } from '../auth-server/mailer'
 
 // Functions
 
@@ -68,6 +69,8 @@ export const createOne = async (data: ICommunityCreate): Promise<void> => {
         // TODO notif?
     } catch (err) {
         const error = errorHandler(err)
+        // Debug this error, already happened once -> Friendship between organisations was removed but Partnership containing one node was not removed
+        await sendDevNotification('Remove community', 'Removing partnership/community after frienship was broken fails. Please check logs' + error.message)
         logger.error(error.message)
         throw error
     }

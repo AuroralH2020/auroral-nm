@@ -45,6 +45,8 @@ docker buildx use multiplatform
 docker buildx build --platform linux/amd64 \
                     --tag ${REGISTRY}/${IMAGE_NAME}:${ENV} \
                     --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+                    --cache-to type=inline \
+                    --cache-from type=registry,ref=${REGISTRY}/${IMAGE_NAME}:${ENV} \
                     -f Dockerfile . --push
 echo Build and publish ended successfully!
 say 'Done!'

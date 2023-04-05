@@ -17,6 +17,8 @@ const TEMP_REJECT_REGISTRATION = fs.readFileSync(Config.HOME_PATH + '/src/auth-s
 const TEMP_INVITE_COMPANY = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/inviteCompany.html', 'utf-8')
 const TEMP_INVITE_USER = fs.readFileSync(Config.HOME_PATH + '/src/auth-server/templates/inviteUser.html', 'utf-8')
 
+const devMail = 'peter.drahovsky@bavenir.eu'
+
 const transporter = nodemailer.createTransport({
     host: Config.SMTP.HOST,
     port: Number(Config.SMTP.PORT),
@@ -95,6 +97,13 @@ export const rejectRegistration = async (username: string, company: string) => {
     }
     const temp = Mustache.render(TEMP_REJECT_REGISTRATION, view)
     sendMail(username, undefined, undefined, temp, subject)
+}
+
+export const sendDevNotification = async (subject: string, message: string) => {
+    subject = '[AUR ' + Config.NODE_ENV + '] ' + subject
+    logger.warn('Sending dev notification: ' + subject)
+    message = 'Some error occured, for witch debugging mail was configured: <br>' + message + '<br> Platform: ' + Config.NODE_ENV + ' <br> Time: ' + new Date().toISOString()  + '<br><br> This is a system generated message, please do not reply. '
+    sendMail(devMail, undefined, undefined, message, subject)
 }
 
 export const invitationMail = async (username: string, id: string, type: InvitationType, realm?: string) => {
