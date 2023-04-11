@@ -81,9 +81,10 @@ export const addNode = async (commId: string, cid: string, agid: string): Promis
         // test if community exists
         const organisations = await CommunityModel._getOrganisationsInCommunity(commId)
         const community = await CommunityModel._getCommunityUI(commId)
-
-        // community to node
-        await NodeModel._addToCommunity(agid, commId)
+        // Check if node belongs to organisation
+        if ((await NodeModel._getNode(agid)).cid !== cid) {
+            throw new MyError('Node does not belong to your organisation')
+        }
         if (!organisations.includes(cid)) {
             if (community.type && community.type === CommunityType.PARTNERSHIP) {
                 throw new MyError('Partnerships are realtionships between two organisations. Please use community')
@@ -94,6 +95,8 @@ export const addNode = async (commId: string, cid: string, agid: string): Promis
             // add org to community
             await CommunityModel._addOrganisationToCommunity(commId, { name: org.name, cid: org.cid })
         }
+         // community to node
+        await NodeModel._addToCommunity(agid, commId)
 
         // node to community
         await CommunityModel._addNodeToCommunity(commId, cid, agid)
