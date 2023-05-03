@@ -31,7 +31,7 @@ export const xmpp = {
     notifyPrivacy: async (agid?: string): Promise<void> => {
         if (agid) {
             try {
-                const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PRIVACY, '')
+                const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PRIVACY, {})
                 const bodyMessage: {payload: any, signature?: string} = { payload }
                 if (Config.NODE_ENV === 'production') {
                     try {
@@ -53,7 +53,7 @@ export const xmpp = {
     notifyPartnersChanged: async (agid?: string): Promise<void> => {
         if (agid) {
             try {
-                const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PARTNERS, '')
+                const payload = buildXmppMessageBody(agid, XmppNotificationTypes.PARTNERS, {})
                 const bodyMessage: {payload: any, signature?: string} = { payload }
                 if (Config.NODE_ENV === 'production') {
                     try {
@@ -74,7 +74,7 @@ export const xmpp = {
     },
     notifyContractCreated: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_CREATE, JSON.stringify(body))
+            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_CREATE, body)
             const bodyMessage: {payload: any, signature?: string} = { payload }
             if (Config.NODE_ENV === 'production') {
                 try {
@@ -94,7 +94,7 @@ export const xmpp = {
     },
     notifyContractRemoved: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_REMOVE, JSON.stringify(body))
+            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_REMOVE, body)
             const bodyMessage: {payload: any, signature?: string} = { payload }
             if (Config.NODE_ENV === 'production') {
                 try {
@@ -114,7 +114,7 @@ export const xmpp = {
     },
     notifyContractItemUpdate: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_UPDATE, JSON.stringify(body))
+            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_UPDATE, body)
             const bodyMessage: {payload: any, signature?: string} = { payload }
             if (Config.NODE_ENV === 'production') {
                 try {
@@ -134,7 +134,7 @@ export const xmpp = {
     },
     notifyContractItemRemoved: async (agid: string, body: JsonType): Promise<void> => {
         try {
-            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_REMOVE, JSON.stringify(body))
+            const payload = buildXmppMessageBody(agid, XmppNotificationTypes.CONTRACT_ITEM_REMOVE, body)
             const bodyMessage: {payload: any, signature?: string} = { payload }
             if (Config.NODE_ENV === 'production') {
                 try {
@@ -156,7 +156,7 @@ export const xmpp = {
 
 // PRIVATE FUNCTIONS
 
-const buildXmppMessageBody = function(destinationOid: string, nid: string, body: string) { 
+const buildXmppMessageBody = function(destinationOid: string, nid: string, body: JsonType) { 
     return {
         messageType: 1,
         requestId: 0,
