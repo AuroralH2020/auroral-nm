@@ -15,7 +15,7 @@ import { RegistrationService } from '../../../core'
 import { RegistrationModel } from '../../../persistance/registration/model'
 import { UserModel } from '../../../persistance/user/model'
 import { OrganisationModel } from '../../../persistance/organisation/model'
-import { InvitationModel } from '../../../persistance/invitation/model'
+import { sendDevNotification } from '../../../auth-server/mailer'
 
 // Controllers
 

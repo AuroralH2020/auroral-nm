@@ -11,6 +11,7 @@ import { CommunityType, ICommunityCreate } from '../persistance/community/types'
 import { NodeModel } from '../persistance/node/model'
 import { OrganisationModel } from '../persistance/organisation/model'
 import { HttpStatusCode } from '../utils'
+import { sendDevNotification } from '../auth-server/mailer'
 
 // Functions
 
@@ -68,6 +69,8 @@ export const createOne = async (data: ICommunityCreate): Promise<void> => {
         // TODO notif?
     } catch (err) {
         const error = errorHandler(err)
+        // Debug this error, already happened once -> Friendship between organisations was removed but Partnership containing one node was not removed
+        await sendDevNotification('Remove community', 'Removing partnership/community after frienship was broken fails. Please check logs' + error.message)
         logger.error(error.message)
         throw error
     }
@@ -78,9 +81,10 @@ export const addNode = async (commId: string, cid: string, agid: string): Promis
         // test if community exists
         const organisations = await CommunityModel._getOrganisationsInCommunity(commId)
         const community = await CommunityModel._getCommunityUI(commId)
-
-        // community to node
-        await NodeModel._addToCommunity(agid, commId)
+        // Check if node belongs to organisation
+        if ((await NodeModel._getNode(agid)).cid !== cid) {
+            throw new MyError('Node does not belong to your organisation')
+        }
         if (!organisations.includes(cid)) {
             if (community.type && community.type === CommunityType.PARTNERSHIP) {
                 throw new MyError('Partnerships are realtionships between two organisations. Please use community')
@@ -91,6 +95,8 @@ export const addNode = async (commId: string, cid: string, agid: string): Promis
             // add org to community
             await CommunityModel._addOrganisationToCommunity(commId, { name: org.name, cid: org.cid })
         }
+         // community to node
+        await NodeModel._addToCommunity(agid, commId)
 
         // node to community
         await CommunityModel._addNodeToCommunity(commId, cid, agid)

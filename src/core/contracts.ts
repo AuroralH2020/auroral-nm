@@ -473,6 +473,7 @@ export const removeItems = async (ctid: string, oids: string[], cid: string, tok
 
 export const getNotDiscoverableNodesInContract = async (ctid: string, cid: string): Promise<{cid: string, nodes: string[], name: string}[]> => {
     const sharedNodes = []
+    // get contract
     const contract = await ContractModel._getContract(ctid)
     if (!contract.organisations.includes(cid)) {
         throw new MyError('You are not part of this contract', HttpStatusCode.FORBIDDEN)
@@ -480,7 +481,7 @@ export const getNotDiscoverableNodesInContract = async (ctid: string, cid: strin
     // Nodes owning items in contract 
     const nodesInContract: string[] = []
     for (const item of contract.items) {
-        if (item.enabled) {
+        if (item.cid === cid && item.enabled) {
             nodesInContract.push((await ItemModel._getItem(item.oid)).agid)
         }
     }
@@ -489,10 +490,11 @@ export const getNotDiscoverableNodesInContract = async (ctid: string, cid: strin
         // Check if node is shared in partnership
         const partnership = await CommunityModel._getPartnershipByCids(cid, remoteOrg)
         const remoteOrgObject = partnership.organisations.filter((org) => org.cid === cid)[0]
-        sharedNodes.push({ cid: remoteOrg, nodes: remoteOrgObject.nodes, name: remoteOrgObject.name })
+        // Return CID of org that will gain access to the nodes, name of partnership and nodes
+        sharedNodes.push({ cid: remoteOrg, name: partnership.description, nodes: remoteOrgObject.nodes })
     }
     // Filter out nodes shared in partnership
-    const notSharedNodes = sharedNodes.map(org => {
+    const notSharedNodes = Array.from(sharedNodes).map(org => {
         return {
             cid: org.cid,
             name: org.name,
