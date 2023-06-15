@@ -73,15 +73,15 @@ UiRouter
 .put('/organisation/:cid', addOrigin(Interfaces.UI), jwt(), validateBody(updateOrganisationSchema), createAudit(SourceType.ORGANISATION), organisationCtrl.updateOrganisation)
 .delete('/organisation', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN]), createAudit(SourceType.ORGANISATION), organisationCtrl.removeOrganisation)
 // Send friendship request to cid by authenticated user
-.post('/organisation/:cid/friendship/request', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.processFriendRequest)
+.post('/organisation/:cid/friendship/request', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.ORGANISATION), friendingCtrl.processFriendRequest)
 // Send friendship request approval to cid from authenticated user
-.post('/organisation/:cid/friendship/accept', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.acceptFriendRequest)
+.post('/organisation/:cid/friendship/accept', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.ORGANISATION), friendingCtrl.acceptFriendRequest)
 // Send friendship request rejection to cid from authenticated user
-.post('/organisation/:cid/friendship/reject', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.rejectFriendRequest)
+.post('/organisation/:cid/friendship/reject', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.ORGANISATION), friendingCtrl.rejectFriendRequest)
 // Send friendship request cancellation to cid from authenticated user
-.post('/organisation/:cid/friendship/cancelRequest', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendRequest)
+.post('/organisation/:cid/friendship/cancelRequest', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendRequest)
 // Send friendship cancellation to cid from authenticated user
-.post('/organisation/:cid/friendship/cancel', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendship)
+.post('/organisation/:cid/friendship/cancel', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.ORGANISATION), friendingCtrl.cancelFriendship)
 
 // USERS
 .get('/user/:uid', addOrigin(Interfaces.UI), jwt(), userCtrl.getOne)
@@ -130,9 +130,9 @@ UiRouter
 .post('/contract/:ctid/reject', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.rejectContract)
 .post('/contract/:ctid/invite', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.inviteOrganisations)
 .post('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt(), createAudit(SourceType.CONTRACT), contractsCtrl.addItem)
-.put('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OWNER]), validateBody(editItemContractSchema), createAudit(SourceType.CONTRACT), contractsCtrl.editItem)
-.delete('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeItem)
-.delete('/contract/:ctid/items/:cid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeAllCompanyItems)
+.put('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OWNER, RolesEnum.SERV_PROVIDER]), validateBody(editItemContractSchema), createAudit(SourceType.CONTRACT), contractsCtrl.editItem)
+.delete('/contract/:ctid/item/:oid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR, RolesEnum.DEV_OWNER, RolesEnum.SERV_PROVIDER]), createAudit(SourceType.CONTRACT), contractsCtrl.removeItem)
+.delete('/contract/:ctid/items/:cid', addOrigin(Interfaces.UI), jwt([RolesEnum.INFRAS_OPERATOR]), createAudit(SourceType.CONTRACT), contractsCtrl.removeAllCompanyItems)
 .get('/contract/:ctid/nodes/is-discoverable', addOrigin(Interfaces.UI), jwt(), contractsCtrl.checkNodesSharing)
 .put('/contract/:ctid/nodes/make-discoverable',addOrigin(Interfaces.UI), jwt(), contractsCtrl.fixNodeSharing)
 

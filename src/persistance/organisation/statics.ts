@@ -362,10 +362,19 @@ export async function count(
       {
         '$match': {
           'status': OrganisationStatus.ACTIVE, 
-          'name': {
-            '$regex': text, 
-            '$options': 'i'
+          '$or': [
+            {
+            'name': {
+              '$regex': text, 
+              '$options': 'i'
+            }
+          },{
+            'cid': {
+              '$regex': text,
+              '$options': 'i'
+            }
           }
+        ]
         }
       },
       {
