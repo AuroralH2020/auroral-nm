@@ -96,5 +96,5 @@ export type JWTGatewayToken = {
     cid: string // Missing in JWT - added in middleware
     // purpose: string // Replaces aud in future versions and aud value changes to 'auroral.bavenir.eu'
     agid: string // Internal use only == sub || iss (To be deprecated)
-    email: string // fake email for DLT, AGID@auroral.eu
+    email: string // fake email for DLT, AGID@node.auroral.eu
 } & JWTRegisteredClaims

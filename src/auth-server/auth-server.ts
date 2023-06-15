@@ -144,7 +144,7 @@ export const signAppToken = async (id: string, whoami: AuroralUserType, ip?: str
         await setSession(user.uid, sessionValue)
     } else if (whoami === AuroralUserType.NODE) {
         const node = await NodeModel._getNode(id)
-        tokenObject.email = `${node.agid}@auroral.eu`
+        tokenObject.email = `${node.agid}@node.auroral.eu`
         tokenObject.cid = node.cid
         tokenObject.origin = AuroralUserType.NODE
         tokenObject.sub = node.agid
