@@ -41,3 +41,4 @@ DLT_MANAGE_HOST=http://auroralvm.dlt.iti.gr
 DLT_MANAGE_PORT=4002
 DLT_CONTRACT_HOST=http://auroralvm.dlt.iti.gr
 DLT_CONTRACT_PORT=3000
+KFK_HOST=https://kfk.jupiter.bavenir.eu/

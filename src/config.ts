@@ -39,6 +39,9 @@ export const Config = {
 			PASSWORD: process.env.DLT_INTROSPECTION_PASSWORD! || 'changeme'
 		}
 	},
+	KFK: {
+		HOST: process.env.KFK_HOST!,
+	},
 	XMPP_CLIENT: {
 		URL: process.env.XMPP_CLIENT_URL!,
 		PASSWORD: process.env.XMPP_PASSWORD || 'changeme',

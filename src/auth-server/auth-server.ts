@@ -45,11 +45,10 @@ if (Config.NODE_ENV === 'test') {
 }
 
 // AUDIENCE Claim values
-const audClaims = ['auroral.bavenir.eu', Config.DLT.AUTH_HOST]
+const audClaims = ['auroral.bavenir.eu', Config.DLT.AUTH_HOST, Config.KFK.HOST]
 
 // PURPOSE Claim values
-const purposeClaims = ['NM', 'refresh', 'validate', 'validatepwd', 'pwdrecovery', 'passwordless', 'DLT_READWRITE', 'DLT_READ']
-
+const purposeClaims = ['NM', 'refresh', 'validate', 'validatepwd', 'pwdrecovery', 'passwordless', 'DLT_READWRITE', 'DLT_READ', 'KFK']
 
 /**
  * Salt and Hash passwords before storing
@@ -148,7 +147,7 @@ export const signAppToken = async (id: string, whoami: AuroralUserType, ip?: str
         tokenObject.cid = node.cid
         tokenObject.origin = AuroralUserType.NODE
         tokenObject.sub = node.agid
-        tokenObject.purpose = purposeClaims[7]
+        tokenObject.purpose = [purposeClaims[7], purposeClaims[8]].toString()
         tokenObject.roles = ''
     } else {
         throw new Error('Invalid Auroral user type')
