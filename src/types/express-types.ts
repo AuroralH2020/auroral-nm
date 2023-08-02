@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Locals } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 export interface CustomRequestObject<P extends {} = {}, B = {} | string | undefined, Q extends {} = {} > extends Request {
 	params: P,
