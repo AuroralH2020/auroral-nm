@@ -112,7 +112,7 @@ export const cs = {
         return request('groups/' + name, 'GET', undefined, ApiHeader) as Promise<csGroup>
     },
     postGroup: async (name: string, description?: string) => {
-        return request('groups', 'POST', { name, description, shared: true }, ApiHeader) as Promise<void>
+        return request('groups', 'POST', { name, description, shared: true, members: [], admins: [] }, ApiHeader) as Promise<void>
     },
     deleteGroup: async (name: string) => {
         return request('groups/' + name, 'DELETE', undefined, ApiHeader) as Promise<void>
