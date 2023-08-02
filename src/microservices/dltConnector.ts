@@ -7,7 +7,7 @@ import { SmartContractItemType, SmartContractType, SmartContractUserType } from 
 
 // API DEFINITIONS
 const contractApi = got.extend({
-    prefixUrl: Config.DLT.CONTRACT_HOST + ':' + Config.DLT.CONTRACT_PORT + '/auroral/acl-test/',
+    prefixUrl: Config.DLT.CONTRACT_HOST + ':' + Config.DLT.CONTRACT_PORT + '/auroral/acl/',
     responseType: 'json',
     isStream: false,
     retry: 2, // Retries on failure N times
