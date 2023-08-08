@@ -134,6 +134,15 @@ export interface IItemUpdate {
     // interactionPatterns: ??[]
 }
 
+export type BrokenItemInfoType = {
+    agid: string,
+    oid: string,
+    cid: string,
+    hasContracts: string[],
+    hasCommunities: string[]
+    status: ItemStatus
+}
+
 // Input update Item from gateway
 export interface IGatewayItemUpdate {
     oid: string,
@@ -229,7 +238,10 @@ export interface IItemModel extends Model<IItemDocument> {
     ) => Promise<ContractItemSelect[]>
     _count: (
         this: IItemModel,
-    ) => Promise<number>
+    ) => Promise<number>,
+    _getBrokenItemsWithoutActiveNode: (
+        this: IItemModel,
+    ) => Promise<BrokenItemInfoType[]>,
     _search: (
         this: IItemModel,
         cid: string,

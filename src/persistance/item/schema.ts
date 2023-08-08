@@ -8,7 +8,7 @@ import {
     removeUserFromItem,
     getByOwner,
     getItemsPrivacy,
-    addContractToItem, removeContractFromItem, removeContractFromCompanyItems, getAllCompanyItemsContractView, count, search, getAllCompanyItems
+    addContractToItem, removeContractFromItem, removeContractFromCompanyItems, getAllCompanyItemsContractView, count, search, getAllCompanyItems, getBrokenItemsWithoutActiveNode
 } from './statics'
 import { updateItem, removeItem } from './methods'
 import { IItemDocument, IItemModel, ItemType, ItemStatus, ItemPrivacy, ItemLabelsObj, ItemDomainType } from './types'
@@ -62,6 +62,7 @@ ItemSchema.statics._addContract = addContractToItem
 ItemSchema.statics._removeContract = removeContractFromItem
 ItemSchema.statics._removeContractFromCompanyItems = removeContractFromCompanyItems
 ItemSchema.statics._getAllCompanyItemsContractView = getAllCompanyItemsContractView
+ItemSchema.statics._getBrokenItemsWithoutActiveNode = getBrokenItemsWithoutActiveNode
 ItemSchema.statics._search = search
 
 // Methods

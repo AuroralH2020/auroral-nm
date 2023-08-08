@@ -18,6 +18,7 @@ import * as itemsCtrl from './controllers/items'
 import * as contractsCtrl from './controllers/contracts'
 import * as communitiesCtrl from './controllers/communities'
 import * as externalUsersCtrl from './controllers/externalUsers'
+import * as consistencyCtrl from './controllers/consistency'
 
 // Types
 import { Interfaces } from '../../types/locals-types'
@@ -39,10 +40,13 @@ import {
 const UiRouter = Router()
 
 UiRouter
+// ADMIN
 // SESSIONS
 .get('/sessions/all/:cursor', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getAll)
 .get('/sessions/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.getOne)
 .delete('/sessions/:uid', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), sessionsCtrl.delOne)
+// CONSISTENCY CHECKS
+.get('/consistency/items', addOrigin(Interfaces.UI), jwt([RolesEnum.DEV_OPS]), consistencyCtrl.fixItems)
 
 // API KEYS
 .post('/api-keys', addOrigin(Interfaces.UI), jwt([RolesEnum.ADMIN, RolesEnum.SYS_INTEGRATOR]), externalUsersCtrl.createExternalUser)

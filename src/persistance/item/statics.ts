@@ -7,7 +7,7 @@ import {
   GetAllQuery,
   GetByOwnerQuery,
   IItemPrivacy,
-  ContractItemSelect, ItemPrivacy
+  ContractItemSelect, ItemPrivacy, BrokenItemInfoType
 } from './types'
 import { MyError, ErrorSource } from '../../utils/error-handler'
 import { HttpStatusCode } from '../../utils/http-status-codes'
@@ -256,6 +256,39 @@ export async function getAllCompanyItems(
 export async function count(
 this: IItemModel): Promise<Number> {
   return this.countDocuments({ status: { $ne: ItemStatus.DELETED } }).exec()
+}
+
+export async function getBrokenItemsWithoutActiveNode(
+  this: IItemModel
+): Promise<BrokenItemInfoType[]> {
+  const record = await this.aggregate([
+    { $match: { status: { $ne: 'Deleted' } } },
+    {
+      $project: {
+        _id: 0,
+        cid: 1,
+        agid: 1,
+        oid: 1,
+        status: 1,
+        hasCommunities: 1,
+        hasContracts: 1
+      }
+    },
+    {
+      $lookup: {
+        from: 'nodes',
+        localField: 'agid',
+        foreignField: 'agid',
+        as: 'node'
+      }
+    },
+    { $match: { 'node.status': 'deleted' } },
+    { $project: { node: 0 } }]).exec()
+  if (record) {
+    return record
+  } else {
+    throw new MyError('Items not found', HttpStatusCode.NOT_FOUND, { source: ErrorSource.ITEM })
+  }
 }
 
 export async function search(
