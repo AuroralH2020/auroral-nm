@@ -9,6 +9,8 @@ import { IItem, ItemPrivacy, ItemStatus } from '../../src/persistance/item/types
 import { IOrganisationUI, OrganisationStatus, UISkins } from '../../src/persistance/organisation/types'
 import { IUserUIProfile } from '../../src/persistance/user/types'
 import { OrganisationModel } from '../../src/persistance/organisation/model'
+import { NodeModel } from '../../src/persistance/node/model'
+import { INodeUI } from '../../src/persistance/node/types'
 
 jest.mock('../../src/persistance/organisation/model.ts')
 jest.mock('../../src/persistance/community/model.ts')
@@ -68,6 +70,7 @@ describe('Contracts', () => {
   it('addNode', async () => {
     const spy = jest.spyOn(communities, 'addNode')
     jest.spyOn(CommunityModel, '_getOrganisationsInCommunity').mockResolvedValue(['org1'])
+    jest.spyOn(NodeModel, '_getNode').mockResolvedValue({cid:"org2"} as unknown as INodeUI)
     jest.spyOn(CommunityModel, '_getCommunityUI').mockResolvedValue(community1)
     jest.spyOn(OrganisationModel,'_getOrganisation').mockResolvedValue({ name: 'org1', nodes: ['node1'] } as any as IOrganisationUI)
     const response1 = await communities.addNode('commId1','org2','node2')
