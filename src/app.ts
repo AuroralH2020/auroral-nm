@@ -41,7 +41,10 @@ app.set('trust proxy', 1)
 app.use(accessControl())
 
 const corsOptions = {
-  origin: Config.NODE_ENV === 'development' ? 'https://auroral.dev.bavenir.eu' : 'https://auroral.bavenir.eu',
+  // original
+  // origin: Config.NODE_ENV === 'development' ? 'https://auroral.dev.bavenir.eu' : 'https://auroral.bavenir.eu',
+  origin: Config.NODE_ENV === 'development' ? '*' : 'https://auroral.bavenir.eu',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
  
