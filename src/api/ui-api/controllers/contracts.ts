@@ -77,8 +77,12 @@ export const checkContractDlt: getContractDltController = async (req, res) => {
          }
         // check if contract is in DLT
         const dltContract = await dlt.getContractById(res.locals.token, ctid)
+        
         // check if contract is in DLT
         if (dltContract) {
+            if(!dltContract?.items){
+                dltContract.items = []
+            }
             comparison.dlt = { 
                 orgs: dltContract.orgs, 
                 status: dltContract.contract_status,
