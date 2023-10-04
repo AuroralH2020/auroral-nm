@@ -58,7 +58,7 @@ export const registration: registrationController = async (req, res) => {
     const agid = decoded ? decoded.agid : req.body.agid
     const node = await NodeModel._getNode(agid)
 
-    const itemsToActivate: { oid:string, data:  IItemUpdate, uid: string }[] = []
+    const itemsToActivate: { oid:string, data: IItemUpdate, uid: string }[] = []
     // Async registration of items
     await Promise.all(req.body.items.map(async (it): Promise<boolean> => {
       try {

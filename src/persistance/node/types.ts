@@ -17,6 +17,7 @@ export type DefaultOwnerType = {
     Device: string,
     Service: string,
     Marketplace: string,
+    Dataset: string
 }
 
 export type DefaultOwnerTypeUpdate = {

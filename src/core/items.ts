@@ -24,6 +24,8 @@ import {
 } from '../persistance/item/types'
 import { xmpp } from '../microservices/xmppClient'
 import { ContractModel } from '../persistance/contract/model'
+import { IUserDocument } from '../persistance/user/types'
+import { RolesEnum } from '../types/roles'
 
 // Functions
 
@@ -166,10 +168,12 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
  */
 export const updateOne = async (oid: string, data: IItemUpdate, owner?: string): Promise<void> => {
     try {
+    // Get user
+    const user = owner != null ? await UserModel._getDoc(owner!) : null
     // Get item
         const item = await ItemModel._getDoc(oid)
     // Validate agid provided by agent or uid by UI
-        if (owner != null && owner !== item.agid && owner !== item.uid && item.status !== ItemStatus.DISABLED) {
+        if (owner != null && owner !== item.uid && item.status !== ItemStatus.DISABLED) {
             // logger.error('Cannot update ' + oid + ' because it does not belong to user or agent requester: ' + owner)
             throw new MyError('Item does not belong to requester', HttpStatusCode.FORBIDDEN)
         }
@@ -177,7 +181,18 @@ export const updateOne = async (oid: string, data: IItemUpdate, owner?: string):
         // Check conflicts
         // Authorizations
         // Dependencies
-
+        if (data.status) {
+        // Check roles and User validity
+          if (!user) {
+            throw new MyError('We need valid user to activate item', HttpStatusCode.FORBIDDEN)
+          }  
+          if (user.roles.indexOf(RolesEnum.DEV_OWNER) === -1 && item.type === ItemType.DEVICE) {
+            throw new MyError('We need user with device owner role to activate a device', HttpStatusCode.FORBIDDEN)
+          }
+          if (user.roles.indexOf(RolesEnum.SERV_PROVIDER) === -1 && item.type === ItemType.SERVICE) {
+            throw new MyError('We need user with service provider role to activate a service', HttpStatusCode.FORBIDDEN)
+          }
+        }
         // check conflicts
         await checkBeforeItemUpdate(item.oid, data)
         // Update

@@ -138,11 +138,12 @@ export const updateOne: UpdateOneController = async (req, res) => {
   const data = req.body
   const { decoded } = res.locals
 	try {
+    // Identify user
     await ItemService.updateOne(oid, data, decoded.sub)
     // Send notification to company
     const myOrgName = (await OrganisationModel._getOrganisation(decoded.cid)).name
     const myItemName = (await ItemModel._getItem(oid)).name
-    const myUserName = (await UserModel._getUser(decoded.sub)).name
+    const myUserName = (await UserModel._getDoc(decoded.sub)).name
     let eventType = EventType.itemUpdatedByUser
     if (data.status) { 
       if (data.status === ItemStatus.DISABLED) {

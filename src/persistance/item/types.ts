@@ -4,7 +4,8 @@ import { SearchResult } from '../../types/misc-types'
 export enum ItemType {
     DEVICE = 'Device',
     SERVICE = 'Service',
-    MARKETPLACE = 'Marketplace'
+    MARKETPLACE = 'Marketplace',
+    DATASET = 'Dataset'
 }
 
 export enum ItemStatus {
@@ -27,7 +28,9 @@ export enum ItemDomainType {
     FARMING = 'Farming',
     TOURISM = 'Tourism',
     WEATHER = 'Weather',
-    INDOORQUALITY = 'Indoor quality'
+    INDOORQUALITY = 'Indoor quality',
+    DAIRYFARMING = 'Dairy farming',
+    CIRCULARECONOMY = 'Circular economy'
 }
 
 export type ItemLabelsObj = {
