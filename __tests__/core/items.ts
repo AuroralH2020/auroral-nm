@@ -12,6 +12,7 @@ import { NodeModel } from '../../src/persistance/node/model'
 import { INodeUI, NodeStatus, NodeType } from '../../src/persistance/node/types'
 import { ErrorSource, MyError } from '../../src/utils/error-handler'
 import { csSession } from '../../src/types/cs-types'
+import { RolesEnum } from '../../src/types/roles'
 
 jest.mock('../../src/persistance/organisation/model.ts')
 jest.mock('../../src/persistance/contract/model.ts')
@@ -63,6 +64,7 @@ const org1 = {
 const user1 = {
   name: 'username1',
   email: '1@1.cz',
+  roles: [RolesEnum.SERV_PROVIDER, RolesEnum.DEV_OWNER],
   accessLevel: ItemPrivacy.FOR_FRIENDS
 } as any as IUserUIProfile
 
@@ -143,9 +145,9 @@ describe('Items', () => {
     jest.spyOn(ItemModel, '_getDoc').mockResolvedValue({ ...item1, _updateItem: async () => { } } as unknown as IItemDocument)
     jest.spyOn(ItemModel, '_getItem').mockResolvedValue(item1)
     await items.updateOne('oid',{})
-    await expect(items.updateOne('oid', {},'owner3')).rejects.toMatchObject({ status: 403 })
-    await expect(items.updateOne('oid', { status: ItemStatus.DISABLED },'owner3')).rejects.toMatchObject({ status: 403 })
-    await expect(items.updateOne('oid', { status: ItemStatus.DELETED },'owner3')).rejects.toMatchObject({ status: 403 })
+    await expect(items.updateOne('oid', {},'owner3')).rejects.toMatchObject({ status: 400 })
+    await expect(items.updateOne('oid', { status: ItemStatus.DISABLED },'owner3')).rejects.toMatchObject({ status: 400 })
+    await expect(items.updateOne('oid', { status: ItemStatus.DELETED },'owner3')).rejects.toMatchObject({ status: 400 })
     jest.spyOn(ItemModel, '_getItem').mockResolvedValue({ ...item1, hasContracts: [] })
     jest.spyOn(UserModel, '_getUser').mockResolvedValue(user1)
 

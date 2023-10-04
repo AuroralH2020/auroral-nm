@@ -169,7 +169,7 @@ export const removeOne = async (oid: string, owner?: string): Promise<void> => {
 export const updateOne = async (oid: string, data: IItemUpdate, owner?: string): Promise<void> => {
     try {
     // Get user
-    const user = owner != null ? await UserModel._getDoc(owner!) : null
+    const user = owner != null ? await UserModel._getUser(owner!) : null
     // Get item
         const item = await ItemModel._getDoc(oid)
     // Validate agid provided by agent or uid by UI

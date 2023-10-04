@@ -4,7 +4,7 @@ import { logger } from './utils/logger'
 dotenv.config()
 
 if (process.env.NODE_ENV === 'test') {
-	console.log('Using test configuration...')
+	// console.log('Using test configuration...')
 } else if (
 	!process.env.NODE_ENV || !process.env.IP
 	|| !process.env.PORT
