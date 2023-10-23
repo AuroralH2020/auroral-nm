@@ -20,6 +20,7 @@ const normalConfig = {
 	PORT: process.env.PORT!,
 	SECRET_TOKEN: process.env.SECRET_TOKEN!,
 	SCHEDULER_ENABLED: process.env.SCHEDULER_ENABLED,
+	TRUST_PROXY: process.env.TRUST_PROXY ? process.env.TRUST_PROXY : '1',
 	SESSIONS: {
 		ENABLED: process.env.SESSIONS_ENABLED === 'true' ? true : false,
 		DURATION: process.env.SESSIONS_DURATION ? Number(process.env.SESSION_DURATION) : 7200 // Defaults to 2 hour
@@ -100,6 +101,7 @@ const testConfig = {
 	PORT: '4000',
 	SECRET_TOKEN: '1234',
 	SCHEDULER_ENABLED: false,
+	TRUST_PROXY: '',
 	SESSIONS: {
 		ENABLED:  false,
 		DURATION: 7200 

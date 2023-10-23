@@ -32,7 +32,7 @@ app.use((_req, res, next) => {
   next()
 })
 // Trust proxy, accepting only last hop (1)
-app.set('trust proxy', 1)
+app.set('trust proxy', Config.TRUST_PROXY)
 
 // Basic cors setup
 // app.use(cors())
