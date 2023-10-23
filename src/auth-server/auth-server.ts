@@ -3,6 +3,7 @@ import nodejsCrypto from 'crypto'
 import path from 'path'
 import fs from 'fs'
 import jwt from 'jsonwebtoken'
+import { obscureLastTwoIpOctets } from '../utils/ip'
 import { AccountModel } from '../persistance/account/model'
 import { Config } from '../config'
 import { logger } from '../utils/logger'
@@ -139,7 +140,7 @@ export const signAppToken = async (id: string, whoami: AuroralUserType, ip?: str
                 purposeClaims[7]].toString() 
         tokenObject.roles = user.roles.toString()
         // Set session
-        const sessionValue = user.uid + ':' + id + ':' + tokenObject.iat + ':' + ip
+        const sessionValue = user.uid + ':' + id + ':' + tokenObject.iat + ':' + obscureLastTwoIpOctets(ip)
         await setSession(user.uid, sessionValue)
     } else if (whoami === AuroralUserType.NODE) {
         const node = await NodeModel._getNode(id)
