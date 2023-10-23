@@ -5,13 +5,10 @@ const ipv6_regex =
 export function obscureLastTwoIpOctets(ip: string): string {
   if (ipv4_regex.test(ip)) {
     const split = ip.split('.')
-    split[2] = 'XXXX'
-    split[3] = 'XXXX'
-    return split.join('.')
+    return [split[0], split[1], 'XXXX', 'XXXX'].join('.')
   } else if (ipv6_regex.test(ip)) {
     const split = ip.split(':')
-    const newSpit = [split[0], split[1], split[2], split[3], 'XXXX', 'XXXX', 'XXXX', 'XXXX']
-    return newSpit.join(':')
+    return [split[0], split[1], split[2], split[3], 'XXXX', 'XXXX', 'XXXX', 'XXXX'].join(':')
   }
   return ip
 }
