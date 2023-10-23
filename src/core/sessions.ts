@@ -1,4 +1,5 @@
 import { RedisClientOptions } from 'redis'
+import { obscureLastTwoIpOctets } from '../utils/ip'
 import { RedisFactory } from '../microservices/redisConnector'
 import { Config } from '../config'
 import { logger } from '../utils/logger'
@@ -17,9 +18,22 @@ logger.info('Connected successfully Redis for sessions!!')
 
 // Functions
 
+const _obscureLastTwoIpOctets = (session: string | null): string | null => {
+    if (!session) {
+        return null
+    }
+    const splitSession = session.split(':')
+    const ip = splitSession.at(3)
+    if (ip) {
+        const obscuredIp = obscureLastTwoIpOctets(ip)
+        splitSession[3] = obscuredIp
+    }
+    return splitSession.join(':')
+}
+
 export const getSession = async (key: string): Promise<string | null> => {
     if (Config.SESSIONS.ENABLED) {
-        return redisDb.get(key)
+        return _obscureLastTwoIpOctets(await redisDb.get(key))
     } else {
         return ''
     }
