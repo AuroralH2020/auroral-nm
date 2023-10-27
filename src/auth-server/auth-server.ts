@@ -137,7 +137,7 @@ export const signAppToken = async (id: string, whoami: AuroralUserType, ip?: str
                 purposeClaims[0],
                 whoami === AuroralUserType.UI ? 
                 purposeClaims[6] : 
-                purposeClaims[7]].toString() 
+                purposeClaims[7]].toString()
         tokenObject.roles = user.roles.toString()
         // Set session
         const sessionValue = user.uid + ':' + id + ':' + tokenObject.iat + ':' + obscureLastTwoIpOctets(ip)

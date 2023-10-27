@@ -8,7 +8,7 @@ export function obscureLastTwoIpOctets(ip: string | undefined): string | undefin
   }
   if (ipv4_regex.test(ip)) {
     const split = ip.split('.')
-    return [split[0], split[1], 'XXXX', 'XXXX'].join('.')
+    return [split[0], split[1], 'XXX', 'XXX'].join('.')
   } else if (ipv6_regex.test(ip)) {
     const split = ip.split(':')
     return [split[0], split[1], split[2], split[3], 'XXXX', 'XXXX', 'XXXX', 'XXXX'].join(':')
