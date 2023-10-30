@@ -15,3 +15,17 @@ export function obscureLastTwoIpOctets(ip: string | undefined): string | undefin
   }
   return ip
 }
+
+export function obscureLastIpOctet(ip: string | undefined): string | undefined {
+  if (ip === undefined) {
+    return ip
+  }
+  if (ipv4_regex.test(ip)) {
+    const split = ip.split('.')
+    return [split[0], split[1], split[2], 'XXX'].join('.')
+  } else if (ipv6_regex.test(ip)) {
+    const split = ip.split(':')
+    return [split[0], split[1], split[2], split[3], split[4], split[5], split[6], 'XXXX'].join(':')
+  }
+  return ip
+}
