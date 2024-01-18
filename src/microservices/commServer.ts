@@ -61,15 +61,17 @@ export const cs = {
         logger.info(`Communication server connected, there are ${sessions.localSessions} session(s) active`)
     },
     getSessions: async (username: string): Promise<{ session: csSession[], ttl: number }> => {
-        const uri = 'sessions/' + username
-        const session = await redisDb.getWithTTL(uri)
-        if (!session.value) {
-            const data = await request(uri, 'GET', undefined, ApiHeader) as { sessions: csSession[] }
-            await redisDb.set(uri, JSON.stringify(data), 900)
-            return { session: data.sessions, ttl: 900 }
-        } else {
-            return { session: JSON.parse(session.value).sessions, ttl: session.ttl }
-        }
+        // Feature disabled for openfire version 4.8.0 -> REST API sessions is not working
+        return { session: [], ttl: 0 }
+        // const uri = 'sessions/' + username
+        // const session = await redisDb.getWithTTL(uri)
+        // if (!session.value) {
+        //     const data = await request(uri, 'GET', undefined, ApiHeader) as { sessions: csSession[] }
+        //     await redisDb.set(uri, JSON.stringify(data), 900)
+        //     return { session: data.sessions, ttl: 900 }
+        // } else {
+        //     return { session: JSON.parse(session.value).sessions, ttl: session.ttl }
+        // }
     },
     closeSessions: async (username: string) => {
         return request('sessions/' + username, 'DELETE', undefined, ApiHeader) as Promise<void>
