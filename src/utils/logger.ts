@@ -36,12 +36,14 @@ const options = {
 },
   console: {
     level: 'debug',
+    // level: 'info',
     handleExceptions: true,
     timestamp: true,
     format: combine(
+      format.errors({ stack: true }),
       label({ label: process.env.LOGGER_LABEL }),
       timestamp(),
-      colorize(),
+      // colorize(),
       logFormat
     )
   },
@@ -50,8 +52,8 @@ const options = {
 // instantiate a new Winston Logger with the settings defined above
 export const logger = createLogger({
   transports: [
-    new transports.File(options.file),
-    new transports.File(options.errorfile),
+    // new transports.File(options.file),
+    // new transports.File(options.errorfile),
     new transports.Console(options.console),
   ],
   exitOnError: false, // do not exit on handled exceptions

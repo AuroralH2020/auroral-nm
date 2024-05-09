@@ -97,7 +97,7 @@ export const registration: registrationController = async (req, res) => {
         return false
       }
     }))
-    logger.info('Gateway with id ' + agid + ' registered items')
+    logger.info({ msg: 'Gateway with id ' + agid + ' registered items', id: res.locals.reqId })
     for (const item of itemsToActivate) {
       setTimeout(() => { // enable item in 30seconds
         logger.info('Autoenabling item registered under: ' + agid)

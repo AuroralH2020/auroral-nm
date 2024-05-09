@@ -60,7 +60,7 @@ export const getAgentItems: getAgentItemsController = async (req, res) => {
       const data = (await NodeModel._getNode(agid)).hasItems
       return responseBuilder(HttpStatusCode.OK, res, null, data)
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
 	} catch (err) {
@@ -87,7 +87,7 @@ export const getPartner: getPartnerController = async (req, res) => {
       const org = await OrganisationModel._getOrganisation(cid)
       return responseBuilder(HttpStatusCode.OK, res, null, { nodes: org.hasNodes, name: org.name })
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
   } catch (err) {
@@ -108,7 +108,7 @@ export const getPartners: getPartnersController = async (_req, res) => {
       const knows = (await OrganisationModel._getOrganisation(cid)).knows
       return responseBuilder(HttpStatusCode.OK, res, null, knows)
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
   } catch (err) {
@@ -136,7 +136,7 @@ export const getCid: getCidController = async (req, res) => {
       }
       return responseBuilder(HttpStatusCode.OK, res, null, reqNodeCid)
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
   } catch (err) {
@@ -175,7 +175,7 @@ export const getRelationship: getAgentRelationship = async (req, res) => {
       }
       return responseBuilder(HttpStatusCode.OK, res, null, relation)
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
   } catch (err) {
@@ -195,7 +195,7 @@ export const getPrivacy: getAgentPrivacy = async (_req, res) => {
       const answer = await ItemModel._getItemsPrivacy(myNode.hasItems)
       return responseBuilder(HttpStatusCode.OK, res, null, answer)
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
 	} catch (err) {
@@ -230,7 +230,7 @@ export const getContractedItemsByCid: getContractedItemsByCidCtrl = async (req, 
         return responseBuilder(HttpStatusCode.OK, res, null, response)
       }
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null)
     }
   } catch (err) {
@@ -253,7 +253,7 @@ export const getAgentPubkey: getAgentPubkeyCtrl = async (req, res) => {
     // in case node is asking for pubkey of 'auroral-dev-user' or 'auroral_user_1'
     if (agid.toLowerCase().includes(Config.XMPP_CLIENT.ENVIRONMENT)) {
       if (Config.NODE_ENV === 'development') {
-        logger.warn('Request for platform pubkey in development mode')
+        logger.warn({ msg: 'Request for platform pubkey in development mode', id: res.locals.reqId })
       }
       return responseBuilder(HttpStatusCode.OK, res, null, getMyPubkey())
     }

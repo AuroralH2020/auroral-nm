@@ -46,12 +46,23 @@ import { RolesEnum } from '../types/roles'
         const data = await ItemModel._getAllItems(query, Number(offset))
         // Enrich Data and return
         return Promise.all(data.map(async (it) => {
+            try {
             return {
                 ...it,
                 companyName: cid === it.cid ? myCompanyName : (await OrganisationModel._getOrganisation(it.cid)).name,
                 online: (await cs.getSessions(it.oid)).session.length > 0
+                }
+            } catch (err) {
+                const error = errorHandler(err)
+                logger.warn(`Item ${it.oid}, error retrieving status from CS: ${error.message}`)
+                return {
+                    ...it,
+                    companyName: cid === it.cid ? myCompanyName : (await OrganisationModel._getOrganisation(it.cid)).name,
+                    online: false
+                }
             }
-        }))
+        })
+    )
     } catch (err) {
         throw errorHandler(err)
     }
@@ -75,16 +86,16 @@ import { RolesEnum } from '../types/roles'
         }
         // Get Company
         const company = await OrganisationModel._getOrganisation(data.cid)
-        // Get CS Status
-        const csObject = await cs.getSessions(data.oid)
+        // Get CS Status (Currently not supported by Openfire)
+        // const csObject = await cs.getSessions(data.oid)
         // Get gateway info
         const gateway = await NodeModel._getNode(data.agid)
         // Enrich Data and return
         return {
                 ...data,
                 companyName: company.name,
-                online: csObject.session.length > 0,
-                ttl: csObject.ttl,
+                online: false, // csObject.session.length > 0,
+                ttl: 0, // csObject.ttl,
                 owner,
                 gateway: {
                     name: gateway.name

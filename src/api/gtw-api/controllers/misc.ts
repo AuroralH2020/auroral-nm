@@ -32,6 +32,7 @@ export const handshake: handshakeController = async (req, res) => {
       exp: ((await verifyToken(token.token)) as unknown as JWTAURORALToken).exp
     }
     await ensureUserExistsinDLT(`${decoded.agid}@node.auroral.eu`, decoded.cid, `${decoded.agid}@node.auroral.eu`, token.token)
+    logger.info({ msg: `Gateway ${decoded.agid} handshake successful`, id: res.locals.reqId })
     return responseBuilder(HttpStatusCode.OK, res, null, JSON.stringify(response))
 	} catch (err) {
     const error = errorHandler(err)
@@ -54,10 +55,10 @@ export const sendCounters: sendCountersController = async (req, res) => {
       records.forEach(async (it) => { 
         await RecordModel._createRecord({ ...it, requestType: getType(it.messageType), agid, cid }) 
       })
-      logger.info('Gateway with id ' + agid + ' stored its counters')
+      logger.info({ msg: 'Gateway with id ' + agid + ' stored its counters', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.OK, res, null, null)
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
     }
 	} catch (err) {
@@ -82,10 +83,10 @@ export const getCounters: getCountersController = async (_req, res) => {
       // TBD: Parse query params
       // TBD: Get records ( aggregated records )
       // TBD: Define return type of the controller
-      logger.info('Gateway with id ' + agid + ' retrieved its counter statistics')
+      logger.info({ msg: 'Gateway with id ' + agid + ' retrieved its counter statistics', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.OK, res, null, null)
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
     }
 	} catch (err) {
@@ -104,10 +105,10 @@ export const sendNodeInfo: getNodeInfoController = async (req, res) => {
     if (decoded) {
       const agid = decoded.agid
       await NodeModel._addNodeInfo(agid, { versions })
-      logger.debug('Gateway with id ' + agid + ' stored its info')
+      logger.debug({ msg: 'Gateway with id ' + agid + ' stored its info', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.OK, res, null, null)
     } else {
-      logger.error('Gateway unauthorized access attempt')
+      logger.error({ msg: 'Gateway unauthorized access attempt', id: res.locals.reqId })
       return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, null, null)
     }
   } catch (err) {

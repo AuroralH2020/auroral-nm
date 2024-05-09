@@ -68,16 +68,18 @@ export const jwt = (roles?: RolesEnum[]) => {
                             // }
                             // Blacklisted token check
                             if (await tokenBlacklist.checkInBlacklist(decoded.sub, token)) {
+                                logger.error({ msg: 'Token is blacklisted', id: res.locals.reqId })
                                 return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, 'Token is blacklisted')
                             }
                             return next()
                         } else {
-                            logger.error('Session expired')
+                            logger.error({ msg: 'Session expired', id: res.locals.reqId })
                             return responseBuilder(HttpStatusCode.UNAUTHORIZED, res, decoded.sub + ': Session expired')
                         }
                     }
                 ).catch(() => {
                     // Verify session error block
+                    logger.error({ msg: 'Error retrieving session', id: res.locals.reqId })
                     return responseBuilder(HttpStatusCode.INTERNAL_SERVER_ERROR, res, 'Error retrieving session')
                 })
             }).catch((err1) => {
@@ -89,12 +91,13 @@ export const jwt = (roles?: RolesEnum[]) => {
                     return responseBuilder(error.status, res, error.message)
                 } catch (err) {
                     const finalerror = errorHandler(err)
+                    logger.error({ msg: finalerror.message, id: res.locals.reqId })
                     return responseBuilder(finalerror.status, res, finalerror.message)
                 }
             })     
         } catch (err2) {
             const error = errorHandler(err2)
-            logger.error(error.message)
+            logger.error({ msg: error.message, id: res.locals.reqId })
             return responseBuilder(error.status, res, error.message)
         }
     } as JwtController
